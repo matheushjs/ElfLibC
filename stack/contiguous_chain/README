@@ -1,0 +1,3 @@
+stack_st:
+	stack for simple types, that can be returned from functions entirely, by value.
+	So don't apply for matrixes or complex structs.

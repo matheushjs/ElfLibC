@@ -30,13 +30,14 @@ num_t *num_fread(FILE *stream){
 	} while(isspace(a) || a == '\t');
 	i = DIGITS-1;
 
+	//Parses signal, if there is one.
 	if(a == '-'){
 		res->sig = 1;
 	} else if(isdigit(a)){
 		n->d[i] = a - 48;
 		i--;
 		count++;
-	} else return NULL;
+	} else if(a != '+') return NULL;
 
 	for(; i >= 0; i--){
 		a = fgetc(stream);
@@ -44,10 +45,10 @@ num_t *num_fread(FILE *stream){
 			n->d[i] = a - 48;
 			count++;
 			continue;
-		}
-		if(isblank(a)) continue;
-		if(a == '\n' || a == EOF || a == '\r') break;
-		fprintf(stderr, "Invalid character: %d. To finish typing the number, type a newline.\n", a);
+		} else if(isblank(a)) continue;
+		else if(a == '\n' || a == EOF) break;
+		
+		fprintf(stderr, "Invalid character: '%d'. To finish typing the number, type a newline.\n", a);
 		num_destroy(&n), num_destroy(&res);
 		return NULL;
 	}
@@ -66,6 +67,7 @@ void num_print(num_t *n){
 	printf("\n");
 }
 
+//Compares magnitude of n1 and n2.
 bool mag_equal(num_t *n1, num_t *n2){
 	int i;
 	for(i = 0; i < DIGITS; i++)
@@ -73,11 +75,13 @@ bool mag_equal(num_t *n1, num_t *n2){
 	return TRUE;
 }
 
+//Compares 2 signed numbers n1 and n2.
 bool num_equal(num_t *n1, num_t *n2){
 	if(n1->sig != n2->sig) return FALSE;
 	return mag_equal(n1, n2);
 }
 
+//Compares magnitude of n1 and n2.
 bool mag_higher(num_t *n1, num_t *n2){
 	int i;
 	for(i = DIGITS-1; i >= 0; i--){
@@ -87,6 +91,7 @@ bool mag_higher(num_t *n1, num_t *n2){
 	return FALSE; //caso n1 == n2
 }
 
+//Compares 2 signed numbers n1 and n2.
 bool num_higher(num_t *n1, num_t *n2){
 	if(n1->sig != n2->sig) return n1->sig == 1 ? FALSE : TRUE;
 	if(n1->sig == 0) return mag_higher(n1, n2);
@@ -94,7 +99,7 @@ bool num_higher(num_t *n1, num_t *n2){
 	return mag_higher(n1, n2);
 }
 
-//Sums two positive numbers.
+//Sums magnitude of n1 and n2.
 num_t *mag_sum(num_t *n1, num_t *n2){
 	int i, sum, car = 0;
 	num_t *res = num_create();
@@ -145,7 +150,7 @@ num_t *num_sum(num_t *n1, num_t *n2){
 	return res;
 }
 
-//Subtracts n2 from n1
+//Subtracts n2 from n1. (n1 - n2).
 num_t *num_sub(num_t *n1, num_t *n2){
 	num_t *res;
 	if(n1->sig == 0 && n2->sig == 1) return mag_sum(n1, n2);
@@ -158,6 +163,7 @@ num_t *num_sub(num_t *n1, num_t *n2){
 }
 
 //Multiplies n1 by d
+static	//static until you get rid of sig_overflow.
 num_t *num_scalar_mult(num_t *n1, unsigned char d){
 	int i, car = 0, prod;
 	num_t *res = num_create();

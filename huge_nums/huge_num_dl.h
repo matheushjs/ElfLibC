@@ -29,7 +29,6 @@ num_t *mag_sum(num_t *n1, num_t *n2);
 num_t *mag_sub(num_t *n1, num_t *n2);
 num_t *num_sum(num_t *n1, num_t *n2);
 num_t *num_sub(num_t *n1, num_t *n2);
-num_t *num_scalar_mult(num_t *n1, unsigned char d);
 void num_shift_l(num_t *n1, int offset);
 num_t *num_mult(num_t *n1, num_t *n2);
 num_t *num_div(num_t *n1, num_t *n2);

@@ -42,13 +42,24 @@ static node_t *node_from_data(data_t *data){
 
 
 /*
- * Tree functions
+ * User-layer functions.
  */
+
+//Create tree with 0 nodes.
 tree_t *tree_create(){
 	return (tree_t *) calloc(sizeof(tree_t));
 }
 
-void tree_destroy(){
+//Destroy tree and set it as a NULL pointer.
+void tree_destroy(tree_t **tree){
+}
+
+//Return TRUE if tree is empty.
+bool tree_empty(tree_t *tree){
+}
+
+//Return TRUE if the current position is a node with no children.
+bool tree_is_leaf(tree_t *tree){
 }
 
 //Returns the data at the current position of the given 'tree'.
@@ -61,4 +72,22 @@ bool tree_change_data(tree_t *tree, data_t *data){
 
 //Appends a node to the 'curr' node of the given 'tree'.
 bool tree_add_node(tree_t *tree, bool rightSide){
+}
+
+//Updates the current position to one of the current node's children.
+bool tree_down(tree_t *tree, bool rightSide){
+}
+
+//Updates the current position to the current node's only parent.
+bool tree_up(tree_t *tree){
+}
+
+//Creates a new node with 'data', then set this node as the parent of a new tree,
+//	with children being the parent nodes of 'treeR' and 'treeL'.
+tree_t *tree_merge(tree_t *tree1, tree_t *tree2, data_t *data){
+}
+
+//Moves the current position up to the parent,
+//	then delete the old node recursively.
+bool *tree_delete_branch(tree_t *tree){
 }

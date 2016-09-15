@@ -10,19 +10,13 @@
  * Matheus H. J. Saldanha
  */
 
+#include <stdlib.h>
 #include <string.h>
 #include <tree.h>
 
-//Node structure.
-//Supposed to be hidden from the user.
-typedef struct{
-	node_t *right, *left;
-	data_t data;
-} node_t;
-
 //Creates a node with NULL children and null data.
 static node_t *node_create(){
-	return (node_t *) calloc(sizeof(node_t));
+	return (node_t *) calloc(sizeof(node_t), 1);
 }
 
 //Destroy a node.
@@ -30,6 +24,10 @@ static void node_destroy(node_t **node){
 	if(!node) return;
 	free(*node);
 	*node = NULL;
+}
+
+//Destroy a node recursively.
+static void node_destroy_r(node_t **node){
 }
 
 //Creates a node with NULL children and data_t 'data'.
@@ -47,7 +45,7 @@ static node_t *node_from_data(data_t *data){
 
 //Create tree with 0 nodes.
 tree_t *tree_create(){
-	return (tree_t *) calloc(sizeof(tree_t));
+	return (tree_t *) calloc(sizeof(tree_t), 1);
 }
 
 //Destroy tree and set it as a NULL pointer.

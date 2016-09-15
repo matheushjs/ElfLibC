@@ -14,6 +14,18 @@
 #include <string.h>
 #include <tree.h>
 
+typedef struct tree_node node_t;
+struct tree_node {
+	node_t *right, *left;
+	data_t data;
+};
+
+struct tree_structure {
+	node_t *parent;
+	node_t *curr;
+	int size;
+};
+
 //Creates a node with NULL children and null data.
 static node_t *node_create(){
 	return (node_t *) calloc(sizeof(node_t), 1);

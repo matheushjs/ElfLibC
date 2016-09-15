@@ -1,16 +1,11 @@
-typedef enum {FALSE, TRUE} bool;
+#ifndef _TREE_H
+#define _TREE_H
+
+/* Set the tree data_type here	*/
+/* The declaration of the data_type should be in this file also	*/
 typedef int data_t;
 
-//Node structure.
-//Not supposed to be used by the user.
-typedef struct tree_node node_t;
-struct tree_node {
-	node_t *right, *left;
-	data_t data;
-};
+typedef enum {FALSE, TRUE} bool;
+typedef struct tree_structure tree_t;
 
-typedef struct {
-	node_t *parent;
-	node_t *curr;
-	int size;
-} tree_t;
+#endif

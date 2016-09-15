@@ -6,6 +6,6 @@
 typedef int data_t;
 
 typedef enum {FALSE, TRUE} bool;
-typedef struct tree_struct *tree_t;
+typedef struct tree_struct tree_t;
 
 #endif

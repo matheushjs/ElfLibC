@@ -18,5 +18,6 @@ bool tree_append_data(tree_t *, data_t *, bool);
 bool tree_descend(tree_t *, bool);
 bool tree_rewind(tree_t *);
 void tree_print_curr(tree_t *, void (*)(data_t *));
+void tree_print(tree_t *, void (*)(data_t *));
 
 #endif

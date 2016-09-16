@@ -54,6 +54,21 @@ static node_t *node_from_data(data_t *data){
 	return node;
 }
 
+static void node_print(node_t *node, void (*print)(data_t *)){
+	if(!node) return;
+	print(&node->data);
+}
+
+static void node_print_r(node_t *node, void (*print)(data_t *)){
+	if(!node){ printf(" N "); return; }
+	node_print(node, print);
+	printf(" { ");
+	node_print_r(node->left, print);
+	printf(" ");
+	node_print_r(node->right, print);
+	printf(" } ");
+}
+
 
 /*
  * User-layer functions.
@@ -156,7 +171,11 @@ bool tree_delete_branch(tree_t *tree, bool rightSide){
 }
 
 void tree_print_curr(tree_t *tree, void (*print)(data_t *)){
+	if(tree) node_print(tree->curr, print);
+}
+
+void tree_print(tree_t *tree, void (*print)(data_t *)){
 	if(!tree) return;
-	if(tree_is_empty(tree)) return;
-	print(&tree->curr->data);
+	node_print_r(tree->root, print);
+	printf("\n");
 }

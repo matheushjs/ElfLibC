@@ -3,6 +3,7 @@
 
 int main(int argc, char *argv[]){
 	void print(data_t *data){ printf("%d\n", *data); }
+	void print2(data_t *data){ printf("%d", *data); }
 	data_t data;
 
 	tree_t *tree = tree_create();
@@ -55,6 +56,8 @@ int main(int argc, char *argv[]){
 	tree_print_curr(tree, print);
 
 	if(tree_reached_leaf(tree)) printf("We are on a leaf\n");
+
+	tree_print(tree, print2);
 
 	tree_destroy(&tree);
 	tree_destroy(&tree);

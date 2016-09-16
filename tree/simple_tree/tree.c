@@ -11,10 +11,11 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <tree.h>
 
-#include <stdio.h>
+#define DEBUG(X) fprintf(stderr, "DEBUG:%s:%d: "X"\n", __FILE__, __LINE__);
 
 typedef struct tree_node node_t;
 struct tree_node {
@@ -89,21 +90,21 @@ void tree_destroy(tree_t **tree){
 
 //Return TRUE if tree is empty.
 bool tree_is_empty(tree_t *tree){
-	if(!tree) return FALSE;	//ERROR
+	if(!tree){ DEBUG("NULL pointer received."); return FALSE; }
 	return tree->root == NULL ? TRUE : FALSE;
 }
 
 //Return TRUE if the current position is a node with no children.
 bool tree_reached_leaf(tree_t *tree){
-	if(!tree) return FALSE; //ERROR
-	if(tree_is_empty(tree)) return FALSE;
+	if(!tree){ DEBUG("NULL pointer received."); return FALSE; }
+	if(tree_is_empty(tree)){ DEBUG("Empty tree received."); return FALSE; }
 	return tree->curr->right == NULL && tree->curr->left == NULL ? TRUE : FALSE;
 }
 
 //Returns the data at the current position of the given 'tree'.
 data_t *tree_get_data(tree_t *tree){
-	if(!tree) return NULL; //ERROR
-	if(tree_is_empty(tree)) return NULL;
+	if(!tree){ DEBUG("NULL pointer received"); return NULL; }
+	if(tree_is_empty(tree)){ DEBUG("Empty tree received."); return NULL; }
 	data_t *data = (data_t *) malloc(sizeof(data));
 	memcpy(data, &tree->curr->data, sizeof(data));
 	return data;
@@ -111,20 +112,21 @@ data_t *tree_get_data(tree_t *tree){
 
 //Updates data on current position in 'tree' with 'data'.
 bool tree_change_data(tree_t *tree, data_t *data){
-	if(!tree || !data) return FALSE; //ERROR
-	if(tree_is_empty(tree)) return FALSE;
+	if(!tree || !data){ DEBUG("NULL pointer received."); return FALSE; }
+	if(tree_is_empty(tree)){ DEBUG("Empty tree received."); return FALSE; }
 	memcpy(&tree->curr->data, data, sizeof(data));
 	return TRUE;
 }
 
 //Appends a node to the 'curr' node of the given 'tree'.
+//If the tree is empty, adds that data as the root node.
 bool tree_append_data(tree_t *tree, data_t *data, bool rightSide){
 	node_t *node;
-	if(!tree) return FALSE;
+	if(!tree){ DEBUG("NULL pointer received."); return FALSE; }
 
 	if(data) node = node_from_data(data);
 	else node = (node_t *) calloc(sizeof(node_t), 1);
-	if(!node) return FALSE;
+	if(!node){ DEBUG("Could not allocate memory"); return FALSE; } 
 
 	if(tree_is_empty(tree)){
 		tree->curr = tree->root = node;
@@ -143,8 +145,8 @@ bool tree_append_data(tree_t *tree, data_t *data, bool rightSide){
 
 //Updates the current position to one of the current node's children.
 bool tree_descend(tree_t *tree, bool rightSide){
-	if(!tree) return FALSE;
-	if(tree_is_empty(tree)) return FALSE;
+	if(!tree){ DEBUG("NULL pointer received."); return FALSE; }
+	if(tree_is_empty(tree)){ DEBUG("Empty tree received."); return FALSE; }
 	if(rightSide){
 		if(!tree->curr->right) return FALSE;
 		tree->curr = tree->curr->right;
@@ -157,13 +159,18 @@ bool tree_descend(tree_t *tree, bool rightSide){
 
 //Updates the current position to the root node. 
 bool tree_rewind(tree_t *tree){
-	if(!tree) return FALSE;
+	if(!tree){ DEBUG("NULL pointer received"); return FALSE; } 
 	tree->curr = tree->root;
 }
 
 //Creates a new node with 'data', then set this node as the root of a new tree,
 //	with children being the root nodes of 'treeR' and 'treeL'.
 tree_t *tree_merge(tree_t* treeR, tree_t* treeL, data_t *data){
+	//Create a new root using "data". If "data" is NULL, root will have a ZERO data.
+
+	//If any tree is NULL, return an ERROR.
+	//if any of the trees are empty (NULL root), just ignore that tree (free it though).
+	//if both trees are empty, return the new root. 
 }
 
 //Deletes the branch starting from, but not including, the current node.
@@ -175,7 +182,7 @@ void tree_print_curr(tree_t *tree, void (*print)(data_t *)){
 }
 
 void tree_print(tree_t *tree, void (*print)(data_t *)){
-	if(!tree) return;
+	if(!tree){ printf("nil\n"); return; }
 	node_print_r(tree->root, print);
 	printf("\n");
 }

@@ -6,6 +6,9 @@ int main(int argc, char *argv[]){
 	void print2(data_t *data){ printf("%d", *data); }
 	data_t data;
 
+	printf("Attempting to append node to a NULL tree\n");
+	tree_append_data(NULL, NULL, TRUE);
+
 	tree_t *tree = tree_create();
 	tree_print_curr(tree, print);
 

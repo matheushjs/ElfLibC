@@ -9,7 +9,7 @@ int main(int argc, char *argv[]){
 	printf("Attempting to append node to a NULL tree\n");
 	tree_append_data(NULL, NULL, TRUE);
 
-	tree_t *tree = tree_create();
+	tree_t *tree = tree_alloc();
 	tree_print_curr(tree, print);
 
 	printf("Adding 0 to the right (should just update root)\n");

@@ -76,7 +76,7 @@ static void node_print_r(node_t *node, void (*print)(data_t *)){
  */
 
 //Create tree with 0 nodes.
-tree_t * tree_create(){
+tree_t * tree_alloc(){
 	return (tree_t *) calloc(sizeof(struct tree_struct), 1);
 }
 

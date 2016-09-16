@@ -8,7 +8,7 @@ typedef int data_t;
 typedef enum {FALSE, TRUE} bool;
 typedef struct tree_struct tree_t;
 
-tree_t * tree_create();
+tree_t * tree_alloc();
 void tree_destroy(tree_t **);
 bool tree_is_empty(tree_t *);
 bool tree_reached_leaf(tree_t *);

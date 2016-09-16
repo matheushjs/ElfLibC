@@ -14,6 +14,8 @@
 #include <string.h>
 #include <tree.h>
 
+#include <stdio.h>
+
 typedef struct tree_node node_t;
 struct tree_node {
 	node_t *right, *left;
@@ -21,7 +23,7 @@ struct tree_node {
 };
 
 typedef struct tree_struct {
-	node_t *parent;
+	node_t *root;
 	node_t *curr;
 } tree_t;
 
@@ -65,26 +67,28 @@ tree_t * tree_create(){
 //Destroy tree and set it as a NULL pointer.
 void tree_destroy(tree_t **tree){
 	if(!*tree) return;
-	node_destroy_r(&(*tree)->parent);
+	node_destroy_r(&(*tree)->root);
 	free(*tree);
 	*tree = NULL;
 }
 
 //Return TRUE if tree is empty.
-bool tree_empty(tree_t *tree){
+bool tree_is_empty(tree_t *tree){
 	if(!tree) return FALSE;	//ERROR
-	return tree->parent == NULL ? TRUE : FALSE;
+	return tree->root == NULL ? TRUE : FALSE;
 }
 
 //Return TRUE if the current position is a node with no children.
-bool tree_is_leaf(tree_t *tree){
+bool tree_reached_leaf(tree_t *tree){
 	if(!tree) return FALSE; //ERROR
+	if(tree_is_empty(tree)) return FALSE;
 	return tree->curr->right == NULL && tree->curr->left == NULL ? TRUE : FALSE;
 }
 
 //Returns the data at the current position of the given 'tree'.
 data_t *tree_get_data(tree_t *tree){
 	if(!tree) return NULL; //ERROR
+	if(tree_is_empty(tree)) return NULL;
 	data_t *data = (data_t *) malloc(sizeof(data));
 	memcpy(data, &tree->curr->data, sizeof(data));
 	return data;
@@ -93,51 +97,109 @@ data_t *tree_get_data(tree_t *tree){
 //Updates data on current position in 'tree' with 'data'.
 bool tree_change_data(tree_t *tree, data_t *data){
 	if(!tree || !data) return FALSE; //ERROR
-	memcpy(data, &tree->curr->data, sizeof(data));
+	if(tree_is_empty(tree)) return FALSE;
+	memcpy(&tree->curr->data, data, sizeof(data));
 	return TRUE;
 }
 
 //Appends a node to the 'curr' node of the given 'tree'.
-bool tree_append_node(tree_t *tree, data_t *data, bool rightSide){
-	node_t * node;
+bool tree_append_data(tree_t *tree, data_t *data, bool rightSide){
+	node_t *node;
 	if(!tree) return FALSE;
-	
+
 	if(data) node = node_from_data(data);
 	else node = (node_t *) calloc(sizeof(node_t), 1);
-	
-	if(!node) return FALSE;	
-	
-	if(rightSide) tree->curr->right = node;
-	else tree->curr->left = node;
+	if(!node) return FALSE;
+
+	if(tree_is_empty(tree)){
+		tree->curr = tree->root = node;
+		return TRUE;
+	}
+
+	if(rightSide){
+		node_destroy_r(&tree->curr->right);
+		tree->curr->right = node;
+	} else {
+		node_destroy_r(&tree->curr->left);
+		tree->curr->left = node;
+	}
 	return TRUE;
 }
 
 //Updates the current position to one of the current node's children.
-bool tree_down(tree_t *tree, bool rightSide){
+bool tree_descend(tree_t *tree, bool rightSide){
 	if(!tree) return FALSE;
-	if(rightSide) tree->curr = tree->curr->right;
-	else tree->curr = tree->curr->left;
+	if(tree_is_empty(tree)) return FALSE;
+	if(rightSide){
+		if(!tree->curr->right) return FALSE;
+		tree->curr = tree->curr->right;
+	} else {
+		if(!tree->curr->left) return FALSE;
+		tree->curr = tree->curr->left;
+	}
 	return TRUE;
 }
 
-//Updates the current position to the current node's only parent.
+//Updates the current position to the root node. 
 bool tree_rewind(tree_t *tree){
 	if(!tree) return FALSE;
-	tree->curr = tree->parent;
+	tree->curr = tree->root;
 }
 
-//Creates a new node with 'data', then set this node as the parent of a new tree,
-//	with children being the parent nodes of 'treeR' and 'treeL'.
+//Creates a new node with 'data', then set this node as the root of a new tree,
+//	with children being the root nodes of 'treeR' and 'treeL'.
 tree_t *tree_merge(tree_t* treeR, tree_t* treeL, data_t *data){
 }
 
-//Moves the current position up to the parent,
-//	then delete the old node recursively.
-bool tree_delete_branch(tree_t *tree){
+//Deletes the branch starting from, but not including, the current node.
+bool tree_delete_branch(tree_t *tree, bool rightSide){
 }
 
+void tree_print_curr(tree_t *tree, void (*print)(data_t *)){
+	if(!tree) return;
+	if(tree_is_empty(tree)) return;
+	print(&tree->curr->data);
+}
 
 int main(int argc, char *argv[]){
-	data_t data = 4;
+	void print(data_t *data){ printf("%d\n", *data); }
+	data_t data;
+
+	tree_t *tree = tree_create();
+	tree_print_curr(tree, print);
+
+	printf("Adding 1 to the right (should just update root)\n");
+	data = 1;
+	tree_append_data(tree, &data, TRUE);
+	tree_print_curr(tree, print);
+
+	printf("Attempting to descend right\n");
+	if(!tree_descend(tree, TRUE)) printf("Could not descend\n");
+	else printf("Descended\n");
+
+	printf("Adding 2 to the right\n");
+	data = 2;
+	tree_append_data(tree, &data, TRUE);
+	
+	printf("Attempting to descend right\n");
+	if(!tree_descend(tree, TRUE)) printf("Could not descend\n");
+	else printf("Descended\n");
+	
+	tree_print_curr(tree, print);
+	data = 3;
+	printf("Attempting to change data\n");
+	tree_change_data(tree, &data);
+	tree_print_curr(tree, print);
+
+	printf("Adding 1 to the right\n");
+	data = 1;
+	tree_append_data(tree, &data, TRUE);
+	
+	printf("Attempting to descend right\n");
+	if(!tree_descend(tree, TRUE)) printf("Could not descend\n");
+	else printf("Descended\n");
+	tree_print_curr(tree, print);
+
+	tree_destroy(&tree);
 	return 0;
 }

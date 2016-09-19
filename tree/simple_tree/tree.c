@@ -165,12 +165,24 @@ bool tree_rewind(tree_t *tree){
 
 //Creates a new node with 'data', then set this node as the root of a new tree,
 //	with children being the root nodes of 'treeR' and 'treeL'.
-tree_t *tree_merge(tree_t* treeR, tree_t* treeL, data_t *data){
-	//Create a new root using "data". If "data" is NULL, root will have a ZERO data.
+//Trees being merged are passed by reference to remind the user that they are being freed.
+tree_t *tree_merge(tree_t **treeR, tree_t **treeL, data_t *data){
+	if(!*treeR || !*treeL){ DEBUG("NULL tree received"); return NULL; }
+	tree_t *newTree = tree_alloc();
+	
+	//Creates a new root using "data".
+	//If "data" is NULL, root will have a ZERO data.
+	tree_append_data(newTree, data, TRUE);
 
-	//If any tree is NULL, return an ERROR.
-	//if any of the trees are empty (NULL root), just ignore that tree (free it though).
-	//if both trees are empty, return the new root. 
+	//If any tree is empty (NULL root), newTree will have a NULL corresponding pointer.
+	newTree->root->right = (*treeR)->root;
+	newTree->root->left = (*treeL)->root;
+
+	free(*treeR);
+	free(*treeL);
+	*treeR = NULL;
+	*treeL = NULL;
+	return newTree;
 }
 
 //Deletes the branch starting from, but not including, the current node.

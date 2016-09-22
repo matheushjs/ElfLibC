@@ -3,3 +3,6 @@ all:
 
 debug:
 	valgrind --leak-check=full ./tree
+
+clean:
+	rm -vf *~

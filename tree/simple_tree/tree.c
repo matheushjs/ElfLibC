@@ -188,6 +188,8 @@ tree_t *tree_merge(tree_t **treeR, tree_t **treeL, data_t *data){
 
 //Deletes the branch starting from, but not including, the current node.
 bool tree_delete_branch(tree_t *tree, bool rightSide){
+	if(rightSide) node_destroy_r(&tree->curr->right);
+	else node_destroy_r(&tree->curr->left);
 	return TRUE;
 }
 

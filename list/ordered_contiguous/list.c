@@ -1,9 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
-
-typedef int data_t;
-
-typedef enum {FALSE, TRUE} bool;
+#include <string.h>
+#include <list.h>
 
 typedef struct node_struct node_t;
 struct node_struct {
@@ -11,38 +9,53 @@ struct node_struct {
 	node_t *next;
 };
 
-typedef struct list_struct list_t;
 struct list_struct {
 	node_t *first;
 	int size;
 };
-
-//Should yield TRUE when comparing cmp(first_node, last_node);
-static bool (*cmp)(data_t *, data_t *);
 
 
 /*
  * Node functions
  */
 
-void node_destroy_recursive(node_t *node){
-	node_t *ptr;
-	if(!node) return;
-	do{
-		ptr = node->next;
-		free(node);
-		node = ptr;
-	} while(node);
+node_t *node_alloc(){
+	return (node_t *) calloc(sizeof(node_t), 1);
 }
 
+void node_destroy(node_t **node){
+	if(*node){
+		free(*node);
+		*node = NULL;
+	}
+}
+
+void node_destroy_r(node_t **node){
+	node_t *ptr;
+	if(!*node) return;
+	do{
+		ptr = (*node)->next;
+		node_destroy(node);
+		node = &ptr;
+	} while(*node);
+}
+
+void node_put_data(node_t *node, data_t *data){
+	if(!node) return;
+	memcpy(&node->data, data, sizeof(data_t));
+}
+
+//From 'node', walk forwards 'n' times and retrieve the reached node.
+//Return NULL if out of bounds.
+node_t *node_walk(node_t *node, int n){
+	if(n < 0) return NULL;
+	while(n-- && node) node = node->next;
+	return node;
+}
 
 /*
  * List functions
  */
-
-void list_set_cmp(bool (*function)(data_t *, data_t *)){
-	cmp = function;
-}
 
 list_t *list_alloc(){
 	return (list_t *) calloc(sizeof(list_t), 1);
@@ -50,8 +63,9 @@ list_t *list_alloc(){
 
 void list_destroy(list_t **list){
 	if(*list){
-		node_destroy_recursive((*list)->first);
+		node_destroy_r(&(*list)->first);
 		free(*list);
+		*list = NULL;
 	}
 }
 
@@ -59,27 +73,74 @@ bool list_is_empty(list_t *list){
 	return list->size ? FALSE : TRUE;
 }
 
-void list_insert(list_t *list, data_t *data){
+//cmp() should yield TRUE when comparing cmp(first_node, last_node);
+void list_insert(list_t *list, data_t *data, bool (*cmp)(data_t *, data_t *)){
+	node_t *curr, *prev = NULL;
+	node_t *node;
+
 	if(!list) return;
+	node = node_alloc();
+	node_put_data(node, data);
+
 	if(list_is_empty(list)){
-		//Adds first node
-		return;
+		list->first = node;
 	} else {
-		//Inserts node where it's due.
+		curr = list->first;
+		for(; curr && cmp(&curr->data, data); )
+			prev = curr, curr = curr->next;
+		//Case where insertion happens before first node.
+		if(!prev){
+			node->next = curr;
+			list->first = node;
+		} else {
+			prev->next = node;
+			node->next = curr;
+		}
 	}
+	list->size++;
 }
 
-data_t *list_access(list_t *list, int index){
-
+data_t *list_retrieve(list_t *list, int index){
+	node_t *node;
+	data_t *data;
+	if(!list || list_is_empty(list)) return NULL;
+	node = node_walk(list->first, index);
+	data = (data_t *) malloc(sizeof(data_t));
+	memcpy(data, &node->data, sizeof(data_t));
+	return data;
 }
 
 void list_remove(list_t *list, int index){
 	if(!list) return;
 	if(list_is_empty(list)) return;
+	
+	node_t *node, *aux;
+	if(!index){
+		aux = list->first->next;
+		node_destroy(&list->first);
+		list->first = aux;
+	} else {
+		node = node_walk(list->first, index-1);
+		if(!node) return;	//out of bounds
+		aux = node->next;
+		node->next = aux->next;
+		node_destroy(&aux);
+	}
+	list->size--;
 }
 
-int main(int argc, char *argv[]){
-	bool function(data_t *d1, data_t *d2){ return *d1 < *d2 ? TRUE : FALSE; }
-	list_set_cmp(function);
-	return 0;
+void list_print_r(list_t *list, void (*print)(data_t *)){
+	if(!list) return;
+	node_t *curr = list->first;
+	while(curr){
+		print(&curr->data);
+		printf(" ");
+		curr = curr->next;
+	}
+	printf("\n");
+}
+
+int list_size(list_t *list){
+	if(!list) return -1;
+	return list->size;
 }

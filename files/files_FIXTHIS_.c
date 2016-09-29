@@ -11,7 +11,6 @@
 /*
  * Imprime os valores no arquivo dado, sequencialmente, byte por byte.
  */
-#include <stdio.h>
 void printFileSeq(char *filename){
 	FILE *fp;
 	char c;
@@ -32,9 +31,6 @@ void printFileSeq(char *filename){
 /*
  * Retorna a próxima palavra do arquivo apontado por fp
  */
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
 char *readWord(FILE *fp){
 	int counter = 0;
 	char c, *s = NULL;
@@ -100,9 +96,6 @@ char *readWord(FILE *fp, const char *sep){
  * Retorna o próximo número inteiro do arquivo, em variável int.
  * Retorna 0 caso falhe.
  */
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
 int readInt(FILE *fp){
 	int result;
 	char c;
@@ -126,9 +119,6 @@ int readInt(FILE *fp){
  * Retorna o próximo número real do arquivo, com precisão float.
  * Retorna 0 caso não haja nenhum.
  */
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
 float readFloat(FILE *fp){
 	float result;
 	char c;
@@ -151,8 +141,6 @@ float readFloat(FILE *fp){
 /*
  * Retorna a próxima linha do arquivo, terminando em \n ou no fim do arquivo.
  */
-#include <stdlib.h>
-#include <stdio.h>
 char *readLine(FILE *fp){
 	int counter = 0;
 	char c, *s = NULL;
@@ -168,59 +156,4 @@ char *readLine(FILE *fp){
 	s[counter-1] = '\0';
 		
 	return s;
-}
-
-/*
- * Retorna o número de linhas no arquivo.
- */
-#include <stdio.h>
-int count_row(char *filename){
-	char c;
-	int result = 0;
-	FILE *fp;
-
-	fp = fopen(filename, "r");
-	if(!fp) return -1;
-
-	while(!feof(fp)){
-		c = fgetc(fp);
-		if(c == '\n') result++;
-		
-		if(feof(fp)){
-			//Trata do caso em que o arquivo termina com ENTER seguido de EOF.
-			fseek(fp, -1, SEEK_CUR);
-			if(fgetc(fp) != '\n') result++;
-			break;
-		}
-	}
-
-	fclose(fp);
-	return result;
-}
-
-/*
- * Conta quantos números, reais ou inteiros, há na primeira linha do arquivo.
- */
-#include <stdio.h>
-int count_num_col(char *filename){
-	char c;
-	int result = 0;
-	FILE *fp;
-
-	fp = fopen(filename, "r");
-	if(!fp) return -1;
-
-	do{
-		c = fgetc(fp);
-		if(c == '\n') break;
-		if(isdigit(c) || c == '-'){
-			result++;
-			fseek(fp, -1, SEEK_CUR);
-			//fscanf "pula" o número.
-			fscanf(fp, "%*f");
-		}
-	}while(!feof(fp));
-
-	fclose(fp);
-	return result;
 }

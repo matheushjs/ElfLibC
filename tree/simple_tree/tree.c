@@ -106,7 +106,7 @@ data_t *tree_get_data(tree_t *tree){
 	if(!tree){ DEBUG("NULL pointer received"); return NULL; }
 	if(tree_is_empty(tree)){ DEBUG("Empty tree received."); return NULL; }
 	data_t *data = (data_t *) malloc(sizeof(data));
-	memcpy(data, &tree->curr->data, sizeof(data));
+	memcpy(data, &tree->curr->data, sizeof(data_t));
 	return data;
 }
 
@@ -114,7 +114,7 @@ data_t *tree_get_data(tree_t *tree){
 bool tree_change_data(tree_t *tree, data_t *data){
 	if(!tree || !data){ DEBUG("NULL pointer received."); return FALSE; }
 	if(tree_is_empty(tree)){ DEBUG("Empty tree received."); return FALSE; }
-	memcpy(&tree->curr->data, data, sizeof(data));
+	memcpy(&tree->curr->data, data, sizeof(data_t));
 	return TRUE;
 }
 
@@ -161,6 +161,7 @@ bool tree_descend(tree_t *tree, bool rightSide){
 bool tree_rewind(tree_t *tree){
 	if(!tree){ DEBUG("NULL pointer received"); return FALSE; } 
 	tree->curr = tree->root;
+	return TRUE;
 }
 
 //Creates a new node with 'data', then set this node as the root of a new tree,
@@ -187,6 +188,7 @@ tree_t *tree_merge(tree_t **treeR, tree_t **treeL, data_t *data){
 
 //Deletes the branch starting from, but not including, the current node.
 bool tree_delete_branch(tree_t *tree, bool rightSide){
+	return TRUE;
 }
 
 void tree_print_curr(tree_t *tree, void (*print)(data_t *)){

@@ -47,6 +47,15 @@ static void node_destroy_r(node_t **node){
 	node_destroy(node);
 }
 
+//Destroy a node recursively while applying free_data upon each data_t being stored.
+static void node_destroy_rf(node_t **node, void (*free_data)(data_t)){
+	if(!*node) return;
+	node_destroy_r(&(*node)->right);
+	node_destroy_r(&(*node)->left);
+	free_data((*node)->data);
+	node_destroy(node);
+}
+
 //Creates a node with NULL children and data_t 'data'.
 static node_t *node_from_data(data_t *data){
 	node_t *node = node_create();
@@ -84,6 +93,14 @@ tree_t * tree_alloc(){
 void tree_destroy(tree_t **tree){
 	if(!*tree) return;
 	node_destroy_r(&(*tree)->root);
+	free(*tree);
+	*tree = NULL;
+}
+
+//Destroy tree while applying 'free_data' upon each data_t being stored.
+void tree_destroy_f(tree_t **tree, void (*free_data)(data_t)){
+	if(!*tree) return;
+	node_destroy_rf(&(*tree)->root, free_data);
 	free(*tree);
 	*tree = NULL;
 }
@@ -198,7 +215,6 @@ void tree_print_curr(tree_t *tree, void (*print)(data_t *)){
 }
 
 void tree_print(tree_t *tree, void (*print)(data_t *)){
-	if(!tree){ printf("nil\n"); return; }
+	if(!tree){ printf("nil"); return; }
 	node_print_r(tree->root, print);
-	printf("\n");
 }

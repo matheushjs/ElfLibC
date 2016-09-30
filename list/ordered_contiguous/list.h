@@ -7,6 +7,7 @@ typedef struct list_struct list_t;
 
 list_t *list_alloc();
 void list_destroy(list_t **);
+void list_destroy_f(list_t **, void (*)(data_t));
 bool list_is_empty(list_t *);
 void list_insert(list_t *, data_t *, bool (*)(data_t *, data_t *));
 data_t *list_retrieve(list_t *, int );

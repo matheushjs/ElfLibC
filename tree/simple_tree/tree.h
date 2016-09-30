@@ -10,6 +10,7 @@ typedef struct tree_struct tree_t;
 
 tree_t * tree_alloc();
 void tree_destroy(tree_t **);
+void tree_destroy_f(tree_t **, void (*)(data_t)){
 bool tree_is_empty(tree_t *);
 bool tree_reached_leaf(tree_t *);
 data_t *tree_get_data(tree_t *);

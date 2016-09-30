@@ -19,18 +19,18 @@ struct list_struct {
  * Node functions
  */
 
-node_t *node_alloc(){
+static node_t *node_alloc(){
 	return (node_t *) calloc(sizeof(node_t), 1);
 }
 
-void node_destroy(node_t **node){
+static void node_destroy(node_t **node){
 	if(*node){
 		free(*node);
 		*node = NULL;
 	}
 }
 
-void node_destroy_r(node_t **node){
+static void node_destroy_r(node_t **node){
 	node_t *ptr;
 	if(!*node) return;
 	do{
@@ -40,14 +40,25 @@ void node_destroy_r(node_t **node){
 	} while(*node);
 }
 
-void node_put_data(node_t *node, data_t *data){
+static void node_destroy_rf(node_t **node, void (*free_data)(data_t)){
+	node_t *ptr;
+	if(!*node) return;
+	do{
+		ptr = (*node)->next;
+		free_data((*node)->data);
+		node_destroy(node);
+		node = &ptr;
+	} while(*node);
+}
+
+static void node_put_data(node_t *node, data_t *data){
 	if(!node) return;
 	memcpy(&node->data, data, sizeof(data_t));
 }
 
 //From 'node', walk forwards 'n' times and retrieve the reached node.
 //Return NULL if out of bounds.
-node_t *node_walk(node_t *node, int n){
+static node_t *node_walk(node_t *node, int n){
 	if(n < 0) return NULL;
 	while(n-- && node) node = node->next;
 	return node;
@@ -64,6 +75,14 @@ list_t *list_alloc(){
 void list_destroy(list_t **list){
 	if(*list){
 		node_destroy_r(&(*list)->first);
+		free(*list);
+		*list = NULL;
+	}
+}
+
+void list_destroy_f(list_t **list, void (*free_data)(data_t)){
+	if(*list){
+		node_destroy_rf(&(*list)->first, free_data);
 		free(*list);
 		*list = NULL;
 	}
@@ -137,7 +156,6 @@ void list_print_r(list_t *list, void (*print)(data_t *)){
 		printf(" ");
 		curr = curr->next;
 	}
-	printf("\n");
 }
 
 int list_size(list_t *list){

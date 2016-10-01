@@ -50,8 +50,8 @@ static void node_destroy_r(node_t **node){
 //Destroy a node recursively while applying free_data upon each data_t being stored.
 static void node_destroy_rf(node_t **node, void (*free_data)(data_t)){
 	if(!*node) return;
-	node_destroy_r(&(*node)->right);
-	node_destroy_r(&(*node)->left);
+	node_destroy_rf(&(*node)->right, free_data);
+	node_destroy_rf(&(*node)->left, free_data);
 	free_data((*node)->data);
 	node_destroy(node);
 }

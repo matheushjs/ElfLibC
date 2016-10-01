@@ -36,7 +36,7 @@ static void node_destroy_r(node_t **node){
 	do{
 		ptr = (*node)->next;
 		node_destroy(node);
-		node = &ptr;
+		*node = ptr;
 	} while(*node);
 }
 
@@ -47,7 +47,7 @@ static void node_destroy_rf(node_t **node, void (*free_data)(data_t)){
 		ptr = (*node)->next;
 		free_data((*node)->data);
 		node_destroy(node);
-		node = &ptr;
+		*node = ptr;
 	} while(*node);
 }
 

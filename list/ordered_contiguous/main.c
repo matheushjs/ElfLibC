@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <list.h>
 
@@ -23,7 +24,9 @@ int main(int argc, char *argv[]){
 	list_remove(list, 0);
 	printf("List size: %d\n", list_size(list));
 
-	printf("Retrieving: %d\n", *list_retrieve(list, 0));
+	int *p = list_retrieve(list, 0);
+	printf("Retrieving: %d\n", *p);
+	free(p);
 
 	list_print_r(list, print);
 

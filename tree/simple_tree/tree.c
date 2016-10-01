@@ -122,7 +122,7 @@ bool tree_reached_leaf(tree_t *tree){
 data_t *tree_get_data(tree_t *tree){
 	if(!tree){ DEBUG("NULL pointer received"); return NULL; }
 	if(tree_is_empty(tree)){ DEBUG("Empty tree received."); return NULL; }
-	data_t *data = (data_t *) malloc(sizeof(data));
+	data_t *data = (data_t *) malloc(sizeof(data_t));
 	memcpy(data, &tree->curr->data, sizeof(data_t));
 	return data;
 }

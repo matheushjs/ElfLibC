@@ -2,19 +2,36 @@
 #include <stdio.h>
 #include <string.h>
 #include <slist.h>
+#include <time.h>
 
 #define die(X) fprintf(stderr, "%s:%d:%s(): ERROR: %s", __FILE__, __LINE__, __func__, X "\n"), exit(EXIT_FAILURE)
 
-typedef struct node_struct node_t;
-struct node_struct {
-	data_t data;
-	node_t *next;
+typedef struct mnode_struct mnode_t;
+typedef struct pnode_struct pnode_t;
+
+//pointer node.
+struct pnode_struct {
+	mnode_t *target;
+	pnode_t *next;
+	//pnode_t *up;
+	pnode_t *down;
 };
 
-struct list_struct {
-	node_t *first;
+//main node.
+struct mnode_struct {
+	data_t data;
+	mnode_t *next;
+	pnode_t *up;
+};
+
+//root, main structure for the skiplist.
+struct slist_struct {
+	mnode_t *first;
+	pnode_t **tower;
+	int levels;
 	int size;
 };
+
 
 static void (*free_data)(data_t *) = NULL;
 static void (*copy_data)(data_t *, data_t *) = NULL;
@@ -22,17 +39,36 @@ static bool (*cmp_data)(data_t *, data_t *) = NULL;
 static bool (*equal_data)(data_t *, data_t *) = NULL;
 static void (*print_data)(data_t *) = NULL;
 
+
+/*
+ * General functions
+ */
+
+static
+bool chance(){
+	static unsigned int next = 1;
+	next = next * 11227 + 423 + time(NULL); 
+	srand(next);
+	return rand()%2 == 1 ? TRUE : FALSE;
+}
+
+
 /*
  * Node functions
  */
 
 static
-node_t *node_alloc(){
-	return (node_t *) calloc(sizeof(node_t), 1);
+mnode_t *mnode_alloc(){
+	return (mnode_t *) calloc(sizeof(mnode_t), 1);
 }
 
 static
-void node_destroy(node_t **node){
+pnode_t *pnode_alloc(){
+	return (pnode_t *) calloc(sizeof(pnode_t), 1);
+}
+
+static
+void mnode_destroy(mnode_t **node){
 	if(*node){
 		if(free_data) free_data(&(*node)->data);
 		free(*node);
@@ -41,89 +77,179 @@ void node_destroy(node_t **node){
 }
 
 static
-node_t *node_create(data_t *data){
-	node_t *node = node_alloc();
+void pnode_destroy(pnode_t **node){
+	if(*node){
+		free(*node);
+		*node = NULL;
+	}
+}
+
+static
+mnode_t *mnode_create(data_t *data){
+	mnode_t *node = mnode_alloc();
 	if(!copy_data) memcpy(&node->data, data, sizeof(data_t));
 	else copy_data(&node->data, data);
 	return node;
 }
 
-//From 'node', walk forwards 'n' times and retrieve the reached node.
-//Return NULL if out of bounds.
-static
-node_t *node_walk(node_t *node, int n){
-	if(n < 0) return NULL;
-	while(n-- && node) node = node->next;
-	return node;
-}
-
 /*
- * List functions
+ * SkipList auxiliary functions
  */
 
-void list_set_free_data(void (*free_func)(data_t *)){ free_data = free_func; }
-void list_set_copy_data(void (*copy)(data_t *, data_t *)){ copy_data = copy; }
-void list_set_cmp_data(bool (*cmp)(data_t *, data_t *)){ cmp_data = cmp; }
-void list_set_equal_data(bool (*equal)(data_t *, data_t *)){ equal_data = equal; }
-void list_set_print_data(void (*print)(data_t *)){ print_data = print; }
-
-list_t *list_alloc(){
-	return (list_t *) calloc(sizeof(list_t), 1);
-}
-
-void list_destroy(list_t **list){
-	if(!*list) return;
-	list_t *l;
-	node_t *node, *prev;
-
-	l = *list;
-	node = l->first;
-	if(!node) return;
+//Generates as many pnode_t with target 'target' as needed.
+//Adds each new pnode_t after the pnode_t in the given level of the matrix 'prev_tower'.
+static
+void slist_add_pnodes(slist_t *list, pnode_t **prev_tower, mnode_t *target){
+	int i, counter, tsize;
+	pnode_t *down = NULL, *node;
 	
-	while(node){
-		node = (prev = node, node->next);
-		node_destroy(&prev);
+	counter = 0;
+	tsize = prev_tower ? list->levels : 0;	//stores size of prev_tower.
+	while(chance()) counter++;
+	//printf("\tDEBUG: Checking if realloc() is needed\n");
+	if(counter > list->levels){
+		//printf("\tDEBUG: It was needed. New size: %d\n", counter);
+		list->tower = (pnode_t **) realloc(list->tower, sizeof(pnode_t *) * counter);
+		list->levels = counter;
 	}
+//counter = 1, tsize = 0;
+	for(i = 0; i < counter; i++){
+		//printf("\tDEBUG: Creating pointer node\n");
+		node = pnode_alloc();
+		node->target = target;
+		node->down = down;
 	
-	free(l);
-	*list = NULL;
+		//printf("\tDEBUG: Adding node\n");
+		if(i >= tsize){
+			//printf("\tDEBUG: Adding to a new pointer in list->tower\n");
+			node->next = NULL;
+			list->tower[i] = node;
+			//printf("\tDEBUG: Added.\n");
+		} else if(prev_tower[i]){
+			//printf("\tDEBUG: Adding to a pointer in prev_tower\n");
+			node->next = prev_tower[i]->next;
+			prev_tower[i]->next = node;
+		} else {
+			//printf("\tDEBUG: Adding to an old pointer in list->tower\n");
+			node->next = list->tower[i];
+			list->tower[i] = node;
+		}
+		//printf("\tDEBUG: Addition completed\n");
+
+		down = node;
+	}
 }
 
-bool list_is_empty(list_t *list){
+
+/*
+ * SkipList main functions
+ */
+
+void slist_set_free_data(void (*free_func)(data_t *)){ free_data = free_func; }
+void slist_set_copy_data(void (*copy)(data_t *, data_t *)){ copy_data = copy; }
+void slist_set_cmp_data(bool (*cmp)(data_t *, data_t *)){ cmp_data = cmp; }
+void slist_set_equal_data(bool (*equal)(data_t *, data_t *)){ equal_data = equal; }
+void slist_set_print_data(void (*print)(data_t *)){ print_data = print; }
+
+slist_t *slist_alloc(){
+	return (slist_t *) calloc(sizeof(slist_t), 1);
+}
+
+bool slist_is_empty(slist_t *list){
 	return list->size ? FALSE : TRUE;
 }
 
-void list_insert(list_t *list, data_t *data){
-	node_t *curr, *prev = NULL;
-	node_t *node;
+void slist_insert(slist_t *list, data_t *data){
+	int i;
+	mnode_t *node, *mcurr, *mprev;
+	pnode_t *pprev, *pcurr, **prev_tower;
 
 	if(!list) return;
 	if(!cmp_data){ die("Comparison function is not set.\n"); }
 	if(!equal_data){ die("Equality function is not set.\n"); }
-	node = node_create(data); 
 
-	if(list_is_empty(list)){
-		list->first = node;
-	} else {
-		curr = list->first;
-		while(curr && cmp_data(&curr->data, data))
-			curr = (prev = curr, curr->next);
-		
-		//If data is in the list already.
-		if(curr && equal_data(&curr->data, data)){ node_destroy(&node); return; }
+	prev_tower = (pnode_t **) malloc(sizeof(pnode_t *) * list->levels);
 
-		//Case where insertion happens before first node.
-		if(!prev){
-			node->next = list->first;
-			list->first = node;
-		} else {
-			prev->next = node;
-			node->next = curr;
-		}
+	//Navigate through the skip list, storing in prev_tower all nodes that are located
+	//immediately before where the node containing 'data' would be if it existed in the
+	//same level in the tower.
+	pprev = NULL;
+	//printf("DEBUG: Beginning to navigate the tower\n");
+	for(i = list->levels - 1; i >= 0; i--){
+		//printf("DEBUG: Finding initial point\n");
+		if(pprev){
+			pprev = pprev->down;
+			pcurr = pprev->next;
+		} else pcurr = list->tower[i];
+		//printf("DEBUG: Finding previous point\n");
+		while(pcurr && cmp_data(&pcurr->target->data, data))
+			pcurr = (pprev = pcurr, pcurr->next);
+		prev_tower[i] = pprev;
 	}
+	//printf("DEBUG: Finding initial point in floor\n");
+	if(pprev){
+		mprev = pprev->target;
+		mcurr = mprev->next;
+	} else {
+		mprev = NULL;
+		mcurr = list->first;
+	}
+
+	//printf("DEBUG: Beginning to navigate the floor\n");
+	while(mcurr && cmp_data(&mcurr->data, data))
+		mcurr = (mprev = mcurr, mcurr->next);
+
+	//printf("DEBUG: Checking if data exists\n");
+	//If data exists in the list already.
+	if(mcurr && equal_data(&mcurr->data, data)){ free(prev_tower); return; }
+
+	//printf("DEBUG: Adding node\n");
+	node = mnode_create(data);
+	if(mprev){
+		node->next = mcurr;
+		mprev->next = node;
+		slist_add_pnodes(list, prev_tower, node);
+	} else {
+		node->next = list->first;
+		list->first = node;
+		slist_add_pnodes(list, NULL, node);
+	}
+	//printf("DEBUG: Insertion completed\n");
+
+	free(prev_tower);
 	list->size++;
 }
 
+void slist_print(slist_t *list){
+	if(!list) return;
+	if(!print_data){ fprintf(stderr, "Print function is not set\n"); return; }
+
+/**/
+	pnode_t *pcurr;
+	int i;
+	printf("list (levels, size) = (%d, %d)\n", list->levels, list->size);
+	for(i = list->levels - 1; i >= 0; i--){
+		pcurr = list->tower[i];
+		while(pcurr){
+			print_data(&pcurr->target->data);
+			printf(" ");
+			pcurr = pcurr->next;
+		}
+		printf("\n");
+	}
+/**/
+
+	mnode_t *curr = list->first;
+	while(curr){
+		print_data(&curr->data);
+		printf(" ");
+		curr = curr->next;
+	}
+
+	/**/printf("\n");
+}
+
+/*
 //Returns NULL if element 'key' isn't found.
 //If found, stores the element's index in 'index'
 data_t *list_search(list_t *list, data_t *key, int *index){
@@ -207,3 +333,4 @@ int list_size(list_t *list){
 	if(!list) return -1;
 	return list->size;
 }
+*/

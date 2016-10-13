@@ -268,28 +268,25 @@ void slist_remove_key(slist_t *list, data_t *key){
 	//Find previous nodes for each level in the list->tower.
 	prev_tower = slist_build_prev_tower(list, key, &mprev);
 
-	printf("DEBUG: Finding initial point in floor\n");
+	//Find initial point in floor.
 	if(mprev) mcurr = mprev->next;
 	else mcurr = list->first;
 
-	printf("DEBUG: Beginning to navigate the floor\n");
+	//Navigate through the floor
 	while(mcurr && cmp_data(&mcurr->data, key))
 		mcurr = (mprev = mcurr, mcurr->next);
 
-	printf("DEBUG: Checking if data exists\n");
 	//Check data exists in the list already.
 	if(!mcurr || !equal_data(&mcurr->data, key)){ free(prev_tower); return; }
 	
-	printf("DEBUG: Beginning wiping tower matrix\n");
+	//Remove due nodes in tower matrix
 	for(i = 0; i < list->levels; i++){
-		printf("DEBUG: Picking a tower pointer\n");
 		prev = prev_tower[i];
 		curr = prev ? prev->next : list->tower[i];
 		
 		//Checks if current pnode_t points to the mnode_t that contains 'key'
 		if(!curr || curr->target != mcurr) break;
 
-		printf("DEBUG: Swaping pointers\n");
 		if(prev) prev->next = curr->next;
 		else list->tower[i] = curr->next;
 
@@ -297,7 +294,6 @@ void slist_remove_key(slist_t *list, data_t *key){
 	}
 	free(prev_tower);
 	
-	printf("DEBUG: Destroy main node\n");
 	if(mprev) mprev->next = mcurr->next;
 	else list->first = mcurr->next;
 	mnode_destroy(&mcurr);

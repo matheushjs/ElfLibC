@@ -1,5 +1,5 @@
-#ifndef _LIST_H
-#define _LIST_H
+#ifndef _SLIST_H
+#define _SLIST_H
 
 //The list will store data_t entirely inside each node in the list.
 typedef int data_t;

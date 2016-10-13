@@ -78,7 +78,6 @@ void list_destroy(list_t **list){
 
 	l = *list;
 	node = l->first;
-	if(!node) return;
 	
 	while(node){
 		node = (prev = node, node->next);

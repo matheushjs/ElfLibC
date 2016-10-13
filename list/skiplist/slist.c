@@ -103,37 +103,30 @@ void slist_add_pnodes(slist_t *list, pnode_t **prev_tower, mnode_t *target){
 	pnode_t *down = NULL, *node;
 	
 	counter = 0;
-	tsize = prev_tower ? list->levels : 0;	//stores size of prev_tower.
+	//Stores in tsize the size of prev_tower.
+	tsize = prev_tower ? list->levels : 0;	
 	while(chance()) counter++;
-	//printf("\tDEBUG: Checking if realloc() is needed\n");
+	//Check if realloc() is needed
 	if(counter > list->levels){
-		//printf("\tDEBUG: It was needed. New size: %d\n", counter);
 		list->tower = (pnode_t **) realloc(list->tower, sizeof(pnode_t *) * counter);
 		list->levels = counter;
 	}
 
 	for(i = 0; i < counter; i++){
-		//printf("\tDEBUG: Creating pointer node\n");
 		node = pnode_alloc();
 		node->target = target;
 		node->down = down;
 	
-		//printf("\tDEBUG: Adding node\n");
 		if(i >= tsize){
-			//printf("\tDEBUG: Adding to a new pointer in list->tower\n");
 			node->next = NULL;
 			list->tower[i] = node;
-			//printf("\tDEBUG: Added.\n");
 		} else if(prev_tower[i]){
-			//printf("\tDEBUG: Adding to a pointer in prev_tower\n");
 			node->next = prev_tower[i]->next;
 			prev_tower[i]->next = node;
 		} else {
-			//printf("\tDEBUG: Adding to an old pointer in list->tower\n");
 			node->next = list->tower[i];
 			list->tower[i] = node;
 		}
-		//printf("\tDEBUG: Addition completed\n");
 
 		down = node;
 	}
@@ -152,14 +145,13 @@ pnode_t **slist_build_prev_tower(slist_t *list, data_t *data, mnode_t **mprev){
 
 	prev_tower = (pnode_t **) malloc(sizeof(pnode_t *) * list->levels);
 	pprev = NULL;
-	//printf("DEBUG: Beginning to navigate the tower\n");
 	for(i = list->levels - 1; i >= 0; i--){
-		//printf("DEBUG: Finding initial point\n");
+		//Finding initial point in current level.
 		if(pprev){
 			pprev = pprev->down;
 			pcurr = pprev->next;
 		} else pcurr = list->tower[i];
-		//printf("DEBUG: Finding previous point\n");
+
 		while(pcurr && cmp_data(&pcurr->target->data, data))
 			pcurr = (pprev = pcurr, pcurr->next);
 
@@ -239,19 +231,16 @@ void slist_insert(slist_t *list, data_t *data){
 	//Find previous nodes for each level in the list->tower.
 	prev_tower = slist_build_prev_tower(list, data, &mprev);
 
-	//printf("DEBUG: Finding initial point in floor\n");
+	//Find initial mnode_t in floor
 	if(mprev) mcurr = mprev->next;
 	else mcurr = list->first;
 
-	//printf("DEBUG: Beginning to navigate the floor\n");
 	while(mcurr && cmp_data(&mcurr->data, data))
 		mcurr = (mprev = mcurr, mcurr->next);
 
-	//printf("DEBUG: Checking if data exists\n");
 	//Check if data exists in the list already.
 	if(mcurr && equal_data(&mcurr->data, data)){ free(prev_tower); return; }
 
-	//printf("DEBUG: Adding node\n");
 	node = mnode_create(data);
 	if(mprev){
 		node->next = mcurr;
@@ -262,7 +251,6 @@ void slist_insert(slist_t *list, data_t *data){
 		list->first = node;
 		slist_add_pnodes(list, NULL, node);
 	}
-	//printf("DEBUG: Insertion completed\n");
 
 	free(prev_tower);
 	list->size++;
@@ -324,14 +312,12 @@ data_t *slist_search(slist_t *list, data_t *data){
 	mnode_t *curr;
 
 	pprev = NULL;
-	//printf("DEBUG: Beginning to navigate the tower\n");
 	for(i = list->levels - 1; i >= 0; i--){
-		//printf("DEBUG: Finding initial point\n");
 		if(pprev){
 			pprev = pprev->down;
 			pcurr = pprev->next;
 		} else pcurr = list->tower[i];
-		//printf("DEBUG: Finding previous point\n");
+		
 		while(pcurr && cmp_data(&pcurr->target->data, data))
 			pcurr = (pprev = pcurr, pcurr->next);
 	}

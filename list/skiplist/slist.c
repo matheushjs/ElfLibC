@@ -13,7 +13,6 @@ typedef struct pnode_struct pnode_t;
 struct pnode_struct {
 	mnode_t *target;
 	pnode_t *next;
-	//pnode_t *up;
 	pnode_t *down;
 };
 
@@ -112,7 +111,7 @@ void slist_add_pnodes(slist_t *list, pnode_t **prev_tower, mnode_t *target){
 		list->tower = (pnode_t **) realloc(list->tower, sizeof(pnode_t *) * counter);
 		list->levels = counter;
 	}
-//counter = 1, tsize = 0;
+
 	for(i = 0; i < counter; i++){
 		//printf("\tDEBUG: Creating pointer node\n");
 		node = pnode_alloc();
@@ -140,6 +139,47 @@ void slist_add_pnodes(slist_t *list, pnode_t **prev_tower, mnode_t *target){
 	}
 }
 
+//Navigate through the list->tower, storing in prev_tower all nodes that are located
+//immediately before where the node containing 'data' would be if it existed in the
+//same level in the tower.
+//	Returns the prev_tower.
+//	Stores in 'mprev' the furthest mnode_t whose data is 'lower' than the given data
+//		that we managed to find while building the prev_tower.
+static
+pnode_t **slist_build_prev_tower(slist_t *list, data_t *data, mnode_t **mprev){
+	int i;
+	pnode_t *pprev, *pcurr, **prev_tower;
+
+	prev_tower = (pnode_t **) malloc(sizeof(pnode_t *) * list->levels);
+	pprev = NULL;
+	//printf("DEBUG: Beginning to navigate the tower\n");
+	for(i = list->levels - 1; i >= 0; i--){
+		//printf("DEBUG: Finding initial point\n");
+		if(pprev){
+			pprev = pprev->down;
+			pcurr = pprev->next;
+		} else pcurr = list->tower[i];
+		//printf("DEBUG: Finding previous point\n");
+		while(pcurr && cmp_data(&pcurr->target->data, data))
+			pcurr = (pprev = pcurr, pcurr->next);
+
+		prev_tower[i] = pprev;
+	}
+
+	if(mprev) *mprev = pprev ? pprev->target : NULL;
+	return prev_tower;
+}
+
+//Change list->levels and list->tower to ignore floors that are empty.
+static
+void slist_fix_empty_levels(slist_t *list){
+	int i, count;
+	count = 0;
+	for(i = list->levels - 1; i >= 0 && list->tower[i] == NULL; i--) count++;
+	list->levels -= count;
+	list->tower = (pnode_t **) realloc(list->tower, sizeof(pnode_t *) * list->levels);
+	if(!list->levels) list->tower = NULL;
+}
 
 /*
  * SkipList main functions
@@ -155,52 +195,60 @@ slist_t *slist_alloc(){
 	return (slist_t *) calloc(sizeof(slist_t), 1);
 }
 
+void slist_destroy(slist_t **list){
+	int i;
+	slist_t *l = *list;
+	pnode_t *pcurr, *pnext;
+	mnode_t *curr, *next;
+
+	if(!l) return;
+	
+	for(i = l->levels - 1; i >= 0; i--){
+		pcurr = l->tower[i];
+		while(pcurr){
+			pnext = pcurr->next;
+			pnode_destroy(&pcurr);
+			pcurr = pnext;
+		}
+	}
+
+	curr = l->first;
+	while(curr){
+		next = curr->next;
+		mnode_destroy(&curr);
+		curr = next;
+	}
+	
+	free(l->tower);
+	free(l);
+	*list = NULL;
+}
+
 bool slist_is_empty(slist_t *list){
 	return list->size ? FALSE : TRUE;
 }
 
 void slist_insert(slist_t *list, data_t *data){
-	int i;
 	mnode_t *node, *mcurr, *mprev;
-	pnode_t *pprev, *pcurr, **prev_tower;
+	pnode_t **prev_tower;
 
 	if(!list) return;
 	if(!cmp_data){ die("Comparison function is not set.\n"); }
 	if(!equal_data){ die("Equality function is not set.\n"); }
+	
+	//Find previous nodes for each level in the list->tower.
+	prev_tower = slist_build_prev_tower(list, data, &mprev);
 
-	prev_tower = (pnode_t **) malloc(sizeof(pnode_t *) * list->levels);
-
-	//Navigate through the skip list, storing in prev_tower all nodes that are located
-	//immediately before where the node containing 'data' would be if it existed in the
-	//same level in the tower.
-	pprev = NULL;
-	//printf("DEBUG: Beginning to navigate the tower\n");
-	for(i = list->levels - 1; i >= 0; i--){
-		//printf("DEBUG: Finding initial point\n");
-		if(pprev){
-			pprev = pprev->down;
-			pcurr = pprev->next;
-		} else pcurr = list->tower[i];
-		//printf("DEBUG: Finding previous point\n");
-		while(pcurr && cmp_data(&pcurr->target->data, data))
-			pcurr = (pprev = pcurr, pcurr->next);
-		prev_tower[i] = pprev;
-	}
 	//printf("DEBUG: Finding initial point in floor\n");
-	if(pprev){
-		mprev = pprev->target;
-		mcurr = mprev->next;
-	} else {
-		mprev = NULL;
-		mcurr = list->first;
-	}
+	if(mprev) mcurr = mprev->next;
+	else mcurr = list->first;
 
 	//printf("DEBUG: Beginning to navigate the floor\n");
 	while(mcurr && cmp_data(&mcurr->data, data))
 		mcurr = (mprev = mcurr, mcurr->next);
 
 	//printf("DEBUG: Checking if data exists\n");
-	//If data exists in the list already.
+	//Check if data exists in the list already.
 	if(mcurr && equal_data(&mcurr->data, data)){ free(prev_tower); return; }
 
 	//printf("DEBUG: Adding node\n");
@@ -218,6 +266,84 @@ void slist_insert(slist_t *list, data_t *data){
 
 	free(prev_tower);
 	list->size++;
+}
+
+void slist_remove_key(slist_t *list, data_t *key){
+	int i;
+	mnode_t *mcurr, *mprev;
+	pnode_t *prev, *curr, **prev_tower;
+
+	if(!list) return;
+	if(!cmp_data){ die("Comparison function is not set.\n"); }
+	if(!equal_data){ die("Equality function is not set.\n"); }
+
+	//Find previous nodes for each level in the list->tower.
+	prev_tower = slist_build_prev_tower(list, key, &mprev);
+
+	printf("DEBUG: Finding initial point in floor\n");
+	if(mprev) mcurr = mprev->next;
+	else mcurr = list->first;
+
+	printf("DEBUG: Beginning to navigate the floor\n");
+	while(mcurr && cmp_data(&mcurr->data, key))
+		mcurr = (mprev = mcurr, mcurr->next);
+
+	printf("DEBUG: Checking if data exists\n");
+	//Check data exists in the list already.
+	if(!mcurr || !equal_data(&mcurr->data, key)){ free(prev_tower); return; }
+	
+	printf("DEBUG: Beginning wiping tower matrix\n");
+	for(i = 0; i < list->levels; i++){
+		printf("DEBUG: Picking a tower pointer\n");
+		prev = prev_tower[i];
+		curr = prev ? prev->next : list->tower[i];
+		
+		//Checks if current pnode_t points to the mnode_t that contains 'key'
+		if(!curr || curr->target != mcurr) break;
+
+		printf("DEBUG: Swaping pointers\n");
+		if(prev) prev->next = curr->next;
+		else list->tower[i] = curr->next;
+
+		pnode_destroy(&curr);
+	}
+	free(prev_tower);
+	
+	printf("DEBUG: Destroy main node\n");
+	if(mprev) mprev->next = mcurr->next;
+	else list->first = mcurr->next;
+	mnode_destroy(&mcurr);
+	list->size--;
+
+	slist_fix_empty_levels(list);
+}
+
+data_t *slist_search(slist_t *list, data_t *data){
+	int i;
+	pnode_t *pprev, *pcurr;
+	mnode_t *curr;
+
+	pprev = NULL;
+	//printf("DEBUG: Beginning to navigate the tower\n");
+	for(i = list->levels - 1; i >= 0; i--){
+		//printf("DEBUG: Finding initial point\n");
+		if(pprev){
+			pprev = pprev->down;
+			pcurr = pprev->next;
+		} else pcurr = list->tower[i];
+		//printf("DEBUG: Finding previous point\n");
+		while(pcurr && cmp_data(&pcurr->target->data, data))
+			pcurr = (pprev = pcurr, pcurr->next);
+	}
+	
+	if(pprev) curr = pprev->target->next;
+	else curr = list->first;
+
+	while(curr && cmp_data(&curr->data, data))
+		curr = curr->next;
+
+	if(curr && equal_data(&curr->data, data)) return &curr->data;
+	else return NULL;
 }
 
 void slist_print(slist_t *list){
@@ -249,88 +375,6 @@ void slist_print(slist_t *list){
 	/**/printf("\n");
 }
 
-/*
-//Returns NULL if element 'key' isn't found.
-//If found, stores the element's index in 'index'
-data_t *list_search(list_t *list, data_t *key, int *index){
-	int i = 0;
-	node_t *curr;
-
-	if(!cmp_data){ die("Comparison function is not set.\n"); }
-	if(!equal_data){ die("Equality function is not set.\n"); }
-	if(list){
-		curr = list->first;
-		while(curr && cmp_data(&curr->data, key))
-			curr = (i++, curr->next);
-
-		if(curr && equal_data(&curr->data, key)){
-			if(index) *index = i-1;
-			return &curr->data;
-		}
-	}
-
-	if(index) *index = -1;
-	return NULL;
+int slist_size(slist_t *list){
+	return list ? list->size : -1;
 }
-
-data_t *list_retrieve(list_t *list, int index){
-	if(!list || index < 0 || index > list->size) return NULL;
-	node_t *node;
-	node = node_walk(list->first, index);
-	return &node->data;
-}
-
-void list_remove(list_t *list, int index){
-	if(!list) return;
-	if(list_is_empty(list)) return;
-	
-	node_t *node, *aux;
-	if(!index){
-		aux = list->first->next;
-		node_destroy(&list->first);
-		list->first = aux;
-	} else {
-		node = node_walk(list->first, index-1);
-		if(!node) return;	//out of bounds
-		aux = node->next;
-		node->next = aux->next;
-		node_destroy(&aux);
-	}
-	list->size--;
-}
-
-void list_remove_key(list_t *list, data_t *key){
-	node_t *prev = NULL, *curr;
-
-	if(!cmp_data){ die("Comparison function is not set.\n"); }
-	if(!equal_data){ die("Equality function is not set.\n"); }
-	if(!list || list_is_empty(list)) return;
-	
-	curr = list->first;
-	while(curr && cmp_data(&curr->data, key))
-		curr = (prev = curr, curr->next);
-
-	if(curr && equal_data(&curr->data, key)){
-		if(prev) prev->next = curr->next;
-		else list->first = curr->next;
-		node_destroy(&curr);
-		list->size--;
-	}
-}
-
-void list_print(list_t *list){
-	if(!list) return;
-	if(!print_data){ fprintf(stderr, "Print function is not set\n"); return; }
-	node_t *curr = list->first;
-	while(curr){
-		print_data(&curr->data);
-		printf(" ");
-		curr = curr->next;
-	}
-}
-
-int list_size(list_t *list){
-	if(!list) return -1;
-	return list->size;
-}
-*/

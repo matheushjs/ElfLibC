@@ -51,42 +51,32 @@ int main(int argc, char *argv[]){
 	slist_insert(list, &data);
 	slist_print(list);
 	printf("\n");
-/*
-	printf("List size: %d\n", slist_size(list));
-	slist_remove(list, 2);
-	slist_print(list);
-	printf("\n");
-	
-	slist_remove(list, 0);
-	slist_print(list);
-	printf("\n");
-
-	data = 3;
-	slist_remove_key(list, &data);
-	slist_remove_key(list, &data);
-
-	data = 10;
-	slist_remove_key(list, &data);
-	
-	slist_print(list);
-	printf("\n");
 
 	data = 4;
 	slist_remove_key(list, &data);
-	
-	data = 1;
-	slist_remove_key(list, &data);
-	
-	//slist_remove(list, 0);
-
-	printf("List size: %d\n", slist_size(list));
-
-	int *p = slist_retrieve(list, 0);
-	if(p) printf("Retrieving: %d\n", *p);
-
 	slist_print(list);
 	printf("\n");
 
+	data = 10;
+	slist_remove_key(list, &data);
+	slist_print(list);
+	printf("\n");
+	
+	data = 0;
+	if(slist_search(list, &data)) printf("Found %d\n", data);
+	
+	data = 1;
+	if(slist_search(list, &data)) printf("Found %d\n", data);
+
+	data = 3;
+	if(slist_search(list, &data)) printf("Found %d\n", data);
+
+	data = 4;
+	if(slist_search(list, &data)) printf("Found %d\n", data);
+
+	data = 10;
+	if(slist_search(list, &data)) printf("Found %d\n", data);
+
 	slist_destroy(&list);
-*/	return 0;
+	return 0;
 }

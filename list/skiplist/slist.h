@@ -20,11 +20,8 @@ slist_t *slist_alloc();
 void slist_destroy(slist_t **);
 bool slist_is_empty(slist_t *);
 void slist_insert(slist_t *, data_t *);
-data_t *slist_search(slist_t *, data_t *, int *);
+data_t *slist_search(slist_t *, data_t *);
 
-//Be aware that list_retrieve() returns a pointer to the data stored.
-data_t *slist_retrieve(slist_t *, int);
-void slist_remove(slist_t *, int);
 void slist_remove_key(slist_t *, data_t *);
 void slist_print(slist_t *);
 int slist_size(slist_t *);

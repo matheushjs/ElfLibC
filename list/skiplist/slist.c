@@ -117,14 +117,17 @@ void slist_add_pnodes(slist_t *list, pnode_t **prev_tower, mnode_t *target){
 		node->target = target;
 		node->down = down;
 		
-		if(i >= tsize || !prev_tower[i]){
+		if(i >= tsize){
+			node->next = NULL;
+			list->tower[i] = node;
+		} else if(!prev_tower[i]){
 			node->next = list->tower[i];
 			list->tower[i] = node;
-		} else {
+		}else {
 			node->next = prev_tower[i]->next;
 			prev_tower[i]->next = node;
 		}
-		
+
 		down = node;
 	}
 }

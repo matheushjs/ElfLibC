@@ -109,6 +109,7 @@ void slist_add_pnodes(slist_t *list, pnode_t **prev_tower, mnode_t *target){
 	//Check if realloc() is needed
 	if(counter > list->levels){
 		list->tower = (pnode_t **) realloc(list->tower, sizeof(pnode_t *) * counter);
+		memset(&list->tower[list->levels], 0, (counter - list->levels) * sizeof(pnode_t *));
 		list->levels = counter;
 	}
 
@@ -117,10 +118,7 @@ void slist_add_pnodes(slist_t *list, pnode_t **prev_tower, mnode_t *target){
 		node->target = target;
 		node->down = down;
 		
-		if(i >= tsize){
-			node->next = NULL;
-			list->tower[i] = node;
-		} else if(!prev_tower[i]){
+		if(i >= tsize || !prev_tower[i]){
 			node->next = list->tower[i];
 			list->tower[i] = node;
 		}else {

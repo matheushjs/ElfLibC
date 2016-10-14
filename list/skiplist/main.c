@@ -52,12 +52,16 @@ int main(int argc, char *argv[]){
 	slist_print(list);
 	printf("\n");
 
-	data = 4;
+	data = 1;
+	slist_remove_key(list, &data);
+	slist_remove_key(list, &data);
 	slist_remove_key(list, &data);
 	slist_print(list);
 	printf("\n");
 
 	data = 10;
+	slist_remove_key(list, &data);
+	slist_remove_key(list, &data);
 	slist_remove_key(list, &data);
 	slist_print(list);
 	printf("\n");

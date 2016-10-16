@@ -9,8 +9,8 @@ typedef enum {FALSE, TRUE} bool;
 typedef struct queue_struct queue_t;
 
 queue_t *queue_alloc();
-void queue_push(queue_t *, data_t *);
-data_t *queue_pop(queue_t *);
+void queue_enqueue(queue_t *, data_t *);
+data_t *queue_next(queue_t *);
 void queue_destroy(queue_t **);
 void queue_destroy_f(queue_t **, void (*)(data_t *));
 int queue_size(queue_t *);

@@ -47,8 +47,3 @@ void vector_maxmin(data_t *vector, int size, data_t *rmax, data_t *rmin){
 	*rmax = max;
 	*rmin = min;
 }
-
-int main(int argc, char *argv[]){
-	
-	return 0;
-}

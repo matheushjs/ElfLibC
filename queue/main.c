@@ -19,68 +19,68 @@ int main(int argc, char *argv[]){
 	person *p;
 
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	
 	queue_invert(queue);
 	
-	p = queue_pop(queue);
+	p = queue_next(queue);
 	printf("Age: %d\n", p->age);
 	free(p);
 
-	p = queue_pop(queue);
+	p = queue_next(queue);
 	printf("Age: %d\n", p->age);
 	free(p);
 	
-	p = queue_pop(queue);
+	p = queue_next(queue);
 	printf("Age: %d\n", p->age);
 	free(p);
 	
-	p = queue_pop(queue);
+	p = queue_next(queue);
 	printf("Age: %d\n", p->age);
 	free(p);
 	
-	p = queue_pop(queue);
-	printf("Age: %d\n", p->age);
-	free(p);
-	
-	queue_invert(queue);
-	
-	p = queue_pop(queue);
+	p = queue_next(queue);
 	printf("Age: %d\n", p->age);
 	free(p);
 	
 	queue_invert(queue);
 	
-	p = queue_pop(queue);
+	p = queue_next(queue);
+	printf("Age: %d\n", p->age);
+	free(p);
+	
+	queue_invert(queue);
+	
+	p = queue_next(queue);
 	printf("Age: %d\n", p->age);
 	free(p);
 
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 
 	queue_destroy(&queue);
 
@@ -93,19 +93,19 @@ int main(int argc, char *argv[]){
 	}
 
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 	p = person_create();
-	queue_push(queue, p);
+	queue_enqueue(queue, p);
 
 	queue_destroy_f(&queue, (void (*)(person *)) freePerson);
 

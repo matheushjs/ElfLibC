@@ -3,14 +3,13 @@
 
 typedef struct node_struct node_t;
 struct node_struct {
-	node_t *head;
-	node_t *tail;
+	node_t *front;
 	data_t *key;
 };
 
 struct queue_struct {
-	node_t *head;
-	node_t *tail;
+	node_t *front;
+	node_t *back;
 	int count;
 };
 
@@ -38,7 +37,7 @@ queue_t *queue_alloc(){
 	return (queue_t *) calloc(sizeof(queue_t), 1);
 }
 
-void queue_push(queue_t *q, data_t *data){
+void queue_enqueue(queue_t *q, data_t *data){
 	node_t *new;
 	
 	if(!q) return;
@@ -46,54 +45,53 @@ void queue_push(queue_t *q, data_t *data){
 	new->key = data;
 
 	if(!q->count){
-		q->head = q->tail = new;
+		q->front = q->back = new;
 	} else {
-		q->tail->tail = new;
-		new->head = q->tail;
-		q->tail = new;
+		q->front->front = new;
+		q->front = new;
 	}
 	(q->count)++;
 }
 
-data_t *queue_pop(queue_t *q){
+data_t *queue_next(queue_t *q){
 	data_t *ret = NULL;
+	node_t *aux;
 
 	if(!q) return ret;
 	if(!q->count) return ret;
 	(q->count)--;
 
-	ret = q->head->key;
+	ret = q->back->key;
 	if(!q->count){
-		node_destroy(&q->head);
-		q->tail = NULL;
+		node_destroy(&q->back);
+		q->back = q->front = NULL;
 	}else{
-		q->head = q->head->tail;
-		node_destroy(&q->head->head);
+		aux = q->back;
+		q->back = q->back->front;
+		node_destroy(&aux);
 	}
 	return ret;
 }
 
 //Destroy the queue, assuming (data_t *) can be freed with a simple free(data_t *).
 void queue_destroy(queue_t **q_pointer){
-	queue_t *q;
+	queue_t *q = *q_pointer;;
 
-	if(*q_pointer){
-		q = *q_pointer;
-		while(q->count) free(queue_pop(q));
+	if(q){
+		while(q->count) free(queue_next(q));
 		free(q);
-		q = NULL;
+		*q_pointer = NULL;
 	}
 }
 
 //Destroy the queue, freeing each (data_t *) using function 'f'.
 void queue_destroy_f(queue_t **q_pointer, void (*f)(data_t *p)){
-	queue_t *q;
+	queue_t *q = *q_pointer;
 
-	if(*q_pointer){
-		q = *q_pointer;
-		while(q->count) f(queue_pop(q));
+	if(q){
+		while(q->count) f(queue_next(q));
 		free(q);
-		q = NULL;
+		*q_pointer = NULL;
 	}
 }
 
@@ -104,28 +102,28 @@ int queue_size(queue_t *q){
 
 data_t *queue_front(queue_t *q){
 	if(!q || !q->count) return NULL;
-	else return q->head->key;
+	else return q->front->key;
 }
 
 data_t *queue_back(queue_t *q){
 	if(!q || !q->count) return NULL;
-	else return q->tail->key;
+	else return q->back->key;
 }
 
 void queue_invert(queue_t *q){
 	if(!q || !q->count) return;
-	node_t *curr, *aux;
+	node_t *curr, *next, *new;
 
-	curr = q->head;
-	
+	curr = q->back;
+	new = NULL;
 	while(curr){
-		aux = curr->tail;
-		curr->tail = curr->head;
-		curr->head = aux;
-		curr = curr->head;
+		next = curr->front;
+		curr->front = new;
+		new = curr;
+		curr = next;
 	}
 	
-	aux = q->head;
-	q->head = q->tail;
-	q->tail = aux;
+	new = q->front;
+	q->front = q->back;
+	q->back = new;
 }

@@ -146,6 +146,21 @@ void tree_insert(tree_t *tree, data_t *data){
 }
 
 static
+void destroy_op(node_t *node){
+	if(!node) return;
+	destroy_op(node->right);
+	destroy_op(node->left);
+	node_destroy(&node);
+}
+
+void tree_destroy(tree_t **tree){
+	if(!*tree) return;
+	destroy_op((*tree)->root);
+	free(*tree);
+	*tree = NULL;
+}
+
+static
 void print_op(node_t *node){
 	if(!node) return;
 	if(node->left) printf("{");

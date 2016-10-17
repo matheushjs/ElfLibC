@@ -32,5 +32,6 @@ int main(int argc, char *argv[]){
 		printf("\n");
 	}
 
+	tree_destroy(&tree);
 	return 0;
 }

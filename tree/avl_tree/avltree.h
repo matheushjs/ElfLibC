@@ -16,6 +16,7 @@ void tree_set_print(void (*)(data_t *));
 
 tree_t *tree_alloc();
 void tree_insert(tree_t *, data_t *);
+void tree_destroy(tree_t **);
 void tree_print(tree_t *);
 
 #endif

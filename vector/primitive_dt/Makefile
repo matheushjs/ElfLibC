@@ -1,5 +1,19 @@
+CC=gcc
+CFLAGS=-Wall
+INCLUDE=./include/
+SRC=src/vector.c
+EXEC1=prog
+LIBS=-lm
+RM=rm -fv
+
+MAIN1=src/main.c
+MAIN2=src/benchmark.c
+EXEC1=prog
+EXEC2=test
+
 all:
-	gcc -Wall -I./ vector.c -o vector
+	$(CC) $(CFLAGS) -I$(INCLUDE) $(MAIN1) $(SRC) -o $(EXEC1) $(LIBS)
+	$(CC) $(CFLAGS) -I$(INCLUDE) $(MAIN2) $(SRC) -o $(EXEC2) $(LIBS)
 
 clean:
-	rm -fv *~
+	find -type f -name "*~" -exec $(RM) '{}' \;

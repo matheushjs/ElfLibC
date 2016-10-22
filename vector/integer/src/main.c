@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <vector.h>
 #include <utils.h>
-#include <shellsort.h>
+#include <countingsort.h>
 
 enum {
 	PROGNAME,
@@ -11,7 +11,7 @@ enum {
 };
 
 int main(int argc, char *argv[]){
-	int *vec, size;
+	int *vec, *R, size;
 
 	if(argc != NARGS){
 		printf("Usage: ./prog [size]\n");
@@ -23,10 +23,11 @@ int main(int argc, char *argv[]){
 	vector_print(vec, size);
 
 	/* Sorting function goes here */
-	shellsort(vec, size);
+	R = countingsort(vec, size);
 	/*Sorting function ends here */
 
-	vector_print(vec, size);
+	vector_print(R, size);
+	free(R);
 
 	free(vec);
 	return 0;

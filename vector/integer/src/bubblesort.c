@@ -1,7 +1,8 @@
 #include <stdbool.h>
 #include <utils.h>
+#include <vector.h>
 
-void bubblesort(int *vec, int size){
+void bubblesort(data_t *vec, int size){
 	int i;
 	bool good;
 	do

@@ -1,8 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <utils.h>
+#include <vector.h>
 
-void merge(int *vec, int *dup1, int *dup2, int size1, int size2){
+void merge(data_t *vec, data_t *dup1, data_t *dup2, int size1, int size2){
 	int total = size1 + size2;
 	do{
 		total--;
@@ -22,15 +23,15 @@ void merge(int *vec, int *dup1, int *dup2, int size1, int size2){
 	} while(total);
 }
 
-void mergesort(int *vec, int size){
-	int *dup;
+void mergesort(data_t *vec, int size){
+	data_t *dup;
 	int mid;
 
 	if(size == 1) return;
 	mid = size/2;
 	
-	dup = (int *) malloc(sizeof(int) * size);
-	memcpy(dup, vec, sizeof(int) * size);
+	dup = (data_t *) malloc(sizeof(data_t) * size);
+	memcpy(dup, vec, sizeof(data_t) * size);
 
 	mergesort(dup, mid);
 	mergesort(dup+mid, size-mid);

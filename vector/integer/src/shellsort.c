@@ -1,6 +1,7 @@
 #include <utils.h>
+#include <vector.h>
 
-void shellsort(int *vec, int size){
+void shellsort(data_t *vec, int size){
 	int i, j, h = 1;
 	while(h < size) h = h*3 + 1;
 	do{

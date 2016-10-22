@@ -1,6 +1,7 @@
 #include <utils.h>
+#include <vector.h>
 
-void insertionsort(int *vec, int size){
+void insertionsort(data_t *vec, int size){
 	int i, j;
 	for(i = 1; i < size; i++){
 		j = i;

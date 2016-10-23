@@ -1,7 +1,8 @@
 CC=gcc
 CFLAGS=-Wall -O3
 INCLUDE=./include/
-SRC=src/vector.c src/bubblesort.c src/insertionsort.c src/mergesort.c src/shellsort.c src/heapsort.c src/countingsort.c
+SRC=src/utils.c src/vector.c src/bubblesort.c src/insertionsort.c src/mergesort.c \
+    src/shellsort.c src/heapsort.c src/countingsort.c src/quicksort.c
 EXEC1=prog
 LIBS=-lm
 RM=rm -fv

@@ -1,4 +1,4 @@
 RM = rm -fv
 
 clean:
-	$(RM) ./*~ ./*/*~ ./*/*/*~ ./*/*/*/*~
+	find -type f -name "*~" -exec $(RM) '{}' \;

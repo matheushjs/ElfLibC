@@ -5,12 +5,13 @@
 #include <quicksort.h>
 
 int main(int argc, char *argv[]){
-	int size, *vec;
+	int *vec;
+	unsigned int size;
 	clock_t begin, end;
 	//int *R;
 
 	for(size = 1000; size < 1<<30; size += 1000){
-		vec = vector_create_random(size, 100);
+		vec = vector_create_random(size, size*5);
 		
 		begin = clock();
 		/* Code being benchmarked starts here */

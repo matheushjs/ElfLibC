@@ -2,75 +2,42 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-#include <avltree.h>
 
 #define DIE(X) fprintf(stderr, "ERROR:%s:%d: %s\n", __FILE__, __LINE__, X), exit(EXIT_FAILURE)
 #define ROTATED -3 //Should be any char outside interval [-2, 2]
 
 typedef struct node_struct {
+	void *data;
 	struct node_struct *left, *right;
-	data_t data;
 	char bf;	//balancing factor.
 } node_t;
 
+typedef struct tree_struct tree_t;
 struct tree_struct {
 	node_t *root;
+
+	bool (*data_higher)(void *, void *);
+	bool (*data_equal)(void *, void *);
+	void (*data_free)(void *);
+	void (*data_print)(void *);
 };
 
-static bool (*data_higher)(data_t *, data_t *) = NULL;
-static bool (*data_equal)(data_t *, data_t *) = NULL;
-static void (*data_copy)(data_t *, data_t *) = NULL;
-static void (*data_free)(data_t *) = NULL;
-static void (*data_print)(data_t *) = NULL;
-
-/*
- * Node functions
- */
-
 static
-node_t *node_alloc(){
-	return (node_t *) calloc(sizeof(node_t), 1);
-}
-
-static
-node_t *node_create(data_t *data){
-	node_t *res = node_alloc();
-	if(data_copy) data_copy(&res->data, data);
-	else memcpy(&res->data, data, sizeof(data_t));
+node_t *node_create(void *data){
+	node_t *res = (node_t *) calloc(sizeof(node_t), 1);
+	res->data = data;
 	return res;
 }
 
-static
-void node_destroy(node_t **node){
-	if(*node){
-		if(data_free) data_free(&(*node)->data);
-		free(*node);
-		*node = NULL;
-	}
-}
-
-//Function for merely freeing the memory used by the node.
-static
-void node_free(node_t **node){
-	if(*node){
-		free(*node);
-		*node = NULL;
-	}
-}
-
-
-/*
- * Tree functions
- */
-
-void tree_set_higher(bool (*higher)(data_t *, data_t *)){ data_higher = higher; }
-void tree_set_equal(bool (*equal)(data_t *, data_t *)){ data_equal = equal; }
-void tree_set_copy(void (*copy)(data_t *, data_t *)){ data_copy = copy; }
-void tree_set_free(void (*free_func)(data_t *)){ data_free = free_func; }
-void tree_set_print(void (*print)(data_t *)){ data_print = print; }
-
-tree_t *tree_alloc(){
-	return (tree_t *) calloc(sizeof(tree_t), 1);
+tree_t *tree_alloc(bool (*higher)(void*,void*), bool (*equal)(void*,void*),
+		void (*dfree)(void*), void (*print)(void *)){
+	tree_t *res;
+	res = (tree_t *) calloc(sizeof(tree_t), 1);
+	res->data_higher = higher;
+	res->data_equal = equal;
+	res->data_free = dfree;
+	res->data_print = print;
+	return res;
 }
 
 static
@@ -99,27 +66,27 @@ void rotate_l(node_t **node){
 //If a rotation occured, returns ROTATED, signaling the previous function calls to
 //not change any other node's balancing factor.
 static
-char insert_op(node_t **node_ptr, data_t *data){
+char insert_op(tree_t *tree, node_t **node_ptr, void *data){
 	char value;
 	node_t *node = *node_ptr;
 
-	if(data_higher(data, &node->data)){
+	if(tree->data_higher(data, &node->data)){
 		//Go to the right branch
 		if(!node->right){
 			node->right = node_create(data);
 			node->bf--; //Always becomes 1, 0 or -1.
 		} else {
-			value = insert_op(&node->right, data);
+			value = insert_op(tree, &node->right, data);
 			if(value == ROTATED) return ROTATED;
 			else if(value) node->bf--;
 		}
-	} else if (!data_equal(data, &node->data)){
+	} else if (!tree->data_equal(data, &node->data)){
 		//Go to the left branch
 		if(!node->left){
 			node->left = node_create(data);
 			node->bf++; //Always becomes 1, 0 or -1.
 		} else {
-			value = insert_op(&node->left, data);
+			value = insert_op(tree, &node->left, data);
 			if(value == ROTATED) return ROTATED;
 			else if (value) node->bf++;
 		}
@@ -139,40 +106,53 @@ char insert_op(node_t **node_ptr, data_t *data){
 	return (*node_ptr)->bf;
 }
 
-void tree_insert(tree_t *tree, data_t *data){
-	if(!tree || !data){ DIE("Invalid pointer");  return; }
+void tree_insert(tree_t *tree, void *data){
+	if(!tree || !data){ DIE("Invalid pointer"); return; }
 	if(!tree->root) tree->root = node_create(data);
-	else insert_op(&tree->root, data);
+	else insert_op(tree, &tree->root, data);
+}
+
+bool tree_search(tree_t *tree, void *data){
+	node_t *cur = tree->root;
+	while(cur){
+		if(tree->data_equal(data, cur->data))
+			return true;
+		else if(tree->data_higher(data, cur->data))
+			cur = cur->right;
+		else cur = cur->left;
+	}
+	return false;
 }
 
 static
-void destroy_op(node_t *node){
+void destroy_op(tree_t *tree, node_t *node){
 	if(!node) return;
-	destroy_op(node->right);
-	destroy_op(node->left);
-	node_destroy(&node);
+	destroy_op(tree, node->right);
+	destroy_op(tree, node->left);
+	tree->data_free(node->data);
+	free(node);
 }
 
 void tree_destroy(tree_t **tree){
 	if(!*tree) return;
-	destroy_op((*tree)->root);
+	destroy_op(*tree, (*tree)->root);
 	free(*tree);
 	*tree = NULL;
 }
 
 static
-void print_op(node_t *node){
+void print_op(tree_t *tree, node_t *node){
 	if(!node) return;
 	if(node->left) printf("{");
-	print_op(node->left);
+	print_op(tree, node->left);
 	if(node->left) printf("} ");
-	data_print(&node->data);
+	tree->data_print(node->data);
 	if(node->right) printf(" {");
-	print_op(node->right);
+	print_op(tree, node->right);
 	if(node->right) printf("}");
 }
 
 void tree_print(tree_t *tree){
 	if(!tree) return;
-	print_op(tree->root);
+	print_op(tree, tree->root);
 }

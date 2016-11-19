@@ -3,33 +3,46 @@
 #include <stdbool.h>
 #include <avltree.h>
 
-bool higher(int *a, int *b){
-	return *a > *b ? true : false;
+bool higher(void *a, void *b){
+	return (*(int *)a > *(int *)b) ? true : false;
 }
 
-bool equal(int *a, int *b){
-	return *a == *b ? true : false;
+bool equal(void *a, void *b){
+	return (*(int *)a == *(int *)b) ? true : false;
 }
 
-void print(int *a){
-	printf("%d", *a);
+void print(void *a){
+	printf("%d", *(int *)a);
+}
+
+void data_free(void *a){
+	free(a);
 }
 
 int main(int argc, char *argv[]){
-	int i, lim, add[] = {10, 7, 20, 15, 17, 25, 30, 5, 1};
+	int i, lim;
+	int add[] = {10, 7, 20, 15, 17, 25, 30, 5, 1};
+	int search[] = {20, 15, 101};
+	int *p;
 	tree_t *tree;
 
-	tree_set_higher(higher);
-	tree_set_equal(equal);
-	tree_set_print(print);
-
 	lim = sizeof(add)/sizeof(int);
-	tree = tree_alloc();
+	tree = tree_alloc(higher, equal, data_free, print);
 	for(i = 0; i < lim; i++){
-		printf("Attempting to insert: %d\n", add[i]);
-		tree_insert(tree, &add[i]);
+		p = (int *) malloc(sizeof(int));
+		*p = add[i];
+		printf("Attempting to insert: %d\n", *p);
+		tree_insert(tree, p);
 		tree_print(tree);
 		printf("\n");
+	}
+
+	lim = sizeof(search)/sizeof(int);
+	for(i = 0; i < lim; i++){
+		p = (int *) malloc(sizeof(int));
+		*p = search[i];
+		printf("%s: %d\n", tree_search(tree, p) ? "Found" : "Did not find", *p);
+		free(p);
 	}
 
 	tree_destroy(&tree);

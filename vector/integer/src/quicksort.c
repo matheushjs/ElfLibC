@@ -31,42 +31,16 @@ void quicksort(data_t *vec, int size){
 
 #define MEDIAN(X, Y, Z) (X<=Y?(X>=Z?X:(Z<=Y?Z:Y)):(Y>=Z?Y:(X<=Z?X:Z)))
 static
-void partition_med(int *vector, int left, int right, int *di, int *dj){
-	int mid, i, j;
-
-	mid = MEDIAN(vector[(right+left)/2], vector[left], vector[right]);
-
-	i = left;
-	j = right;
-	while(i <= j){
-		while(vector[i] < mid) i++;
-		while(vector[j] > mid) j--;
-		if(i > j) break;
-
-		swap(vector, i, j);
-		i++;
-		j--;
-	}
-	
-	*di = i;
-	*dj = j;
-}
-
-//What is guaranteed is that:
-// [left,j] inteval contains numbers <= pivot
-// [i,right] interval contains numbers >= pivot
-//there might be items in interval (j,i)
-//these items will have equal value to the pivot, so they end up in their correct places.
-static
 void partition(int *vector, int left, int right, int *di, int *dj){
-	int mid, i, j;
+	int pivot, i, j;
 
-	mid = vector[(right+left)/2];
+	pivot = MEDIAN(vector[(right+left)/2], vector[left], vector[right]);
+
 	i = left;
 	j = right;
 	while(i <= j){
-		while(vector[i] < mid) i++;
-		while(vector[j] > mid) j--;
+		while(vector[i] < pivot) i++;
+		while(vector[j] > pivot) j--;
 		if(i > j) break;
 
 		swap(vector, i, j);
@@ -83,7 +57,7 @@ void quicksort_op(data_t *vec, int left, int right){
 
 	if(right-left < 1) return;
 
-	partition_med(vec, left, right, &i, &j);
+	partition(vec, left, right, &i, &j);
 	quicksort_op(vec, left, j);
 	quicksort_op(vec, i, right);
 }

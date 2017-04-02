@@ -9,7 +9,7 @@
 
 typedef struct _ElfQueue ElfQueue;
 
-ElfQueue *elf_queue_alloc();
+ElfQueue *elf_queue_new();
 void elf_queue_push(ElfQueue *q, void *data);
 void *elf_queue_pop(ElfQueue *q);
 void elf_queue_destroy(ElfQueue **q_pointer);

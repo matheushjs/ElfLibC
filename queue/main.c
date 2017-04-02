@@ -9,7 +9,7 @@ void print(void *i){
 int main(int argc, char *argv[]){
 	ElfQueue *q;
 
-	q = elf_queue_alloc();
+	q = elf_queue_new();
 
 	printf("[0|%d]\n", elf_queue_size(q));
 	printf("[0|%lu]\n", (unsigned long) elf_queue_front(q));

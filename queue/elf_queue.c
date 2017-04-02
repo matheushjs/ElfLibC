@@ -39,7 +39,7 @@ static void node_destroy(Node **node){
  * Queue functions
  */
 
-ElfQueue *elf_queue_alloc(){
+ElfQueue *elf_queue_new(){
 	return (ElfQueue *) calloc(sizeof(ElfQueue), 1);
 }
 

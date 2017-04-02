@@ -1,8 +1,7 @@
 #ifndef _ELF_LIST_MATRIX_H_
 #define _ELF_LIST_MATRIX_H_
 
-struct ElfGraphList;
-typedef struct ElfGraphList ElfGraphList;
+typedef struct _ElfGraphList ElfGraphList;
 
 #include <stdio.h>
 #include <stdbool.h>

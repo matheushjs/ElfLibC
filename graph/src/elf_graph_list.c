@@ -14,7 +14,7 @@ typedef struct ElfNode {
 	struct ElfNode *next;	//List will be ordered, with no duplicates.
 } ElfNode;
 
-typedef struct ElfGraphList {
+typedef struct _ElfGraphList {
 	int n;
 	bool oriented;
 	ElfNode **array; //Array of lists.

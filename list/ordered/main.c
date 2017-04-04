@@ -1,43 +1,44 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <list.h>
+#include <elf_list.h>
 
-bool lower(int *d1, int *d2){
-	return *d1 < *d2 ? TRUE : FALSE;
+bool lower(void *d1, void *d2){
+	return ELF_POINTER_TO_INT(d1) < ELF_POINTER_TO_INT(d2) ? true : false;
 }
 
-void print(int *d){
-	printf("%d", *d);
+void print(void *d){
+	printf("%d ", ELF_POINTER_TO_INT(d));
+}
+
+void print_list(ElfList *l){
+	elf_list_traverse(l, print);
+	printf("\n");
 }
 
 int main(int argc, char *argv[]){
-	int data = 0;
 
-	list_set_cmp_data(lower);
-	list_set_print_data(print);
+	ElfList *list = elf_list_new(lower);
+	print_list(list);
+	
+	int i;
+	for(i = 0; i < 20; i++)
+		elf_list_insert(list, ELF_INT_TO_POINTER(i%7));
+	print_list(list);
+	printf("size: %d\n", elf_list_size(list));
 
-	list_t *list = list_alloc();
-	list_insert(list, &data);
-	data++;
-	list_insert(list, &data);
-	data++;
-	list_insert(list, &data);
-	data++;
-	list_insert(list, &data);
-	data++;
-	list_insert(list, &data);
-	data++;
+	for(i = 19; i >= 0; i--)
+		elf_list_remove(list, i);
+	print_list(list);
 
-	printf("List size: %d\n", list_size(list));
-	list_remove(list, 2);
-	list_remove(list, 0);
-	printf("List size: %d\n", list_size(list));
+	for(i = 0; i < 20; i++)
+		elf_list_insert(list, ELF_INT_TO_POINTER(i%7));
+	print_list(list);
+	for(i = 19; i >= 0; i--)
+		print(elf_list_get(list, i));
+	printf("\n");
+	
 
-	int *p = list_retrieve(list, 0);
-	printf("Retrieving: %d\n", *p);
+	elf_list_destroy(&list);
 
-	list_print(list);
-
-	list_destroy(&list);
 	return 0;
 }

@@ -1,5 +1,5 @@
-list: main.c list.c
-	gcc -Wall -I. main.c list.c -o list
+list: main.c elf_list.c
+	gcc -Wall -I. main.c elf_list.c -o list
 
 clean:
 	rm -vf *~

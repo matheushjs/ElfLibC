@@ -14,11 +14,11 @@ typedef struct ElfNode {
 	struct ElfNode *next;	//List will be ordered, with no duplicates.
 } ElfNode;
 
-typedef struct _ElfGraphList {
+typedef struct _ElfGraph {
 	int n;
 	bool oriented;
 	ElfNode **array; //Array of lists.
-} ElfGraphList;
+} ElfGraph;
 
 
 /* 
@@ -29,9 +29,9 @@ static bool elf_node_list_remove(ElfNode **current, int adj);
 
 
 //Creates a graph with N vertexes, oriented or not.
-ElfGraphList *elf_graph_list_new(int N, bool oriented){
+ElfGraph *elf_graph_new(int N, bool oriented){
 	if(N < 0) DIE("Number of vertixes cannot be negative");
-	ElfGraphList *new = malloc(sizeof(ElfGraphList));
+	ElfGraph *new = malloc(sizeof(ElfGraph));
 	new->n = N;
 	new->oriented = oriented;
 	new->array = calloc(sizeof(ElfNode *), N); //NULL pointers.
@@ -39,8 +39,8 @@ ElfGraphList *elf_graph_list_new(int N, bool oriented){
 }
 
 //Deallocates all the memory used by 'graph', and sets its pointer to NULL.
-//'graph' should be an ElfGraphList* passed by reference (hence a double pointer).
-void elf_graph_list_destroy(ElfGraphList **graph){
+//'graph' should be an ElfGraph* passed by reference (hence a double pointer).
+void elf_graph_destroy(ElfGraph **graph){
 	int i, n;
 	ElfNode **array_copy = (*graph)->array;
 
@@ -61,7 +61,7 @@ void elf_graph_list_destroy(ElfGraphList **graph){
 
 //Adds to the graph an edge from 'src' to 'dest'.
 //If the graph is not oriented, the inverse direction is also added.
-void elf_graph_list_add_edge(ElfGraphList *graph, int src, int dest, int weight){
+void elf_graph_add_edge(ElfGraph *graph, int src, int dest, int weight){
 	if(src < 0 || dest < 0 || src >= graph->n || dest >= graph->n) DIE("Invalid vertix indexes");
 	
 	ElfNode *node = malloc(sizeof(ElfNode));
@@ -79,7 +79,7 @@ void elf_graph_list_add_edge(ElfGraphList *graph, int src, int dest, int weight)
 
 //Removes, if exists, the edge going from 'src' to 'dest'.
 //If the graph is not oriented, the inverse is also removed.
-void elf_graph_list_remove_edge(ElfGraphList *graph, int src, int dest){
+void elf_graph_remove_edge(ElfGraph *graph, int src, int dest){
 	if(src < 0 || dest < 0 || src >= graph->n || dest >= graph->n) DIE("Invalid vertix indexes");
 
 	elf_node_list_remove(&graph->array[src], dest);
@@ -87,7 +87,7 @@ void elf_graph_list_remove_edge(ElfGraphList *graph, int src, int dest){
 }
 
 //Prints the adjacency list of a graph
-void elf_graph_list_print_list(const ElfGraphList *graph, FILE *fp){
+void elf_graph_print_list(const ElfGraph *graph, FILE *fp){
 	int i, dimension = graph->n;
 	for(i = 0; i < dimension; i++){
 		ElfNode *node = graph->array[i];
@@ -101,7 +101,7 @@ void elf_graph_list_print_list(const ElfGraphList *graph, FILE *fp){
 }
 
 //Prints indexes of vertices that are adjacent to 'subjectVertex'.
-void elf_graph_list_print_adjacent_vertex(const ElfGraphList *graph, int subjectVertex, FILE *fp){
+void elf_graph_print_adjacent_vertex(const ElfGraph *graph, int subjectVertex, FILE *fp){
 	if(subjectVertex >= graph->n || subjectVertex < 0) DIE("Invalid subjectVertex");
 	ElfNode *node = graph->array[subjectVertex];
 
@@ -116,7 +116,7 @@ void elf_graph_list_print_adjacent_vertex(const ElfGraphList *graph, int subject
 
 //Prints the lowest weight edge of the graph.
 //If the graph is not oriented, the vertex indexes are printed in crescent order.
-void elf_graph_list_print_edge_lowest_weight(const ElfGraphList *graph, FILE *fp){
+void elf_graph_print_edge_lowest_weight(const ElfGraph *graph, FILE *fp){
 	int mini, minj, minVal = INT_MAX;
 	
 	int i, dimension;
@@ -138,7 +138,7 @@ void elf_graph_list_print_edge_lowest_weight(const ElfGraphList *graph, FILE *fp
 }
 
 //Prints the transposed adjacency list of a graph
-void elf_graph_list_print_matrix_transposed(ElfGraphList *graph, FILE *fp){
+void elf_graph_print_matrix_transposed(ElfGraph *graph, FILE *fp){
 	int current_col, dimension = graph->n;
 	ElfNode **node_records;
 

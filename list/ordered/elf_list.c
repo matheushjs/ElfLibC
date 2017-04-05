@@ -105,28 +105,28 @@ void *elf_list_remove(ElfList *list, int index){
 	void *key;
 	
 	if(!list) ELF_DIE("Received null pointer");
+	if(index < 0 || index >= list->size) return NULL;
 
 	Node *prev, *cur = list->first;
-	if(cur == NULL) return NULL;
 
 	prev = NULL;
 	for(i = 0; i < index; i++){
 		prev = cur;
 		cur = cur->next;
-		if(cur == NULL) return NULL;
 	}
 
 	//At this point, cur is not NULL and positioned in the index-th element.
 	//prev should be the previous node, or NULL if index = 0.
 	key = cur->key;
 
-	if(prev == NULL){
+	if(index == 0){
 		list->first = cur->next;
 	} else {
 		prev->next = cur->next;
 	}
 	free(cur);
 
+	list->size--;
 	return key;
 }
 
@@ -142,14 +142,12 @@ void *elf_list_get(const ElfList *list, int index){
 	int i;
 
 	if(!list) ELF_DIE("Received null pointer");
+	if(index < 0 || index >= list->size) return NULL;
 	
 	Node *cur = list->first;
-	if(cur == NULL) return NULL;
 
-	for(i = 0; i < index; i++){
+	for(i = 0; i < index; i++)
 		cur = cur->next;
-		if(cur == NULL) return NULL;
-	}
 
 	return cur->key;
 }

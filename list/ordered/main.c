@@ -29,6 +29,7 @@ int main(int argc, char *argv[]){
 	for(i = 19; i >= 0; i--)
 		elf_list_remove(list, i);
 	print_list(list);
+	printf("size: %d\n", elf_list_size(list));
 
 	for(i = 0; i < 20; i++)
 		elf_list_insert(list, ELF_INT_TO_POINTER(i%7));

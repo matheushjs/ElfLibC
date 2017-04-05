@@ -29,6 +29,12 @@ ELF_POINTER_TO_UINT(p)
 	- Macros for type casting from signed/unsigned integers to pointers.
 	- Useful since this queue data structure can only store void pointers.
 
+ElfList
+	- Ordered list of void*
+	- Ascending order
+	- Accepts duplicates
+	- In case of duplicates, older pointers comes first
+
 ElfList *elf_list_new(bool (*greaterThan)(void*,void*));
 	- Returns a new list, using the function 'greaterThan' as ordering function.
 	- If greaterThan is NOT reflexive, then duplicate elements will be

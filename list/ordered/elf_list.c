@@ -22,7 +22,7 @@ struct _ElfList {
 	int size;
 };
 
-static
+static inline
 Node *node_new(){
 	return (Node *) calloc(sizeof(Node), 1);
 }

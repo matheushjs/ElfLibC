@@ -60,7 +60,7 @@ void elf_list_insert(ElfList *list, int key){
 //Inserts 'key' into the list if it's not a duplicate.
 //If it is a duplicate, return false (fail). Else return true.
 //It is forbidden to insert ELF_INVALID_INT.
-bool elf_list_insert_unique(ElfList *list, int key){
+bool elf_list_insertUnique(ElfList *list, int key){
 	if(!list) ELF_DIE("Received null pointer");
 	if(key == ELF_INVALID_INT) ELF_DIE("Attempted to insert ELF_INVALID_INT");
 
@@ -89,14 +89,26 @@ bool elf_list_insert_unique(ElfList *list, int key){
 	return true;
 }
 
-//Returns 'true' if 'key' exists within list.
-bool elf_list_search(ElfList *list, int key){
+//If 'key' exists within list, return the index of the first occurence.
+//Return -1 otherwise.
+int elf_list_indexOf(ElfList *list, int key){
 	if(!list) ELF_DIE("Received null pointer");
 	
 	Node *curr = list->first;
-	while(curr != NULL && curr->key != key)
+	int count = 0;
+	while(curr != NULL && curr->key < key){
 		curr = curr->next;
-	if(curr != NULL) return true;
+		count++;
+	}
+	if(curr != NULL && curr->key == key)
+		return count;
+	else return -1;
+}
+
+//Returns 'true' if 'key' exists within list.
+bool elf_list_contains(ElfList *list, int key){
+	if(elf_list_indexOf(list, key) != -1)
+		return true;
 	else return false;
 }
 
@@ -202,7 +214,7 @@ void elf_list_traverse(ElfList *list, void(*func)(int)){
 }
 
 //Returns an iterator to the first element of list.
-ElfListIt *elf_list_get_iterator(ElfList *list){
+ElfListIt *elf_list_getIterator(ElfList *list){
 	if(!list) ELF_DIE("Received null pointer");
 	return list->first;
 }

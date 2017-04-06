@@ -10,8 +10,9 @@ typedef struct _ElfList ElfList;
 
 ElfList *elf_list_new();
 void elf_list_insert(ElfList *list_p, int data);
-bool elf_list_insert_unique(ElfList *list, int key);
-bool elf_list_search(ElfList *list, int key);
+bool elf_list_insertUnique(ElfList *list, int key);
+int elf_list_indexOf(ElfList *list, int key);
+bool elf_list_contains(ElfList *list, int key);
 int elf_list_count(ElfList *list, int key);
 void elf_list_destroy(ElfList **list_p);
 int elf_list_remove(ElfList *list, int index);
@@ -24,7 +25,7 @@ struct _ElfListIt {
 	int key;
 	ElfListIt *next;
 };
-ElfListIt *elf_list_get_iterator(ElfList *list);
+ElfListIt *elf_list_getIterator(ElfList *list);
 
 /* Documentation
 
@@ -47,12 +48,16 @@ void elf_list_insert(ElfList *list_p, int data);
 	- Inserts 'key' into the list.
 	- It is forbidden to insert ELF_INVALID_INT (INT_MIN).
 
-bool elf_list_insert_unique(ElfList *list, int key){
+bool elf_list_insertUnique(ElfList *list, int key){
 	- Inserts 'key' into the list if it's not a duplicate.
 	- If it is a duplicate, return false (fail). Else return true.
 	- It is forbidden to insert ELF_INVALID_INT.
 
-bool elf_list_search(ElfList *list, int key);
+int elf_list_indexOf(ElfList *list, int key);
+	- If 'key' exists within list, return the index of the first occurence.
+	- Return -1 otherwise.
+
+bool elf_list_contains(ElfList *list, int key);
 	- Returns 'true' if 'key' exists within list.
 
 int elf_list_count(ElfList *list, int key);
@@ -79,7 +84,7 @@ void elf_list_traverse(ElfList *list, void(*func)(void*));
 ElfListIt
 	- Iterator for the list structure.
 
-ElfListIt *elf_list_get_iterator(ElfList *list);
+ElfListIt *elf_list_getIterator(ElfList *list);
 	- Returns an iterator to the first element of list.
 	- Iterators should not be freed.
 	- Nodes pointed by iterators shouldn't be modified.

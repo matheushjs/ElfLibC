@@ -1,5 +1,5 @@
-#ifndef _ELF_LIST_MATRIX_H_
-#define _ELF_LIST_MATRIX_H_
+#ifndef _ELF_GRAPH_LIST_H_
+#define _ELF_GRAPH_LIST_H_
 
 typedef struct _ElfGraph ElfGraph;
 

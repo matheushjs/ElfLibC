@@ -3,29 +3,30 @@
 #include <stdbool.h>
 #include <string.h>
 #include <limits.h>
+#include <elf_graph.h>
 
 #define DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
 #define MAX(X,Y) X>Y?X:Y
 #define MIN(X,Y) X<Y?X:Y
 
-typedef struct ElfNode {
+typedef struct _Node {
 	int adj;	//Vertix this node 'points' to.
 	int weight;	//Weight of the edge.
-	struct ElfNode *next;	//List will be ordered, with no duplicates.
-} ElfNode;
+	struct _Node *next;	//List will be ordered, with no duplicates.
+} Node;
 
 typedef struct _ElfGraph {
 	int n;
 	bool oriented;
-	ElfNode **array; //Array of lists.
+	Node **array; //Array of lists.
 } ElfGraph;
 
 
 /* 
  * Static functions definitions
  */
-static void elf_node_list_insert(ElfNode **current, ElfNode *node);
-static bool elf_node_list_remove(ElfNode **current, int adj);
+static void elf_node_list_insert(Node **current, Node *node);
+static bool elf_node_list_remove(Node **current, int adj);
 
 
 //Creates a graph with N vertexes, oriented or not.
@@ -34,7 +35,7 @@ ElfGraph *elf_graph_new(int N, bool oriented){
 	ElfGraph *new = malloc(sizeof(ElfGraph));
 	new->n = N;
 	new->oriented = oriented;
-	new->array = calloc(sizeof(ElfNode *), N); //NULL pointers.
+	new->array = calloc(sizeof(Node *), N); //NULL pointers.
 	return new;
 }
 
@@ -42,11 +43,11 @@ ElfGraph *elf_graph_new(int N, bool oriented){
 //'graph' should be an ElfGraph* passed by reference (hence a double pointer).
 void elf_graph_destroy(ElfGraph **graph){
 	int i, n;
-	ElfNode **array_copy = (*graph)->array;
+	Node **array_copy = (*graph)->array;
 
 	//Frees the nodes on the lists.
 	for(i = 0, n = (*graph)->n; i < n; i++){
-		ElfNode *aux, *ref = array_copy[i];
+		Node *aux, *ref = array_copy[i];
 		while(ref != NULL){
 			aux = ref->next;
 			free(ref);
@@ -64,13 +65,13 @@ void elf_graph_destroy(ElfGraph **graph){
 void elf_graph_add_edge(ElfGraph *graph, int src, int dest, int weight){
 	if(src < 0 || dest < 0 || src >= graph->n || dest >= graph->n) DIE("Invalid vertix indexes");
 	
-	ElfNode *node = malloc(sizeof(ElfNode));
+	Node *node = malloc(sizeof(Node));
 	node->adj = dest;
 	node->weight = weight;
 	elf_node_list_insert(&graph->array[src], node);
 
 	if(!graph->oriented){
-		node = malloc(sizeof(ElfNode));
+		node = malloc(sizeof(Node));
 		node->adj = src;
 		node->weight = weight;
 		elf_node_list_insert(&graph->array[dest], node);
@@ -90,7 +91,7 @@ void elf_graph_remove_edge(ElfGraph *graph, int src, int dest){
 void elf_graph_print_list(const ElfGraph *graph, FILE *fp){
 	int i, dimension = graph->n;
 	for(i = 0; i < dimension; i++){
-		ElfNode *node = graph->array[i];
+		Node *node = graph->array[i];
 		fprintf(fp, "%d.", i);
 		while(node != NULL){
 			fprintf(fp, " %d(%d)", node->adj, node->weight);
@@ -103,7 +104,7 @@ void elf_graph_print_list(const ElfGraph *graph, FILE *fp){
 //Prints indexes of vertices that are adjacent to 'subjectVertex'.
 void elf_graph_print_adjacent_vertex(const ElfGraph *graph, int subjectVertex, FILE *fp){
 	if(subjectVertex >= graph->n || subjectVertex < 0) DIE("Invalid subjectVertex");
-	ElfNode *node = graph->array[subjectVertex];
+	Node *node = graph->array[subjectVertex];
 
 	int counter = 0; //Counter will control when to print a blank space.
 	while(node != NULL){
@@ -121,7 +122,7 @@ void elf_graph_print_edge_lowest_weight(const ElfGraph *graph, FILE *fp){
 	
 	int i, dimension;
 	for(i = 0, dimension=graph->n; i < dimension; i++){
-		ElfNode *node = graph->array[i];
+		Node *node = graph->array[i];
 		while(node != NULL){
 			if(node->weight < minVal){
 				mini = i;
@@ -140,13 +141,13 @@ void elf_graph_print_edge_lowest_weight(const ElfGraph *graph, FILE *fp){
 //Prints the transposed adjacency list of a graph
 void elf_graph_print_matrix_transposed(ElfGraph *graph, FILE *fp){
 	int current_col, dimension = graph->n;
-	ElfNode **node_records;
+	Node **node_records;
 
 	if(!graph->oriented) return; //Ignoring as instructed to.
 
 	//Copies the content of graph->array into node_records.
-	node_records = malloc(sizeof(ElfNode *) * dimension);
-	memcpy(node_records, graph->array, sizeof(ElfNode *) * dimension);
+	node_records = malloc(sizeof(Node *) * dimension);
+	memcpy(node_records, graph->array, sizeof(Node *) * dimension);
 
 	//Will run through the records to find which nodes point to the node 0. Then print them.
 	//Those that pointer to node 0 will be incremented (receive value of next node).
@@ -172,10 +173,10 @@ void elf_graph_print_matrix_transposed(ElfGraph *graph, FILE *fp){
  * Implementation of static functions
  */
 
-//Inserts node into an ordered list of ElfNodes.
+//Inserts node into an ordered list of Nodes.
 //If there is already a node with same 'adj' value, the previous node will be replaced.
 static
-void elf_node_list_insert(ElfNode **current, ElfNode *node){
+void elf_node_list_insert(Node **current, Node *node){
 	
 	//Finds the point at which to insert 'node'.
 	//Will stop once 'current' is NULL or 'current' is higher than 'node'.
@@ -194,11 +195,11 @@ void elf_node_list_insert(ElfNode **current, ElfNode *node){
 	}
 }
 
-//Removes a node from an ordered list of ElfNodes;
+//Removes a node from an ordered list of Nodes;
 //If the node doesn't exist, return 'false'; 'true' otherwise.
 static
-bool elf_node_list_remove(ElfNode **current, int adj){
-	ElfNode *aux;
+bool elf_node_list_remove(Node **current, int adj){
+	Node *aux;
 	
 	//Test the current node.
 	if(*current == NULL) return false;

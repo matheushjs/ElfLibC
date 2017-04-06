@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <elf_list.h>
 
 #define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
@@ -10,7 +11,6 @@
 //should be called ElfListIt.
 typedef struct _ElfListIt Node;
 
-
 //List will be crescently ordered.
 typedef struct _ElfList ElfList;
 struct _ElfList {
@@ -18,14 +18,13 @@ struct _ElfList {
 	int size;
 };
 
-static
+
+
+
+static inline
 Node *node_new(){
 	return (Node *) calloc(sizeof(Node), 1);
 }
-
-/*
- * List functions
- */
 
 //Creates a new ordered list.
 ElfList *elf_list_new(){
@@ -37,22 +36,85 @@ ElfList *elf_list_new(){
 void elf_list_insert(ElfList *list, int key){
 	if(!list) ELF_DIE("Received null pointer");
 	if(key == ELF_INVALID_INT) ELF_DIE("Attempted to insert ELF_INVALID_INT");
+	
 	Node *new = node_new();
 	new->key = key;
 	list->size++;
 
 	Node *curr = list->first;
-	if(curr == NULL || curr->key >= key){
-		new->next = curr;
-		list->first = new;
-		return;
+	Node *prev = NULL;
+	while(curr != NULL && curr->key < key){
+		prev = curr;
+		curr = curr->next;
 	}
 
-	while(curr->next != NULL && curr->next->key < key)
-		curr = curr->next;
+	if(prev == NULL){
+		new->next = list->first;
+		list->first = new;
+	} else {
+		new->next = curr;
+		prev->next = new;
+	}
+}
 
-	new->next = curr->next;
-	curr->next = new;
+//Inserts 'key' into the list if it's not a duplicate.
+//If it is a duplicate, return false (fail). Else return true.
+//It is forbidden to insert ELF_INVALID_INT.
+bool elf_list_insert_unique(ElfList *list, int key){
+	if(!list) ELF_DIE("Received null pointer");
+	if(key == ELF_INVALID_INT) ELF_DIE("Attempted to insert ELF_INVALID_INT");
+
+	Node *new = node_new();
+	new->key = key;
+
+	Node *curr = list->first;
+	Node *prev = NULL;
+	while(curr != NULL && curr->key < key){
+		prev = curr;
+		curr = curr->next;
+	}
+
+	if(curr != NULL && curr->key == key){
+		free(new);
+		return false;
+	} else if(prev == NULL){
+		new->next = list->first;
+		list->first = new;
+	} else {
+		new->next = curr;
+		prev->next = new;
+	}
+	
+	list->size++;
+	return true;
+}
+
+//Returns 'true' if 'key' exists within list.
+bool elf_list_search(ElfList *list, int key){
+	if(!list) ELF_DIE("Received null pointer");
+	
+	Node *curr = list->first;
+	while(curr != NULL && curr->key != key)
+		curr = curr->next;
+	if(curr != NULL) return true;
+	else return false;
+}
+
+//Returns the amount of times the value 'key' appears in the list.
+int elf_list_count(ElfList *list, int key){
+	if(!list) ELF_DIE("Received null pointer");
+
+	Node *curr = list->first;
+	while(curr != NULL && curr->key != key)
+		curr = curr->next;
+	if(curr == NULL) return 0;
+	
+	int count = 0;
+	while(curr != NULL && curr->key == key){
+		curr = curr->next;
+		count++;
+	}
+	return count;
 }
 
 //Destroys a list

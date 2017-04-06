@@ -2,6 +2,7 @@
 #define _ELF_LIST_H
 
 #include <limits.h>
+#include <stdbool.h>
 
 #define ELF_INVALID_INT INT_MIN
 
@@ -9,6 +10,9 @@ typedef struct _ElfList ElfList;
 
 ElfList *elf_list_new();
 void elf_list_insert(ElfList *list_p, int data);
+bool elf_list_insert_unique(ElfList *list, int key);
+bool elf_list_search(ElfList *list, int key);
+int elf_list_count(ElfList *list, int key);
 void elf_list_destroy(ElfList **list_p);
 int elf_list_remove(ElfList *list, int index);
 int elf_list_size(const ElfList *list);
@@ -20,7 +24,6 @@ struct _ElfListIt {
 	int key;
 	ElfListIt *next;
 };
-
 ElfListIt *elf_list_get_iterator(ElfList *list);
 
 /* Documentation
@@ -43,6 +46,17 @@ ElfList *elf_list_new();
 void elf_list_insert(ElfList *list_p, int data);
 	- Inserts 'key' into the list.
 	- It is forbidden to insert ELF_INVALID_INT (INT_MIN).
+
+bool elf_list_insert_unique(ElfList *list, int key){
+	- Inserts 'key' into the list if it's not a duplicate.
+	- If it is a duplicate, return false (fail). Else return true.
+	- It is forbidden to insert ELF_INVALID_INT.
+
+bool elf_list_search(ElfList *list, int key);
+	- Returns 'true' if 'key' exists within list.
+
+int elf_list_count(ElfList *list, int key);
+	- Returns the amount of times the value 'key' appears in the list.
 
 void elf_list_destroy(ElfList **list_p);
 	- Destroys a list
@@ -68,6 +82,8 @@ ElfListIt
 ElfListIt *elf_list_get_iterator(ElfList *list);
 	- Returns an iterator to the first element of list.
 	- Iterators should not be freed.
+	- Nodes pointed by iterators shouldn't be modified.
+	- The key in the Node shouldn't be modified.
 	- Iterators become dangling if the origin list is modified.
 	- Iterators become dangling if origin list is destroyed.
 

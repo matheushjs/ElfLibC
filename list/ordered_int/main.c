@@ -32,6 +32,7 @@ int main(int argc, char *argv[]){
 		elf_list_insert(list, i%7);
 	print_list(list);
 	printf("size: %d\n", elf_list_size(list));
+	printf("Count of 0: %d\n", elf_list_count(list, 0));
 
 	for(i = 19; i >= 0; i--)
 		elf_list_remove(list, i);
@@ -44,6 +45,21 @@ int main(int argc, char *argv[]){
 		print(elf_list_get(list, i));
 	printf("\n");
 	test_iterators(list);
+
+	for(i = 19; i >= 0; i--)
+		elf_list_remove(list, i);
+	for(i = 0; i < 20; i++)
+		elf_list_insert_unique(list, i%7);
+	printf("Unique:\n");
+	print_list(list);
+	printf("size: %d\n", elf_list_size(list));
+
+	for(i = 0; i < 10; i++){
+		if(elf_list_search(list, i))
+			printf("Found: %d\n", i);
+		else printf("Didn't find: %d\n", i);
+		printf("Count of %d: %d\n", i, elf_list_count(list, i));
+	}
 
 	elf_list_destroy(&list);
 

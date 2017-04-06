@@ -12,13 +12,23 @@
 typedef struct _ElfList ElfList;
 
 ElfList *elf_list_new(bool (*greaterThan)(void*,void*));
+ElfList *elf_list_newWithEqual(bool (*greaterThan)(void*,void*), bool (*equal)(void*,void*));
+
+/* Functions accepted by any list */
 void elf_list_insert(ElfList *list_p, void *data);
 void elf_list_destroy(ElfList **list_p);
-void elf_list_destroy_f(ElfList **list_p, void (*func)(void*));
+void elf_list_destroyF(ElfList **list_p, void (*func)(void*));
 void *elf_list_remove(ElfList *list, int index);
 int elf_list_size(const ElfList *list);
 void *elf_list_get(const ElfList *list, int index);
 void elf_list_traverse(ElfList *list, void(*func)(void*));
+
+/* Functions accepted only by lists with an equality function */
+bool elf_list_insertUnique(ElfList *list_p, void *data);
+int elf_list_indexOf(ElfList *list_p, void *data);
+bool elf_list_contains(ElfList *list, void *data);
+int elf_list_count(ElfList *list_p, void *data);
+
 
 /* Documentation
 
@@ -37,8 +47,13 @@ ElfList
 
 ElfList *elf_list_new(bool (*greaterThan)(void*,void*));
 	- Returns a new list, using the function 'greaterThan' as ordering function.
-	- If greaterThan is NOT reflexive, then duplicate elements will be
-	  ordered by their insertion dates. Older elements appear first.
+	- greaterThan SHOULD NOT BE REFLEXIVE. This means a > b means b > a is FALSE.
+	- By not having 'equal', some operations are not supported.
+
+ElfList *elf_list_newWithEqual(bool (*greaterThan)(void*,void*), bool (*equal)(void*,void*));
+	- Returns a new list, using the function 'greaterThan' as ordering function,
+	  and 'equal' as equality function.
+	- greaterThan SHOULD NOT BE REFLEXIVE. This means a > b means b > a is FALSE.
 
 void elf_list_insert(ElfList *list_p, void *data);
 	- Inserts 'data' into the list.
@@ -46,7 +61,7 @@ void elf_list_insert(ElfList *list_p, void *data);
 void elf_list_destroy(ElfList **list_p);
 	- Destroys a list, doing nothing to the pointers stored in it.
 
-void elf_list_destroy_f(ElfList **list_p, void (*func)(void*));
+void elf_list_destroyF(ElfList **list_p, void (*func)(void*));
 	- Destroys a list, using function 'func' to free the stored pointers.
 
 void *elf_list_remove(ElfList *list, int index);
@@ -62,6 +77,20 @@ void *elf_list_get(const ElfList *list, int index);
 
 void elf_list_traverse(ElfList *list, void(*func)(void*));
 	- Traverses all nodes in the list, applying 'func' in each stored pointer.
+
+bool elf_list_insertUnique(ElfList *list_p, void *data);
+	- Inserts 'data' into the list if it's not a duplicate.
+	- If list doesn't have an 'equal' function, exits the program.
+	- Returns true is 'data' is unique, false if it's a duplicate.
+
+int elf_list_indexOf(ElfList *list_p, void *data);
+	- If list contains 'data', return its index. Return -1 otherwise.
+
+bool elf_list_contains(ElfList *list, void *data);
+	- Returns true if the list contains 'data'.
+
+int elf_list_count(ElfList *list_p, void *data);
+	- Returns the number of elements 'data' within the list.
 
 */
 

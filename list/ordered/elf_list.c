@@ -19,6 +19,7 @@ typedef struct _ElfList ElfList;
 struct _ElfList {
 	Node *first;
 	bool (*greater)(void *a, void *b); // true if (a > b)
+	bool (*equal)(void *a, void *b); //true if (a == b)
 	int size;
 };
 
@@ -32,9 +33,20 @@ Node *node_new(){
  */
 
 //Creates a new ordered list, with comparison function 'greaterThan'.
+//By not having 'equal', some operations are not supported.
 ElfList *elf_list_new(bool (*greaterThan)(void*,void*)){
 	ElfList *list = calloc(sizeof(ElfList), 1);
 	list->greater = greaterThan;
+	list->equal = NULL;
+	return list;
+}
+
+//Creates a new ordered list, with comparison function 'greaterThan'
+//  and equality function 'equal'.
+ElfList *elf_list_newWithEqual(bool (*greaterThan)(void*,void*), bool (*equal)(void*,void*)){
+	ElfList *list = calloc(sizeof(ElfList), 1);
+	list->greater = greaterThan;
+	list->equal = equal;
 	return list;
 }
 
@@ -82,7 +94,7 @@ void elf_list_destroy(ElfList **list_p){
 }
 
 //Destroys a list, using function 'func' to free the stored pointers.
-void elf_list_destroy_f(ElfList **list_p, void (*func)(void*)){
+void elf_list_destroyF(ElfList **list_p, void (*func)(void*)){
 	ElfList *list = *list_p;
 	Node *node, *aux;
 
@@ -164,4 +176,82 @@ void elf_list_traverse(ElfList *list, void(*func)(void*)){
 		func(cur->key);
 		cur = cur->next;
 	}
+}
+
+//Inserts 'data' into the list if it's not a duplicate.
+//If list doesn't have an 'equal' function, exits the program.
+//Returns true is 'data' is unique, false if it's a duplicate.
+bool elf_list_insertUnique(ElfList *list_p, void *data){
+	if(!list_p) ELF_DIE("Received null pointer");
+	if(!list_p->equal) ELF_DIE("List does not have equal() function");
+
+	ElfList list = *list_p; //For efficiency
+	
+	Node *new = node_new();
+	new->key = data;
+
+	Node *curr = list.first;
+	Node *prev = NULL;
+	while(curr != NULL && list.greater(data, curr->key)){ // while data > curr
+		prev = curr;
+		curr = curr->next;
+	}
+
+	if(curr != NULL && list.equal(curr->key, data)){
+		free(new);
+		return false;
+	} else if(prev == NULL){
+		new->next = list_p->first;
+		list_p->first = new;
+	} else {
+		new->next = prev->next;
+		prev->next = new;
+	}
+	list_p->size++;
+	return true;
+}
+
+//If list contains 'data', return its index. Return -1 otherwise.
+int elf_list_indexOf(ElfList *list_p, void *data){
+	if(!list_p) ELF_DIE("Received null pointer");
+	if(!list_p->equal) ELF_DIE("List does not have equal() function");
+	
+	ElfList list = *list_p; //For efficiency
+	Node *curr = list.first;
+	
+	int count = 0;
+	while(curr != NULL && list.greater(data, curr->key)){
+		curr = curr->next;
+		count++;
+	}
+
+	if(curr != NULL && list.equal(curr->key, data)){
+		return count;
+	} else return -1;
+}
+
+//Returns true if the list contains 'data'.
+bool elf_list_contains(ElfList *list, void *data){
+	if(elf_list_indexOf(list, data) != -1)
+		return true;
+	else return false;
+}
+
+//Returns the number of elements 'data' within the list.
+int elf_list_count(ElfList *list_p, void *data){
+	if(!list_p) ELF_DIE("Received null pointer");
+	if(!list_p->equal) ELF_DIE("List does not have equal() function");
+	
+	ElfList list = *list_p; //For efficiency
+	Node *curr = list.first;
+	
+	while(curr != NULL && list.greater(data, curr->key))
+		curr = curr->next;
+	
+	int count = 0;
+	while(curr != NULL && list.equal(curr->key, data)){
+		count++;
+		curr = curr->next;
+	}
+	return count;
 }

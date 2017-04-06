@@ -49,19 +49,19 @@ void elf_list_insert(ElfList *list_p, void *data){
 	list_p->size++;
 
 	Node *curr = list.first;
-	if(curr == NULL || list.greater(curr->key, data)){ //if curr->key > data
-		new->next = curr;
-		list_p->first = new;
-		return;
-	}
-
-	while(curr->next != NULL
-	   && !list.greater(curr->next->key, data)){ //while next->key <= data
+	Node *prev = NULL;
+	while(curr != NULL && !list.greater(curr->key, data)){ // while curr < data
+		prev = curr;
 		curr = curr->next;
 	}
 
-	new->next = curr->next;
-	curr->next = new;
+	if(prev == NULL){
+		new->next = list_p->first;
+		list_p->first = new;
+	} else {
+		new->next = prev->next;
+		prev->next = new;
+	}
 }
 
 //Destroys a list, doing nothing to the pointers stored in it.

@@ -5,16 +5,14 @@
 
 #define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
 
-typedef struct _Node Node;
-struct _Node {
-	void *key;
-	Node *next;
-};
+//For the convenience of writing shorter code,
+//the node structure used in this source file is
+//simply called Node. The structure to be exported
+//should be called ElfListIt.
+typedef struct _ElfListIt Node;
 
 //List will be crescently ordered, based on the 'greater' function.
 //If the greater function is actually a lower function, it will be sorted decrescently.
-//If the greater function is not a 'greater than or equal to', then duplicates
-//  will be order such that older data appears first.
 typedef struct _ElfList ElfList;
 struct _ElfList {
 	Node *first;
@@ -113,7 +111,7 @@ void elf_list_destroyF(ElfList **list_p, void (*func)(void*)){
 
 //Removes and returns the item at index 'index'.
 //If 'index' is out of range, nothing is done and NULL is returned.
-void *elf_list_remove(ElfList *list, int index){
+void *elf_list_removeIndex(ElfList *list, int index){
 	int i;
 	void *key;
 	
@@ -254,4 +252,49 @@ int elf_list_count(ElfList *list_p, void *data){
 		curr = curr->next;
 	}
 	return count;
+}
+
+//Removes all elements with same value as 'data'.
+//Applies function func() in each pointer removed.
+//Returns the number of elements removed.
+int elf_list_removeValueF(ElfList *list_p, void *data, void(*free_f)(void*)){
+	if(!list_p) ELF_DIE("Received null pointer");
+	if(!list_p->equal) ELF_DIE("List does not have equal() function");
+
+	ElfList list = *list_p; //For efficiency
+	Node *prev, *curr = list.first;
+	
+	prev = NULL; //previous node
+	while(curr != NULL && list.greater(data, curr->key)){
+		prev = curr;
+		curr = curr->next;
+	}
+	
+	//At this point, 'prev' holds the last node before the nodes that will be removed.
+	int count = 0;
+	Node *aux;
+	while(curr != NULL && list.equal(curr->key, data)){
+		count++;
+		aux = curr;
+		curr = curr->next;
+		if(free_f) free_f(aux);
+		list_p->size--;
+	}
+	
+	//At this point, 'curr' holds the first node after the removed nodes.
+	prev->next = curr;
+	return count;
+}
+
+//Removes all elements with same value as 'data'
+//Nothing is done to pointers stored.
+//Returns the number of elements removed.
+int elf_list_removeValue(ElfList *list, void *data){
+	return elf_list_removeValueF(list, data, NULL);
+}
+
+//Returns an iterator to the first node in the list.
+ElfListIt *elf_list_getIterator(ElfList *list){
+	if(!list) ELF_DIE("Received null pointer");
+	return list->first;
 }

@@ -18,7 +18,7 @@ ElfList *elf_list_newWithEqual(bool (*greaterThan)(void*,void*), bool (*equal)(v
 void elf_list_insert(ElfList *list_p, void *data);
 void elf_list_destroy(ElfList **list_p);
 void elf_list_destroyF(ElfList **list_p, void (*func)(void*));
-void *elf_list_remove(ElfList *list, int index);
+void *elf_list_removeIndex(ElfList *list, int index);
 int elf_list_size(const ElfList *list);
 void *elf_list_get(const ElfList *list, int index);
 void elf_list_traverse(ElfList *list, void(*func)(void*));
@@ -28,6 +28,16 @@ bool elf_list_insertUnique(ElfList *list_p, void *data);
 int elf_list_indexOf(ElfList *list_p, void *data);
 bool elf_list_contains(ElfList *list, void *data);
 int elf_list_count(ElfList *list_p, void *data);
+int elf_list_removeValueF(ElfList *list_p, void *data, void(*free_f)(void*));
+int elf_list_removeValue(ElfList *list, void *data);
+
+/* Functions on iterators */
+typedef struct _ElfListIt ElfListIt;
+struct _ElfListIt {
+	void *key;
+	ElfListIt *next;
+};
+ElfListIt *elf_list_getIterator(ElfList *list);
 
 
 /* Documentation
@@ -64,7 +74,7 @@ void elf_list_destroy(ElfList **list_p);
 void elf_list_destroyF(ElfList **list_p, void (*func)(void*));
 	- Destroys a list, using function 'func' to free the stored pointers.
 
-void *elf_list_remove(ElfList *list, int index);
+void *elf_list_removeIndex(ElfList *list, int index);
 	- Removes and returns the item at index 'index'.
 	- If 'index' is out of range, nothing is done and NULL is returned.
 
@@ -91,6 +101,28 @@ bool elf_list_contains(ElfList *list, void *data);
 
 int elf_list_count(ElfList *list_p, void *data);
 	- Returns the number of elements 'data' within the list.
+
+int elf_list_removeValueF(ElfList *list_p, void *data, void(*free_f)(void*));
+	- Removes all elements with same value as 'data'.
+	- Applies function func() in each pointer removed.
+	- Returns the number of elements removed.
+
+int elf_list_removeValue(ElfList *list, void *data);
+	- Removes all elements with same value as 'data'
+	- Nothing is done to pointers stored.
+	- Returns the number of elements removed.
+
+ElfListIt
+	- Iterator for the list structure.
+
+ElfListIt *elf_list_getIterator(ElfList *list);
+	- Returns an iterator to the first element of list.
+	- Iterators should not be freed.
+	- Nodes pointed by iterators shouldn't be modified.
+	- The key in the Node shouldn't be modified.
+	- Iterators become dangling if the origin list is modified.
+	- Iterators become dangling if origin list is destroyed.
+
 
 */
 

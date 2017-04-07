@@ -32,8 +32,12 @@ int main(int argc, char *argv[]){
 	for(i = 0; i < 7; i++)
 		printf("Count of %d: %d\n", i, elf_list_count(list, ELF_INT_TO_POINTER(i)));
 
+	printf("Removed 2: %d\n", elf_list_removeValue(list, ELF_INT_TO_POINTER(2)));
+	printf("size: %d\n", elf_list_size(list));
+	print_list(list);
+
 	for(i = 19; i >= 0; i--)
-		elf_list_remove(list, i);
+		elf_list_removeIndex(list, i);
 	print_list(list);
 	printf("size: %d\n", elf_list_size(list));
 
@@ -46,7 +50,7 @@ int main(int argc, char *argv[]){
 
 	int n;
 	for(i = 0, n = elf_list_size(list); i < n; i++)
-		elf_list_remove(list, 0);
+		elf_list_removeIndex(list, 0);
 	printf("Insert unique:\n");
 	for(i = 0; i < 21; i++)
 		elf_list_insertUnique(list, ELF_INT_TO_POINTER(i%7));

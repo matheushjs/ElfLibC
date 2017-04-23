@@ -1,0 +1,5 @@
+macros:              ELF_DIE
+constants:           ELF_GRAPH_ORIENTED
+objects:             ElfGraph, ElfList, ElfAvlTree
+functions:           elf_graph_someActionToExecute
+files:               elf_graph.c, elf_avl_tree.c

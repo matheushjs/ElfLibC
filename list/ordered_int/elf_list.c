@@ -20,19 +20,17 @@ struct _ElfList {
 
 
 
-
 static inline
 Node *node_new(){
 	return (Node *) calloc(sizeof(Node), 1);
 }
 
-//Creates a new ordered list.
+// Documented in header file.
 ElfList *elf_list_new(){
 	return calloc(sizeof(ElfList), 1);
 }
 
-//Inserts 'key' into the list.
-//It is forbidden to insert ELF_INVALID_INT.
+// Documented in header file.
 void elf_list_insert(ElfList *list, int key){
 	if(!list) ELF_DIE("Received null pointer");
 	if(key == ELF_INVALID_INT) ELF_DIE("Attempted to insert ELF_INVALID_INT");
@@ -57,9 +55,7 @@ void elf_list_insert(ElfList *list, int key){
 	}
 }
 
-//Inserts 'key' into the list if it's not a duplicate.
-//If it is a duplicate, return false (fail). Else return true.
-//It is forbidden to insert ELF_INVALID_INT.
+// Documented in header file.
 bool elf_list_insertUnique(ElfList *list, int key){
 	if(!list) ELF_DIE("Received null pointer");
 	if(key == ELF_INVALID_INT) ELF_DIE("Attempted to insert ELF_INVALID_INT");
@@ -89,8 +85,7 @@ bool elf_list_insertUnique(ElfList *list, int key){
 	return true;
 }
 
-//If 'key' exists within list, return the index of the first occurence.
-//Return -1 otherwise.
+// Documented in header file.
 int elf_list_indexOf(ElfList *list, int key){
 	if(!list) ELF_DIE("Received null pointer");
 	
@@ -105,14 +100,14 @@ int elf_list_indexOf(ElfList *list, int key){
 	else return -1;
 }
 
-//Returns 'true' if 'key' exists within list.
+// Documented in header file.
 bool elf_list_contains(ElfList *list, int key){
 	if(elf_list_indexOf(list, key) != -1)
 		return true;
 	else return false;
 }
 
-//Returns the amount of times the value 'key' appears in the list.
+// Documented in header file.
 int elf_list_count(ElfList *list, int key){
 	if(!list) ELF_DIE("Received null pointer");
 
@@ -129,7 +124,7 @@ int elf_list_count(ElfList *list, int key){
 	return count;
 }
 
-//Destroys a list
+// Documented in header file.
 void elf_list_destroy(ElfList **list_p){
 	ElfList *list = *list_p;
 	Node *node, *aux;
@@ -146,8 +141,7 @@ void elf_list_destroy(ElfList **list_p){
 	}
 }
 
-//Removes and returns the item at index 'index'.
-//If 'index' is out of range, nothing is done and ELF_INVALID_INT is returned.
+// Documented in header file.
 int elf_list_remove(ElfList *list, int index){
 	int i;
 	int key;
@@ -178,14 +172,13 @@ int elf_list_remove(ElfList *list, int index){
 	return key;
 }
 
-//Returns the number of elements in the list.
+// Documented in header file.
 int elf_list_size(const ElfList *list){
 	if(!list) ELF_DIE("Received null pointer");
 	return list->size;
 }
 
-//Returns the element at index 'index'.
-//If 'index' is out of range, nothing is done and ELF_INVALID_INT is returned.
+// Documented in header file.
 int elf_list_get(const ElfList *list, int index){
 	int i;
 
@@ -200,7 +193,7 @@ int elf_list_get(const ElfList *list, int index){
 	return cur->key;
 }
 
-//Traverses all nodes in the list, applying 'func' in each stored integer.
+// Documented in header file.
 void elf_list_traverse(ElfList *list, void(*func)(int)){
 	Node *cur;
 	
@@ -213,7 +206,7 @@ void elf_list_traverse(ElfList *list, void(*func)(int)){
 	}
 }
 
-//Returns an iterator to the first element of list.
+// Documented in header file.
 ElfListIt *elf_list_getIterator(ElfList *list){
 	if(!list) ELF_DIE("Received null pointer");
 	return list->first;

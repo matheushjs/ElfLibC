@@ -37,10 +37,6 @@ ElfList
 	- Ascending order
 	- Accepts duplicates
 
-ElfListIt
-	- List iterator
-	- Avoid using.
-
 ElfList *elf_list_new();
 	- Creates a new ordered list.
 
@@ -83,6 +79,7 @@ void elf_list_traverse(ElfList *list, void(*func)(void*));
 
 ElfListIt
 	- Iterator for the list structure.
+	- Avoid using.
 
 ElfListIt *elf_list_getIterator(ElfList *list);
 	- Returns an iterator to the first element of list.

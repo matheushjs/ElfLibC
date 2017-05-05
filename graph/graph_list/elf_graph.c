@@ -241,7 +241,7 @@ void elf_graph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **
 
 	int i, n;
 	for(i = 0, n = elf_graph_size(graph); i < n; i++){
-		if( dfs_pred[i] == 'w')
+		if( dfs_color[i] == 'w')
 			elf_graph_DFS_visit(graph, i);
 	}
 

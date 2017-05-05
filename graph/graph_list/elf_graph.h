@@ -15,7 +15,11 @@ void elf_graph_print(const ElfGraph *graph);
 void elf_graph_printAdjacent(const ElfGraph *graph, int subjectVertex);
 void elf_graph_readFromFileVE(ElfGraph *graph, FILE *fp, int lim);
 void elf_graph_readFromFileVEW(ElfGraph *graph, FILE *fp, int lim);
+
 void elf_graph_DFS_src(const ElfGraph *graph, int src, int **pred_p, int **time_p, int **finish_p);
+void elf_graph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **finish_p);
+void elf_graph_DFS_registerAfterFunc(void (*func)(int vert));
+
 int *elf_graph_BFS(const ElfGraph *graph, int src, int **dist_p);
 
 /* DOCUMENTATION
@@ -70,6 +74,22 @@ void elf_graph_DFS_src(const ElfGraph *graph, int src, int **pred_p, int **time_
 	-	pred_p: if not NULL, receives the vector of predecessors.
 	-	time_p: if not NULL, receives the vector of time visited.
 	-	finish_p: if not NULL, receives the vector of time finished.
+
+void elf_graph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **finish_p);
+	- Performs a DFS in the graph, until all vertixes are visited once.
+	- Args:
+		graph: graph in which to execute the DFS.
+		pred_p: if not NULL, receives the vector of predecessors.
+		time_p: if not NULL, receives the vector of time visited.
+		finish_p: if not NULL, receives the vector of time finished.
+
+void elf_graph_DFS_registerAfterFunc(void (*func)(int vert)){
+	- Registers a function to be executed in each vertix after all adjacent vertexes have
+		been visited.
+	- Once registered, the function is executed only for ONE DFS, meaning multiple DFS requires
+		multiple function registries.
+	- Args:
+		func: function to register.
 
 int *elf_graph_BFS(const ElfGraph *graph, int src, int **dist_p);
 	- Performs a BFS in the graph, finding the distance/path from all vertexes to 'src'.

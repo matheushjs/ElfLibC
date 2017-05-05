@@ -144,11 +144,13 @@ void elf_graph_readFromFileVEW(ElfGraph *graph, FILE *fp, int lim){
 
 //Static global variables to use on DFS exploring,
 //  to avoid overusing stack memory.
+//TODO: Put all these structs inside the graph struct.
 static int *dfs_pred = NULL;        //predecessor vector
 static char *dfs_color = NULL;      //color vector
 static int *dfs_time_vec = NULL;    //visit time vector
-static int *dfs_finish_vec = NULL; //finishing time vector
+static int *dfs_finish_vec = NULL;  //finishing time vector
 static int dfs_time = 0;            //records current "time"
+static void (*dfs_after_func) (int vert) = NULL; // function to execute on vertix finishing
 
 //Visiting procedure for the DFS.
 //Should only be called after a call to elf_graph_DFS_visit_initialize().
@@ -158,7 +160,7 @@ static
 void elf_graph_DFS_visit(const ElfGraph *graph, int current){
 	ElfListIt *iterator = elf_list_getIterator(graph->array[current]);
 	Edge *edge;
-	
+
 	dfs_color[current] = 'g'; //gray
 	dfs_time_vec[current] = dfs_time++;
 
@@ -170,6 +172,7 @@ void elf_graph_DFS_visit(const ElfGraph *graph, int current){
 		}
 		iterator = iterator->next;
 	}
+	if(dfs_after_func) dfs_after_func(current);
 	dfs_finish_vec[current] = dfs_time++;
 	dfs_color[current] = 'b'; //black
 }
@@ -206,6 +209,18 @@ void elf_graph_DFS_visit_finalize(int **pred_vec, int **time_vec, int **finish_v
 
 	if(finish_vec) *finish_vec = dfs_finish_vec;
 	else free(dfs_finish_vec);
+
+	dfs_color = NULL;
+	dfs_pred = NULL;
+	dfs_time_vec = NULL;
+	dfs_finish_vec = NULL;
+	dfs_after_func = NULL;
+}
+
+// Documented in header file.
+void elf_graph_DFS_registerAfterFunc(void (*func)(int vert)){
+	if(!func) ELF_DIE("Received NULL pointer");
+	dfs_after_func = func;
 }
 
 // Documented in header file.
@@ -215,6 +230,21 @@ void elf_graph_DFS_src(const ElfGraph *graph, int src, int **pred_p, int **time_
 
 	elf_graph_DFS_visit_initialize(graph);
 	elf_graph_DFS_visit(graph, src);
+	elf_graph_DFS_visit_finalize(pred_p, time_p, finish_p);
+}
+
+// Documented in header file.
+void elf_graph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **finish_p){
+	if(!graph) ELF_DIE("Received NULL pointer");
+
+	elf_graph_DFS_visit_initialize(graph);
+
+	int i, n;
+	for(i = 0, n = elf_graph_size(graph); i < n; i++){
+		if( dfs_pred[i] == 'w')
+			elf_graph_DFS_visit(graph, i);
+	}
+
 	elf_graph_DFS_visit_finalize(pred_p, time_p, finish_p);
 }
 

@@ -42,6 +42,20 @@ void solve(ElfGraph *graph){
 	free(pred_array);
 }
 
+void solve2(ElfGraph *graph){
+	int src, dest;
+	int *pred_array;
+
+	elf_graph_DFS_all(graph, &pred_array, NULL, NULL);
+	
+	while(scanf("%d %d", &src, &dest) == 2){
+		print_path(pred_array, src, dest);
+		printf("\n");
+	}
+
+	free(pred_array);
+}
+
 int main(int argc, char *argv[]){
 	int size, edges;
 	scanf("%d %d", &size, &edges);

@@ -31,7 +31,7 @@ void solve(ElfGraph *graph){
 
 	while(scanf("%d %d", &src, &dest) == 2){
 		if(pred_array[src] == NULL)
-			pred_array[src] = elf_graph_DFS(graph, src, NULL);
+			elf_graph_DFS_src(graph, src, pred_array + src, NULL, NULL);
 		print_path(pred_array[src], src, dest);
 		printf("\n");
 	}

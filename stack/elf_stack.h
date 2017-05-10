@@ -9,15 +9,15 @@
 
 typedef struct _ElfStack ElfStack;
 
-ElfStack *elf_stack_new();
-void elf_stack_destroy(ElfStack **s);
-void elf_stack_destroy_f(ElfStack **s_pointer, void(*func)(void*));
-void elf_stack_push(ElfStack *s, void *data);
-void *elf_stack_pop(ElfStack *s);
-void *elf_stack_top(const ElfStack *s);
-int elf_stack_size(const ElfStack *s);
-void elf_stack_traverse(const ElfStack *s, void(*func)(void*));
-void elf_stack_traverse_inv(const ElfStack *s, void(*func)(void*));
+ElfStack *elfStack_new();
+void elfStack_destroy(ElfStack **s);
+void elfStack_destroy_f(ElfStack **s_pointer, void(*func)(void*));
+void elfStack_push(ElfStack *s, void *data);
+void *elfStack_pop(ElfStack *s);
+void *elfStack_top(const ElfStack *s);
+int elfStack_size(const ElfStack *s);
+void elfStack_traverse(const ElfStack *s, void(*func)(void*));
+void elfStack_traverse_inv(const ElfStack *s, void(*func)(void*));
 
 /* DOCUMENTATION
 
@@ -28,37 +28,37 @@ ELF_POINTER_TO_UINT(p)
 	- Macros for type casting from signed/unsigned integers to pointers.
 	- Useful since this queue data structure can only store void pointers.
 
-ElfStack *elf_stack_new();
+ElfStack *elfStack_new();
 	- Returns a new stack.
 
-void elf_stack_destroy(ElfStack **s);
+void elfStack_destroy(ElfStack **s);
 	- Destroys the stack, doing nothing to the stored pointers.
 
-void elf_stack_destroy_f(ElfStack **s_pointer, void(*func)(void*));
+void elfStack_destroy_f(ElfStack **s_pointer, void(*func)(void*));
 	- Destroys the stack, applying 'func' to each stored pointer.
 
-void elf_stack_push(ElfStack *s, void *data);
+void elfStack_push(ElfStack *s, void *data);
 	- Inserts 'data' on the top of the stack.
 
-void *elf_stack_pop(ElfStack *s);
+void *elfStack_pop(ElfStack *s);
 	- Removes and returns the element at the top of the stack.
 	- Returns NULL if the stack is empty.
 	- CAUTION: If using POINTER/INT macros, you should check the size
 		of the stack before using this function.
 
-void *elf_stack_top(const ElfStack *s);
+void *elfStack_top(const ElfStack *s);
 	- Returns the element at the top of the stack, without removing it.
 	- Returns NULL if the stack is empty.
 	- CAUTION: If using POINTER/INT macros, you should check the size
 		of the stack before using this function.
 
-int elf_stack_size(const ElfStack *s);
+int elfStack_size(const ElfStack *s);
 	- Returns the number of elements within the stack.
 
-void elf_stack_traverse(const ElfStack *s, void(*func)(void*));
+void elfStack_traverse(const ElfStack *s, void(*func)(void*));
 	- Traverse the stack, from top to bottom, applying 'func' to each element.
 
-void elf_stack_traverse_inv(const ElfStack *s, void(*func)(void*));
+void elfStack_traverse_inv(const ElfStack *s, void(*func)(void*));
 	- Traverse the stack, from bottom to top, applying 'func' to each element.
 
 */

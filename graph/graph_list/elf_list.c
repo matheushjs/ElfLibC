@@ -31,7 +31,7 @@ Node *node_new(){
  */
 
 // Documented in header file.
-ElfList *elf_list_new(bool (*greaterThan)(void*,void*)){
+ElfList *elfList_new(bool (*greaterThan)(void*,void*)){
 	ElfList *list = calloc(sizeof(ElfList), 1);
 	list->greater = greaterThan;
 	list->equal = NULL;
@@ -39,7 +39,7 @@ ElfList *elf_list_new(bool (*greaterThan)(void*,void*)){
 }
 
 // Documented in header file.
-ElfList *elf_list_newWithEqual(bool (*greaterThan)(void*,void*), bool (*equal)(void*,void*)){
+ElfList *elfList_newWithEqual(bool (*greaterThan)(void*,void*), bool (*equal)(void*,void*)){
 	ElfList *list = calloc(sizeof(ElfList), 1);
 	list->greater = greaterThan;
 	list->equal = equal;
@@ -47,7 +47,7 @@ ElfList *elf_list_newWithEqual(bool (*greaterThan)(void*,void*), bool (*equal)(v
 }
 
 // Documented in header file.
-void elf_list_insert(ElfList *list_p, void *data){
+void elfList_insert(ElfList *list_p, void *data){
 	if(!list_p) ELF_DIE("Received null pointer");
 	
 	ElfList list = *list_p; //For efficiency
@@ -73,7 +73,7 @@ void elf_list_insert(ElfList *list_p, void *data){
 }
 
 // Documented in header file.
-void elf_list_destroy(ElfList **list_p){
+void elfList_destroy(ElfList **list_p){
 	ElfList *list = *list_p;
 	Node *node, *aux;
 
@@ -90,7 +90,7 @@ void elf_list_destroy(ElfList **list_p){
 }
 
 // Documented in header file.
-void elf_list_destroyF(ElfList **list_p, void (*func)(void*)){
+void elfList_destroyF(ElfList **list_p, void (*func)(void*)){
 	ElfList *list = *list_p;
 	Node *node, *aux;
 
@@ -108,7 +108,7 @@ void elf_list_destroyF(ElfList **list_p, void (*func)(void*)){
 }
 
 // Documented in header file.
-void *elf_list_removeIndex(ElfList *list, int index){
+void *elfList_removeIndex(ElfList *list, int index){
 	int i;
 	void *key;
 	
@@ -139,13 +139,13 @@ void *elf_list_removeIndex(ElfList *list, int index){
 }
 
 // Documented in header file.
-int elf_list_size(const ElfList *list){
+int elfList_size(const ElfList *list){
 	if(!list) ELF_DIE("Received null pointer");
 	return list->size;
 }
 
 // Documented in header file.
-void *elf_list_get(const ElfList *list, int index){
+void *elfList_get(const ElfList *list, int index){
 	int i;
 
 	if(!list) ELF_DIE("Received null pointer");
@@ -160,7 +160,7 @@ void *elf_list_get(const ElfList *list, int index){
 }
 
 // Documented in header file.
-void elf_list_traverse(ElfList *list, void(*func)(void*)){
+void elfList_traverse(ElfList *list, void(*func)(void*)){
 	Node *cur;
 	
 	if(!list) ELF_DIE("Received null pointer");
@@ -173,7 +173,7 @@ void elf_list_traverse(ElfList *list, void(*func)(void*)){
 }
 
 // Documented in header file.
-bool elf_list_insertUnique(ElfList *list_p, void *data){
+bool elfList_insertUnique(ElfList *list_p, void *data){
 	if(!list_p) ELF_DIE("Received null pointer");
 	if(!list_p->equal) ELF_DIE("List does not have equal() function");
 
@@ -204,7 +204,7 @@ bool elf_list_insertUnique(ElfList *list_p, void *data){
 }
 
 // Documented in header file.
-int elf_list_indexOf(ElfList *list_p, void *data){
+int elfList_indexOf(ElfList *list_p, void *data){
 	if(!list_p) ELF_DIE("Received null pointer");
 	if(!list_p->equal) ELF_DIE("List does not have equal() function");
 	
@@ -223,14 +223,14 @@ int elf_list_indexOf(ElfList *list_p, void *data){
 }
 
 // Documented in header file.
-bool elf_list_contains(ElfList *list, void *data){
-	if(elf_list_indexOf(list, data) != -1)
+bool elfList_contains(ElfList *list, void *data){
+	if(elfList_indexOf(list, data) != -1)
 		return true;
 	else return false;
 }
 
 // Documented in header file.
-int elf_list_count(ElfList *list_p, void *data){
+int elfList_count(ElfList *list_p, void *data){
 	if(!list_p) ELF_DIE("Received null pointer");
 	if(!list_p->equal) ELF_DIE("List does not have equal() function");
 	
@@ -249,7 +249,7 @@ int elf_list_count(ElfList *list_p, void *data){
 }
 
 // Documented in header file.
-int elf_list_removeValueF(ElfList *list_p, void *data, void(*free_f)(void*)){
+int elfList_removeValueF(ElfList *list_p, void *data, void(*free_f)(void*)){
 	if(!list_p) ELF_DIE("Received null pointer");
 	if(!list_p->equal) ELF_DIE("List does not have equal() function");
 
@@ -279,12 +279,12 @@ int elf_list_removeValueF(ElfList *list_p, void *data, void(*free_f)(void*)){
 }
 
 // Documented in header file.
-int elf_list_removeValue(ElfList *list, void *data){
-	return elf_list_removeValueF(list, data, NULL);
+int elfList_removeValue(ElfList *list, void *data){
+	return elfList_removeValueF(list, data, NULL);
 }
 
 // Documented in header file.
-ElfListIt *elf_list_getIterator(ElfList *list){
+ElfListIt *elfList_getIterator(ElfList *list){
 	if(!list) ELF_DIE("Received null pointer");
 	return list->first;
 }

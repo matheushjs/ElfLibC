@@ -37,7 +37,7 @@ ElfGraph *elf_graph_new(int N, bool oriented){
 	new->oriented = oriented;
 	new->array = calloc(sizeof(ElfList *), N);
 	for(N--; N >= 0; N--)
-		new->array[N] = elf_list_newWithEqual(
+		new->array[N] = elfList_newWithEqual(
 			 elf_edge_greater, elf_edge_equal );
 	return new;
 }
@@ -50,7 +50,7 @@ void elf_graph_destroy(ElfGraph **graph_p){
 
 	if(graph){
 		for(i = 0; i < graph->size; i++)
-			elf_list_destroyF(graph->array + i, free);
+			elfList_destroyF(graph->array + i, free);
 		free(graph->array);
 		free(graph);
 		*graph_p = NULL;
@@ -71,13 +71,13 @@ void elf_graph_addEdge(ElfGraph *graph, int src, int dest, int weight){
 	Edge *edge = malloc(sizeof(Edge));
 	edge->target = dest;
 	edge->weight = weight;
-	elf_list_insertUnique(graph->array[src], edge);
+	elfList_insertUnique(graph->array[src], edge);
 
 	if(!graph->oriented){
 		edge = malloc(sizeof(Edge));
 		edge->target = src;
 		edge->weight = weight;
-		elf_list_insertUnique(graph->array[dest], edge);
+		elfList_insertUnique(graph->array[dest], edge);
 	}
 }
 
@@ -88,9 +88,9 @@ void elf_graph_removeEdge(ElfGraph *graph, int src, int dest){
 	if(src < 0 || dest < 0 || src >= graph->size || dest >= graph->size) ELF_DIE("Invalid vertix indexes");
 	
 	Edge tmp = {.target = dest}, tmp2 = {.target = src};
-	elf_list_removeValue(graph->array[src], &tmp);
+	elfList_removeValue(graph->array[src], &tmp);
 	if(!graph->oriented)
-		elf_list_removeValue(graph->array[dest], &tmp2);
+		elfList_removeValue(graph->array[dest], &tmp2);
 }
 
 //Prints the adjacency list of a graph
@@ -99,7 +99,7 @@ void elf_graph_print(const ElfGraph *graph){
 	int i, dimension = graph->size;
 	for(i = 0; i < dimension; i++){
 		printf("%d. ", i);
-		elf_list_traverse(graph->array[i], elf_edge_print);
+		elfList_traverse(graph->array[i], elf_edge_print);
 		printf("\n");
 	}
 }
@@ -108,7 +108,7 @@ void elf_graph_print(const ElfGraph *graph){
 void elf_graph_printAdjacent(const ElfGraph *graph, int subjectVertex){
 	if(!graph) ELF_DIE("Received NULL pointer");
 	if(subjectVertex >= graph->size || subjectVertex < 0) ELF_DIE("Invalid subjectVertex");
-	elf_list_traverse(graph->array[subjectVertex], elf_edge_print);
+	elfList_traverse(graph->array[subjectVertex], elf_edge_print);
 }
 
 //Reads a sequence of 'lim' non-weighted edges from a file.
@@ -158,7 +158,7 @@ static void (*dfs_after_func) (int vert) = NULL; // function to execute on verti
 //  clean resources used and to retrieve the produced vectors.
 static
 void elf_graph_DFS_visit(const ElfGraph *graph, int current){
-	ElfListIt *iterator = elf_list_getIterator(graph->array[current]);
+	ElfListIt *iterator = elfList_getIterator(graph->array[current]);
 	Edge *edge;
 
 	dfs_color[current] = 'g'; //gray
@@ -267,32 +267,32 @@ int *elf_graph_BFS(const ElfGraph *graph, int src, int **dist_p){
 	}
 
 	//Get a queue
-	ElfQueue *queue = elf_queue_new();
-	elf_queue_push(queue, ELF_INT_TO_POINTER(src)); //macro defined in elf_queue.h
+	ElfQueue *queue = elfQueue_new();
+	elfQueue_push(queue, ELF_INT_TO_POINTER(src)); //macro defined in elfQueue.h
 	color[src] = 'g';
 
 	int current;
-	while(elf_queue_size(queue) != 0){
-		current = ELF_POINTER_TO_INT(elf_queue_pop(queue));
+	while(elfQueue_size(queue) != 0){
+		current = ELF_POINTER_TO_INT(elfQueue_pop(queue));
 		
 		//works even for the first vertex, because distances start at -1.
 		dist_vec[current] = dist_vec[pred[current]] + 1;
 		
 		//Traverse the nodes adjacent to the current node.
-		ElfListIt *iterator = elf_list_getIterator(graph->array[current]);
+		ElfListIt *iterator = elfList_getIterator(graph->array[current]);
 		while(iterator != NULL){
 			int target = ((Edge *) iterator->key)->target;
 			if(color[target] == 'w'){
 				//If they are white, add to queue.
 				color[target] = 'g';
 				pred[target] = current;
-				elf_queue_push(queue, ELF_INT_TO_POINTER(target));
+				elfQueue_push(queue, ELF_INT_TO_POINTER(target));
 			}
 			iterator = iterator->next;
 		}
 		color[current] = 'b';
 	}
-	elf_queue_destroy(&queue);
+	elfQueue_destroy(&queue);
 
 	free(color);
 	if(dist_p != NULL) *dist_p = dist_vec;

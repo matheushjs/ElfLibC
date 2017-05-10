@@ -39,12 +39,12 @@ static void node_destroy(Node **node){
  * Queue functions
  */
 
-ElfQueue *elf_queue_new(){
+ElfQueue *elfQueue_new(){
 	return (ElfQueue *) calloc(sizeof(ElfQueue), 1);
 }
 
 //Inserts a node at the back of the queue.
-void elf_queue_push(ElfQueue *q, void *data){
+void elfQueue_push(ElfQueue *q, void *data){
 	Node *new;
 	
 	if(!q) ELF_DIE("Received NULL queue");
@@ -62,7 +62,7 @@ void elf_queue_push(ElfQueue *q, void *data){
 
 //Removes and returns the front element.
 //Returns NULL if queue is empty.
-void *elf_queue_pop(ElfQueue *q){
+void *elfQueue_pop(ElfQueue *q){
 	Node *node;
 	void *ret;
 
@@ -82,7 +82,7 @@ void *elf_queue_pop(ElfQueue *q){
 }
 
 //Destroys the queue. Nothing is done to the stored pointers.
-void elf_queue_destroy(ElfQueue **q_pointer){
+void elfQueue_destroy(ElfQueue **q_pointer){
 	ElfQueue *q = *q_pointer;
 	Node *node, *aux;
 
@@ -99,7 +99,7 @@ void elf_queue_destroy(ElfQueue **q_pointer){
 }
 
 //Destroy the queue, freeing each key using function 'func'.
-void elf_queue_destroy_f(ElfQueue **q_pointer, void(*func)(void*)){
+void elfQueue_destroy_f(ElfQueue **q_pointer, void(*func)(void*)){
 	ElfQueue *q = *q_pointer;
 	Node *node, *aux;
 
@@ -116,27 +116,27 @@ void elf_queue_destroy_f(ElfQueue **q_pointer, void(*func)(void*)){
 	}
 }
 
-int elf_queue_size(const ElfQueue *q){
+int elfQueue_size(const ElfQueue *q){
 	if(!q) ELF_DIE("Received NULL queue");
 	return q->count;
 }
 
 //Access the front element, without removing it.
-void *elf_queue_front(const ElfQueue *q){
+void *elfQueue_front(const ElfQueue *q){
 	if(!q) ELF_DIE("Received NULL queue");
 	if(!q->count) return NULL;
 	return q->front->key;
 }
 
 //Access the back element, without removing it.
-void *elf_queue_back(const ElfQueue *q){
+void *elfQueue_back(const ElfQueue *q){
 	if(!q) ELF_DIE("Received NULL queue");
 	if(!q->count) return NULL;
 	return q->back->key;
 }
 
 //Inverts the queue.
-void elf_queue_invert(ElfQueue *q){
+void elfQueue_invert(ElfQueue *q){
 	if(!q) ELF_DIE("Received NULL queue");
 
 	/* Starts on the front node.
@@ -164,7 +164,7 @@ void elf_queue_invert(ElfQueue *q){
 }
 
 //Traverse the queue, from front to back, applying function 'func' in each element.
-void elf_queue_traverse(const ElfQueue *q, void(*func)(void *)){
+void elfQueue_traverse(const ElfQueue *q, void(*func)(void *)){
 	if(!q) ELF_DIE("Received NULL queue");
 
 	Node *node = q->front;

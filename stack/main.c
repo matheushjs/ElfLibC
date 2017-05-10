@@ -6,37 +6,37 @@ void print(void *i){
 }
 
 int main(int argc, char *argv[]){
-	ElfStack *s = elf_stack_new();
+	ElfStack *s = elfStack_new();
 
 	int i;
 	for(i = 0; i < 100000; i++)
-		elf_stack_push(s, ELF_INT_TO_POINTER(i));
+		elfStack_push(s, ELF_INT_TO_POINTER(i));
 
-	printf("[99999|%d]\n", ELF_POINTER_TO_INT(elf_stack_pop(s)));
-	printf("[99998|%d]\n", ELF_POINTER_TO_INT(elf_stack_top(s)));
-	printf("[99998|%d]\n", ELF_POINTER_TO_INT(elf_stack_pop(s)));
-	printf("[99998|%d]\n", elf_stack_size(s));
+	printf("[99999|%d]\n", ELF_POINTER_TO_INT(elfStack_pop(s)));
+	printf("[99998|%d]\n", ELF_POINTER_TO_INT(elfStack_top(s)));
+	printf("[99998|%d]\n", ELF_POINTER_TO_INT(elfStack_pop(s)));
+	printf("[99998|%d]\n", elfStack_size(s));
 
 	for(i = 0; i < 100000; i++)
-		elf_stack_pop(s);
+		elfStack_pop(s);
 
-	printf("[0|%d]\n", elf_stack_size(s));
-	printf("[0|%d]\n", ELF_POINTER_TO_INT(elf_stack_pop(s)));
-	printf("[0|%d]\n", ELF_POINTER_TO_INT(elf_stack_top(s)));
-	printf("[0|%d]\n", ELF_POINTER_TO_INT(elf_stack_pop(s)));
+	printf("[0|%d]\n", elfStack_size(s));
+	printf("[0|%d]\n", ELF_POINTER_TO_INT(elfStack_pop(s)));
+	printf("[0|%d]\n", ELF_POINTER_TO_INT(elfStack_top(s)));
+	printf("[0|%d]\n", ELF_POINTER_TO_INT(elfStack_pop(s)));
 
 	for(i = 0; i < 5; i++)
-		elf_stack_push(s, ELF_INT_TO_POINTER(i));
+		elfStack_push(s, ELF_INT_TO_POINTER(i));
 
 	printf("[4 3 2 1 0 |");
-	elf_stack_traverse(s, print);
+	elfStack_traverse(s, print);
 	printf("]\n");
 
 	printf("[0 1 2 3 4 |");
-	elf_stack_traverse_inv(s, print);
+	elfStack_traverse_inv(s, print);
 	printf("]\n");
 
-	elf_stack_destroy(&s);
+	elfStack_destroy(&s);
 
 	return 0;
 }

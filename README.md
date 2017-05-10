@@ -1,7 +1,7 @@
 # Personal C Library
 
 # Naming Standards
-<p>Most standards are inspired by GNOME's naming standards, which can be accessed in this <a href=https://developer.gnome.org/programming-guidelines/stable/namespacing.html.en>here</a>.</p>
+<p>Most standards are inspired by GNOME's naming standards, which can be accessed in this <a href=https://developer.gnome.org/programming-guidelines/stable/namespacing.html.en>link</a>.</p>
 <p><b>Macros:</b> e.g. ELF_DIE</p>
 <p><b>Constants:</b> e.g. ELF_GRAPH_ORIENTED</p>
 <p><b>Functions:</b> e.g. say_hello()</p>

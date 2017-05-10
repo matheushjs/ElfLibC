@@ -6,21 +6,21 @@ typedef struct _ElfGraph ElfGraph;
 #include <stdio.h>
 #include <stdbool.h>
 
-ElfGraph *elf_graph_new(int N, bool oriented);
-void elf_graph_destroy(ElfGraph **graph_p);
-int elf_graph_size(const ElfGraph *graph);
-void elf_graph_addEdge(ElfGraph *graph, int src, int dest, int weight);
-void elf_graph_removeEdge(ElfGraph *graph, int src, int dest);
-void elf_graph_print(const ElfGraph *graph);
-void elf_graph_printAdjacent(const ElfGraph *graph, int subjectVertex);
-void elf_graph_readFromFileVE(ElfGraph *graph, FILE *fp, int lim);
-void elf_graph_readFromFileVEW(ElfGraph *graph, FILE *fp, int lim);
+ElfGraph *elfGraph_new(int N, bool oriented);
+void elfGraph_destroy(ElfGraph **graph_p);
+int elfGraph_size(const ElfGraph *graph);
+void elfGraph_addEdge(ElfGraph *graph, int src, int dest, int weight);
+void elfGraph_removeEdge(ElfGraph *graph, int src, int dest);
+void elfGraph_print(const ElfGraph *graph);
+void elfGraph_printAdjacent(const ElfGraph *graph, int subjectVertex);
+void elfGraph_readFromFileVE(ElfGraph *graph, FILE *fp, int lim);
+void elfGraph_readFromFileVEW(ElfGraph *graph, FILE *fp, int lim);
 
-void elf_graph_DFS_src(const ElfGraph *graph, int src, int **pred_p, int **time_p, int **finish_p);
-void elf_graph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **finish_p);
-void elf_graph_DFS_registerAfterFunc(void (*func)(int vert));
+void elfGraph_DFS_src(const ElfGraph *graph, int src, int **pred_p, int **time_p, int **finish_p);
+void elfGraph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **finish_p);
+void elfGraph_DFS_registerAfterFunc(void (*func)(int vert));
 
-int *elf_graph_BFS(const ElfGraph *graph, int src, int **dist_p);
+int *elfGraph_BFS(const ElfGraph *graph, int src, int **dist_p);
 
 /* DOCUMENTATION
 
@@ -30,43 +30,43 @@ ElfGraph
 	- Size must be specified on instantiation.
 	- Double edges are not allowed.
  
-ElfGraph *elf_graph_new(int N, bool oriented);
+ElfGraph *elfGraph_new(int N, bool oriented);
 	- Returns a graph with N vertixes, indexed from 0 to N-1.
 	- Graph is oriented if 'oriented' is true.
 
-void elf_graph_destroy(ElfGraph **graph_p);
+void elfGraph_destroy(ElfGraph **graph_p);
 	- Deallocates all the memory used by 'graph', and sets its pointer to NULL.
 	- 'graph' should be an ElfGraph* passed by reference (hence a double pointer).
 
-int elf_graph_size(const ElfGraph *graph);
+int elfGraph_size(const ElfGraph *graph);
 	- Returns the amount of vertixes in the graph.
 
-void elf_graph_addEdge(ElfGraph *graph, int src, int dest, int weight);
+void elfGraph_addEdge(ElfGraph *graph, int src, int dest, int weight);
 	- Adds to the graph an edge from 'src' to 'dest'.
 	- If the graph is not oriented, the inverse direction is also added.
 
-void elf_graph_removeEdge(ElfGraph *graph, int src, int dest);
+void elfGraph_removeEdge(ElfGraph *graph, int src, int dest);
 	- Removes, if exists, the edge going from 'src' to 'dest'.
 	- If the graph is not oriented, the inverse is also removed.
 
-void elf_graph_print(const ElfGraph *graph);
+void elfGraph_print(const ElfGraph *graph);
 	- Prints the adjacency list of a graph
 
-void elf_graph_printAdjacent(const ElfGraph *graph, int subjectVertex);
+void elfGraph_printAdjacent(const ElfGraph *graph, int subjectVertex);
 	- Prints indexes of vertices that are adjacent to 'subjectVertex'.
  
-void elf_graph_readFromFileVE(ElfGraph *graph, FILE *fp, int lim);
+void elfGraph_readFromFileVE(ElfGraph *graph, FILE *fp, int lim);
 	- Reads a sequence of 'lim' non-weighted edges from a file.
 	- Reads until EOF if 'lim' is -1.
 	- Will read any blank-character-separated sequence of integers,
 	    following the order: source vertix - destiny vertix
 	- VE stands for vertix and edge
 
-void elf_graph_readFromFileVEW(ElfGraph *graph, FILE *fp, int lim);
+void elfGraph_readFromFileVEW(ElfGraph *graph, FILE *fp, int lim);
 	- Same as above, but also reads weights.
 	- VEW stands for vertix, edge and weight
 
-void elf_graph_DFS_src(const ElfGraph *graph, int src, int **pred_p, int **time_p, int **finish_p);
+void elfGraph_DFS_src(const ElfGraph *graph, int src, int **pred_p, int **time_p, int **finish_p);
 	- Performs a DFS in the graph, finding the time/path from all vertexes to 'src'.
 	- Args:
 	-	graph: pointer to the graph in which to execute the DFS.
@@ -75,7 +75,7 @@ void elf_graph_DFS_src(const ElfGraph *graph, int src, int **pred_p, int **time_
 	-	time_p: if not NULL, receives the vector of time visited.
 	-	finish_p: if not NULL, receives the vector of time finished.
 
-void elf_graph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **finish_p);
+void elfGraph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **finish_p);
 	- Performs a DFS in the graph, until all vertixes are visited once.
 	- Args:
 		graph: graph in which to execute the DFS.
@@ -83,7 +83,7 @@ void elf_graph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **
 		time_p: if not NULL, receives the vector of time visited.
 		finish_p: if not NULL, receives the vector of time finished.
 
-void elf_graph_DFS_registerAfterFunc(void (*func)(int vert)){
+void elfGraph_DFS_registerAfterFunc(void (*func)(int vert)){
 	- Registers a function to be executed in each vertix after all adjacent vertexes have
 		been visited.
 	- Once registered, the function is executed only for ONE DFS, meaning multiple DFS requires
@@ -91,7 +91,7 @@ void elf_graph_DFS_registerAfterFunc(void (*func)(int vert)){
 	- Args:
 		func: function to register.
 
-int *elf_graph_BFS(const ElfGraph *graph, int src, int **dist_p);
+int *elfGraph_BFS(const ElfGraph *graph, int src, int **dist_p);
 	- Performs a BFS in the graph, finding the distance/path from all vertexes to 'src'.
 	- Args:
 	-   dist_p: If 'dist_p' is not NULL, store in it 

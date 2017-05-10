@@ -31,7 +31,7 @@ static void free_2d_matrix(int ***matrix, int row);
  */
 
 //Creates a graph with N vertexes, oriented or not.
-ElfGraphMatrix *elf_graph_matrix_new(int N, bool oriented){
+ElfGraphMatrix *elfGraph_matrix_new(int N, bool oriented){
 	if(N < 0) DIE("Number of vertixes cannot be negative");
 	ElfGraphMatrix *new = (ElfGraphMatrix *) malloc(sizeof(ElfGraphMatrix));
 	new->n = N;
@@ -42,7 +42,7 @@ ElfGraphMatrix *elf_graph_matrix_new(int N, bool oriented){
 
 //Deallocates all the memory used by 'graph', and sets its pointer to NULL.
 //'graph' should be an ElfGraphMatrix* passed by reference (hence a double pointer).
-void elf_graph_matrix_destroy(ElfGraphMatrix **graph){
+void elfGraph_matrix_destroy(ElfGraphMatrix **graph){
 	free_2d_matrix( &((*graph)->matrix), (*graph)->n );
 	free(*graph);
 	*graph = NULL;
@@ -50,7 +50,7 @@ void elf_graph_matrix_destroy(ElfGraphMatrix **graph){
 
 //Adds to the graph an edge from 'src' to 'dest'.
 //If the graph is not oriented, the inverse direction is also added.
-void elf_graph_matrix_add_edge(ElfGraphMatrix *graph, int src, int dest, int weight){
+void elfGraph_matrix_add_edge(ElfGraphMatrix *graph, int src, int dest, int weight){
 	if(weight== INVALID_WEIGHT) DIE("Invalid weight value.");
 	if(src < 0 || dest < 0 || src >= graph->n || dest >= graph->n) DIE("Invalid vertix indexes");
 	graph->matrix[src][dest] = weight;
@@ -59,7 +59,7 @@ void elf_graph_matrix_add_edge(ElfGraphMatrix *graph, int src, int dest, int wei
 
 //Removes, if exists, the edge going from 'src' to 'dest'.
 //If the graph is not oriented, the inverse is also removed.
-void elf_graph_matrix_remove_edge(ElfGraphMatrix *graph, int src, int dest){
+void elfGraph_matrix_remove_edge(ElfGraphMatrix *graph, int src, int dest){
 	if(src < 0 || dest < 0 || src >= graph->n || dest >= graph->n) DIE("Invalid vertix indexes");
 	graph->matrix[src][dest] = INVALID_WEIGHT;
 	if(!graph->oriented) graph->matrix[dest][src] = INVALID_WEIGHT;
@@ -67,7 +67,7 @@ void elf_graph_matrix_remove_edge(ElfGraphMatrix *graph, int src, int dest){
 
 //Prints the adjacency matrix of a graph, with 'failChar' representing absence of an edge,
 //  'sep' being the delimeter between edges, and 'end' being the delimeter between lines in the matrix.
-void elf_graph_matrix_print_matrix(const ElfGraphMatrix *graph, FILE *fp, char failChar, char sep, char end){
+void elfGraph_matrix_print_matrix(const ElfGraphMatrix *graph, FILE *fp, char failChar, char sep, char end){
 	int i, j, dimension = graph->n;
 	for(i = 0; i < dimension; i++){
 		for(j = 0; j < dimension; j++){
@@ -83,7 +83,7 @@ void elf_graph_matrix_print_matrix(const ElfGraphMatrix *graph, FILE *fp, char f
 
 
 //Prints indexes of vertices that are adjacent to 'subjectVertex'.
-void elf_graph_matrix_print_adjacent_vertex(const ElfGraphMatrix *graph, int subjectVertex, FILE *fp){
+void elfGraph_matrix_print_adjacent_vertex(const ElfGraphMatrix *graph, int subjectVertex, FILE *fp){
 	int i, counter, dimension = graph->n;
 	if(subjectVertex >= graph->n || subjectVertex < 0) DIE("Invalid subjectVertex");
 	const int *array = graph->matrix[subjectVertex];
@@ -99,7 +99,7 @@ void elf_graph_matrix_print_adjacent_vertex(const ElfGraphMatrix *graph, int sub
 
 //Prints the lowest weight edge of the graph.
 //If the graph is not oriented, the vertex indexes are printed in crescent order.
-void elf_graph_matrix_print_edge_lowest_weight(const ElfGraphMatrix *graph, FILE *fp){
+void elfGraph_matrix_print_edge_lowest_weight(const ElfGraphMatrix *graph, FILE *fp){
 	int mini, minj, minVal = INT_MAX;
 	const int **mat = (const int **) graph->matrix;
 
@@ -122,7 +122,7 @@ void elf_graph_matrix_print_edge_lowest_weight(const ElfGraphMatrix *graph, FILE
 
 //Prints the transposed adjacency matrix of a graph, with 'failChar' representing absence of an edge,
 //  'sep' being the delimeter between edges, and 'end' being the delimeter between lines in the matrix.
-void elf_graph_matrix_print_matrix_transposed(ElfGraphMatrix *graph, FILE *fp, char failChar, char sep, char end){
+void elfGraph_matrix_print_matrix_transposed(ElfGraphMatrix *graph, FILE *fp, char failChar, char sep, char end){
 	if(!graph->oriented) return; //Ignoring the instruction, as told by the exercise.
 	
 	int i, j, dimension = graph->n;

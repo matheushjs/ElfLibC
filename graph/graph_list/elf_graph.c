@@ -30,7 +30,7 @@ static void elf_edge_print(void *a);
 
 
 //Creates a graph with N vertexes, oriented or not.
-ElfGraph *elf_graph_new(int N, bool oriented){
+ElfGraph *elfGraph_new(int N, bool oriented){
 	if(N < 0) ELF_DIE("Number of vertixes cannot be negative");
 	ElfGraph *new = malloc(sizeof(ElfGraph));
 	new->size = N;
@@ -44,7 +44,7 @@ ElfGraph *elf_graph_new(int N, bool oriented){
 
 //Deallocates all the memory used by 'graph', and sets its pointer to NULL.
 //'graph' should be an ElfGraph* passed by reference (hence a double pointer).
-void elf_graph_destroy(ElfGraph **graph_p){
+void elfGraph_destroy(ElfGraph **graph_p){
 	int i;
 	ElfGraph *graph = *graph_p;
 
@@ -58,13 +58,13 @@ void elf_graph_destroy(ElfGraph **graph_p){
 }
 
 //Returns the amount of vertixes in the graph.
-int elf_graph_size(const ElfGraph *graph){
+int elfGraph_size(const ElfGraph *graph){
 	return graph->size;
 }
 
 //Adds to the graph an edge from 'src' to 'dest'.
 //If the graph is not oriented, the inverse direction is also added.
-void elf_graph_addEdge(ElfGraph *graph, int src, int dest, int weight){
+void elfGraph_addEdge(ElfGraph *graph, int src, int dest, int weight){
 	if(!graph) ELF_DIE("Received NULL pointer");
 	if(src < 0 || dest < 0 || src >= graph->size || dest >= graph->size) ELF_DIE("Invalid vertix indexes");
 	
@@ -83,7 +83,7 @@ void elf_graph_addEdge(ElfGraph *graph, int src, int dest, int weight){
 
 //Removes, if exists, the edge going from 'src' to 'dest'.
 //If the graph is not oriented, the inverse is also removed.
-void elf_graph_removeEdge(ElfGraph *graph, int src, int dest){
+void elfGraph_removeEdge(ElfGraph *graph, int src, int dest){
 	if(!graph) ELF_DIE("Received NULL pointer");
 	if(src < 0 || dest < 0 || src >= graph->size || dest >= graph->size) ELF_DIE("Invalid vertix indexes");
 	
@@ -94,7 +94,7 @@ void elf_graph_removeEdge(ElfGraph *graph, int src, int dest){
 }
 
 //Prints the adjacency list of a graph
-void elf_graph_print(const ElfGraph *graph){
+void elfGraph_print(const ElfGraph *graph){
 	if(!graph) ELF_DIE("Received NULL pointer");
 	int i, dimension = graph->size;
 	for(i = 0; i < dimension; i++){
@@ -105,7 +105,7 @@ void elf_graph_print(const ElfGraph *graph){
 }
 
 //Prints indexes of vertices that are adjacent to 'subjectVertex'.
-void elf_graph_printAdjacent(const ElfGraph *graph, int subjectVertex){
+void elfGraph_printAdjacent(const ElfGraph *graph, int subjectVertex){
 	if(!graph) ELF_DIE("Received NULL pointer");
 	if(subjectVertex >= graph->size || subjectVertex < 0) ELF_DIE("Invalid subjectVertex");
 	elfList_traverse(graph->array[subjectVertex], elf_edge_print);
@@ -116,7 +116,7 @@ void elf_graph_printAdjacent(const ElfGraph *graph, int subjectVertex){
 //Will read any blank-character-separated sequence of integers,
 //  following the order: source vertix - destiny vertix
 //VE - vertix/edge
-void elf_graph_readFromFileVE(ElfGraph *graph, FILE *fp, int lim){
+void elfGraph_readFromFileVE(ElfGraph *graph, FILE *fp, int lim){
 	if(!graph) ELF_DIE("Received NULL pointer");
 	
 	int i, src, dest;
@@ -124,13 +124,13 @@ void elf_graph_readFromFileVE(ElfGraph *graph, FILE *fp, int lim){
 		if(fscanf(fp, "%d %d", &src, &dest) != 2) break;
 		if(src < 0 || dest < 0 || src >= graph->size || dest >= graph->size)
 			ELF_DIE("Invalid vertixes in file.");
-		elf_graph_addEdge(graph, src, dest, 0);
+		elfGraph_addEdge(graph, src, dest, 0);
 	}
 }
 
 //Same as above, but also reads weights.
 //VEW - vertix/edge/weight
-void elf_graph_readFromFileVEW(ElfGraph *graph, FILE *fp, int lim){
+void elfGraph_readFromFileVEW(ElfGraph *graph, FILE *fp, int lim){
 	if(!graph) ELF_DIE("Received NULL pointer");
 	
 	int i, src, dest, wei;
@@ -138,7 +138,7 @@ void elf_graph_readFromFileVEW(ElfGraph *graph, FILE *fp, int lim){
 		if(fscanf(fp, "%d %d %d", &src, &dest, &wei) != 3) break;
 		if(src < 0 || dest < 0 || src >= graph->size || dest >= graph->size)
 			ELF_DIE("Invalid vertixes in file.");
-		elf_graph_addEdge(graph, src, dest, wei);
+		elfGraph_addEdge(graph, src, dest, wei);
 	}
 }
 
@@ -153,11 +153,11 @@ static int dfs_time = 0;            //records current "time"
 static void (*dfs_after_func) (int vert) = NULL; // function to execute on vertix finishing
 
 //Visiting procedure for the DFS.
-//Should only be called after a call to elf_graph_DFS_visit_initialize().
-//elf_graph_DFS_visit_finalize() should be called to
+//Should only be called after a call to elfGraph_DFS_visit_initialize().
+//elfGraph_DFS_visit_finalize() should be called to
 //  clean resources used and to retrieve the produced vectors.
 static
-void elf_graph_DFS_visit(const ElfGraph *graph, int current){
+void elfGraph_DFS_visit(const ElfGraph *graph, int current){
 	ElfListIt *iterator = elfList_getIterator(graph->array[current]);
 	Edge *edge;
 
@@ -168,7 +168,7 @@ void elf_graph_DFS_visit(const ElfGraph *graph, int current){
 		edge = iterator->key;
 		if(dfs_color[edge->target] == 'w'){
 			dfs_pred[edge->target] = current;
-			elf_graph_DFS_visit(graph, edge->target);
+			elfGraph_DFS_visit(graph, edge->target);
 		}
 		iterator = iterator->next;
 	}
@@ -177,9 +177,9 @@ void elf_graph_DFS_visit(const ElfGraph *graph, int current){
 	dfs_color[current] = 'b'; //black
 }
 
-//Initialize the static global variables for use in elf_graph_DFS_visit().
+//Initialize the static global variables for use in elfGraph_DFS_visit().
 static inline
-void elf_graph_DFS_visit_initialize(const ElfGraph *graph){
+void elfGraph_DFS_visit_initialize(const ElfGraph *graph){
 	int i, n;
 	dfs_pred = malloc(sizeof(int) * graph->size);
 	dfs_color = malloc(sizeof(char) * graph->size);
@@ -198,7 +198,7 @@ void elf_graph_DFS_visit_initialize(const ElfGraph *graph){
 //If 'time_vec' is not NULL, it receives the vector of time visited.
 //If 'finish_vec' is not NULL, it receives the vector of time finished.
 static inline
-void elf_graph_DFS_visit_finalize(int **pred_vec, int **time_vec, int **finish_vec){
+void elfGraph_DFS_visit_finalize(int **pred_vec, int **time_vec, int **finish_vec){
 	free(dfs_color);
 	
 	if(pred_vec) *pred_vec = dfs_pred;
@@ -218,38 +218,38 @@ void elf_graph_DFS_visit_finalize(int **pred_vec, int **time_vec, int **finish_v
 }
 
 // Documented in header file.
-void elf_graph_DFS_registerAfterFunc(void (*func)(int vert)){
+void elfGraph_DFS_registerAfterFunc(void (*func)(int vert)){
 	if(!func) ELF_DIE("Received NULL pointer");
 	dfs_after_func = func;
 }
 
 // Documented in header file.
-void elf_graph_DFS_src(const ElfGraph *graph, int src, int **pred_p, int **time_p, int **finish_p){
+void elfGraph_DFS_src(const ElfGraph *graph, int src, int **pred_p, int **time_p, int **finish_p){
 	if(!graph) ELF_DIE("Received NULL pointer");
 	if(src >= graph->size || src < 0) ELF_DIE("Invalid source vertix");
 
-	elf_graph_DFS_visit_initialize(graph);
-	elf_graph_DFS_visit(graph, src);
-	elf_graph_DFS_visit_finalize(pred_p, time_p, finish_p);
+	elfGraph_DFS_visit_initialize(graph);
+	elfGraph_DFS_visit(graph, src);
+	elfGraph_DFS_visit_finalize(pred_p, time_p, finish_p);
 }
 
 // Documented in header file.
-void elf_graph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **finish_p){
+void elfGraph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **finish_p){
 	if(!graph) ELF_DIE("Received NULL pointer");
 
-	elf_graph_DFS_visit_initialize(graph);
+	elfGraph_DFS_visit_initialize(graph);
 
 	int i, n;
-	for(i = 0, n = elf_graph_size(graph); i < n; i++){
+	for(i = 0, n = elfGraph_size(graph); i < n; i++){
 		if( dfs_color[i] == 'w')
-			elf_graph_DFS_visit(graph, i);
+			elfGraph_DFS_visit(graph, i);
 	}
 
-	elf_graph_DFS_visit_finalize(pred_p, time_p, finish_p);
+	elfGraph_DFS_visit_finalize(pred_p, time_p, finish_p);
 }
 
 // Documented in header file.
-int *elf_graph_BFS(const ElfGraph *graph, int src, int **dist_p){
+int *elfGraph_BFS(const ElfGraph *graph, int src, int **dist_p){
 	if(!graph) ELF_DIE("Received NULL pointer");
 	if(src >= graph->size || src < 0) ELF_DIE("Invalid source vertix");
 

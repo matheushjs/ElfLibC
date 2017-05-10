@@ -29,7 +29,7 @@ static void elf_edge_print(void *a);
 /**/
 
 
-//Creates a graph with N vertexes, oriented or not.
+// Documented in header file.
 ElfGraph *elfGraph_new(int N, bool oriented){
 	if(N < 0) ELF_DIE("Number of vertixes cannot be negative");
 	ElfGraph *new = malloc(sizeof(ElfGraph));
@@ -42,8 +42,7 @@ ElfGraph *elfGraph_new(int N, bool oriented){
 	return new;
 }
 
-//Deallocates all the memory used by 'graph', and sets its pointer to NULL.
-//'graph' should be an ElfGraph* passed by reference (hence a double pointer).
+// Documented in header file.
 void elfGraph_destroy(ElfGraph **graph_p){
 	int i;
 	ElfGraph *graph = *graph_p;
@@ -57,13 +56,12 @@ void elfGraph_destroy(ElfGraph **graph_p){
 	}
 }
 
-//Returns the amount of vertixes in the graph.
+// Documented in header file.
 int elfGraph_size(const ElfGraph *graph){
 	return graph->size;
 }
 
-//Adds to the graph an edge from 'src' to 'dest'.
-//If the graph is not oriented, the inverse direction is also added.
+// Documented in header file.
 void elfGraph_addEdge(ElfGraph *graph, int src, int dest, int weight){
 	if(!graph) ELF_DIE("Received NULL pointer");
 	if(src < 0 || dest < 0 || src >= graph->size || dest >= graph->size) ELF_DIE("Invalid vertix indexes");
@@ -81,8 +79,7 @@ void elfGraph_addEdge(ElfGraph *graph, int src, int dest, int weight){
 	}
 }
 
-//Removes, if exists, the edge going from 'src' to 'dest'.
-//If the graph is not oriented, the inverse is also removed.
+// Documented in header file.
 void elfGraph_removeEdge(ElfGraph *graph, int src, int dest){
 	if(!graph) ELF_DIE("Received NULL pointer");
 	if(src < 0 || dest < 0 || src >= graph->size || dest >= graph->size) ELF_DIE("Invalid vertix indexes");
@@ -93,7 +90,7 @@ void elfGraph_removeEdge(ElfGraph *graph, int src, int dest){
 		elfList_removeValue(graph->array[dest], &tmp2);
 }
 
-//Prints the adjacency list of a graph
+// Documented in header file.
 void elfGraph_print(const ElfGraph *graph){
 	if(!graph) ELF_DIE("Received NULL pointer");
 	int i, dimension = graph->size;
@@ -104,18 +101,14 @@ void elfGraph_print(const ElfGraph *graph){
 	}
 }
 
-//Prints indexes of vertices that are adjacent to 'subjectVertex'.
+// Documented in header file.
 void elfGraph_printAdjacent(const ElfGraph *graph, int subjectVertex){
 	if(!graph) ELF_DIE("Received NULL pointer");
 	if(subjectVertex >= graph->size || subjectVertex < 0) ELF_DIE("Invalid subjectVertex");
 	elfList_traverse(graph->array[subjectVertex], elf_edge_print);
 }
 
-//Reads a sequence of 'lim' non-weighted edges from a file.
-//Reads until EOF if 'lim' is -1.
-//Will read any blank-character-separated sequence of integers,
-//  following the order: source vertix - destiny vertix
-//VE - vertix/edge
+// Documented in header file.
 void elfGraph_readFromFileVE(ElfGraph *graph, FILE *fp, int lim){
 	if(!graph) ELF_DIE("Received NULL pointer");
 	
@@ -128,8 +121,7 @@ void elfGraph_readFromFileVE(ElfGraph *graph, FILE *fp, int lim){
 	}
 }
 
-//Same as above, but also reads weights.
-//VEW - vertix/edge/weight
+// Documented in header file.
 void elfGraph_readFromFileVEW(ElfGraph *graph, FILE *fp, int lim){
 	if(!graph) ELF_DIE("Received NULL pointer");
 	

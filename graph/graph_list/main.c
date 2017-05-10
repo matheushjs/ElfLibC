@@ -63,8 +63,12 @@ int main(int argc, char *argv[]){
 	ElfGraph *graph = elfGraph_new(size, true);
 	elfGraph_readFromFileVE(graph, stdin, edges);
 
-	solve2(graph);
+	ElfGraph *graph2 = elfGraph_transpose(graph);
+
+	elfGraph_print(graph);
+	elfGraph_print(graph2);
 
 	elfGraph_destroy(&graph);
+	elfGraph_destroy(&graph2);
 	return 0;
 }

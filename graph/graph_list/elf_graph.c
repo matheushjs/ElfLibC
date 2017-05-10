@@ -109,6 +109,34 @@ void elfGraph_printAdjacent(const ElfGraph *graph, int subjectVertex){
 }
 
 // Documented in header file.
+ElfGraph *elfGraph_transpose(const ElfGraph *graph){
+	if(!graph) ELF_DIE("Received NULL pointer");
+	if(!graph->oriented){
+		fprintf(stderr, "Received undirected graph. Can't transpose it.\n");
+		return NULL;
+	}
+
+	ElfGraph *result;
+	int i, n;
+
+	result = elfGraph_new(graph->size, graph->oriented);
+
+	for(i = 0, n = graph->size; i < n; i++){
+		ElfList *list = graph->array[i];
+		ElfListIt *it = elfList_getIterator(list);
+		Edge *ed;
+
+		while(it != NULL){
+			ed = it->key;
+			elfGraph_addEdge(result, ed->target, i, ed->weight);
+			it = it->next;
+		}
+	}
+
+	return result;
+}
+
+// Documented in header file.
 void elfGraph_readFromFileVE(ElfGraph *graph, FILE *fp, int lim){
 	if(!graph) ELF_DIE("Received NULL pointer");
 	
@@ -292,8 +320,6 @@ int *elfGraph_BFS(const ElfGraph *graph, int src, int **dist_p){
 
 	return pred;
 }
-
-
 
 
 

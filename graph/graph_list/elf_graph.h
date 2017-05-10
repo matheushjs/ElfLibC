@@ -13,6 +13,7 @@ void elfGraph_addEdge(ElfGraph *graph, int src, int dest, int weight);
 void elfGraph_removeEdge(ElfGraph *graph, int src, int dest);
 void elfGraph_print(const ElfGraph *graph);
 void elfGraph_printAdjacent(const ElfGraph *graph, int subjectVertex);
+ElfGraph *elfGraph_transpose(const ElfGraph *graph);
 void elfGraph_readFromFileVE(ElfGraph *graph, FILE *fp, int lim);
 void elfGraph_readFromFileVEW(ElfGraph *graph, FILE *fp, int lim);
 
@@ -55,6 +56,10 @@ void elfGraph_print(const ElfGraph *graph);
 void elfGraph_printAdjacent(const ElfGraph *graph, int subjectVertex);
 	- Prints indexes of vertices that are adjacent to 'subjectVertex'.
  
+ElfGraph *elfGraph_transpose(const ElfGraph *graph);
+	- Returns the transposed graph of 'graph.
+	- If 'graph' is not oriented, returns NULL.
+
 void elfGraph_readFromFileVE(ElfGraph *graph, FILE *fp, int lim);
 	- Reads a sequence of 'lim' non-weighted edges from a file.
 	- Reads until EOF if 'lim' is -1.

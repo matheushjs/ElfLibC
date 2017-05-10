@@ -1,9 +1,0 @@
-This directory should have useful C code that could be used in future university works or any other tasks.
-
-
-Guidelines for data_types directory hierarchy:
-	./<abstract_data_type_name>/<main_characteristic>/<filename>
-	<abstract_data_type_name> such as 'stack', 'set', 'queue'.
-	<main_characteristic> such as 'contiguous_chain', 'double-linked chain'.
-	when multiple types of stack reside in a single directory, such as multiple contiguous-chain stacks, they should differ only by filename, not directory name.
-		e.g: 'stack_st.c' for stack that stores simple types, and 'stack_dt' for stack that stores dynamic types.

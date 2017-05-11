@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <string.h>
-#include <limits.h>
+
 #include <elf_graph.h>
 #include <elf_list.h>
 #include <elf_queue.h>
@@ -10,6 +9,16 @@
 #define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
 #define MAX(X,Y) X>Y?X:Y
 #define MIN(X,Y) X<Y?X:Y
+
+typedef struct _ArgsDFS {
+	int  *dfs_pred;        //predecessor vector
+	char *dfs_color;       //color vector
+	int  *dfs_time_vec;    //visit time vector
+	int  *dfs_finish_vec;  //finishing time vector
+	int  dfs_time;         //records current "time"
+	void (*dfs_after_func) (int vert, void *data); // function to execute on vertix finishing
+	void *dfs_after_data;  //Data to pass to dfs_after_func
+} ArgsDFS;
 
 typedef struct _Edge {
 	int target;	//Vertix this edge 'points' to.
@@ -20,12 +29,17 @@ typedef struct _ElfGraph {
 	int size;
 	bool oriented;
 	ElfList **array;	//Array of lists of edges.
+
+	ArgsDFS dfs_args; //Mutable component (C++ concept).
+	                  //If this is altered, ElfGraph should still be considered const.
 } ElfGraph;
 
-/* Static functions declarations (Implemented on the bottom). */
+/* Some needed static functions declarations (Implemented later in this file). */
 static bool elf_edge_greater(void *a, void *b);
 static bool elf_edge_equal(void *a, void *b);
 static void elf_edge_print(void *a);
+
+static inline void elfGraph_ArgsDFS_reset(const ElfGraph *graph);
 /**/
 
 
@@ -39,6 +53,8 @@ ElfGraph *elfGraph_new(int N, bool oriented){
 	for(N--; N >= 0; N--)
 		new->array[N] = elfList_newWithEqual(
 			 elf_edge_greater, elf_edge_equal );
+
+	elfGraph_ArgsDFS_reset(new);
 	return new;
 }
 
@@ -162,88 +178,104 @@ void elfGraph_readFromFileVEW(ElfGraph *graph, FILE *fp, int lim){
 	}
 }
 
-//Static global variables to use on DFS exploring,
-//  to avoid overusing stack memory.
-//TODO: Put all these structs inside the graph struct.
-static int *dfs_pred = NULL;        //predecessor vector
-static char *dfs_color = NULL;      //color vector
-static int *dfs_time_vec = NULL;    //visit time vector
-static int *dfs_finish_vec = NULL;  //finishing time vector
-static int dfs_time = 0;            //records current "time"
-static void (*dfs_after_func) (int vert, void *data) = NULL; // function to execute on vertix finishing
-static void *dfs_after_data = NULL;
+//Returns a pointer to the graph's ArgsDFS, which is a mutable component of a graph.
+static inline
+ArgsDFS *elfGraph_getArgsDFS(const ElfGraph *graph){
+	//There is an issue with const-qualifiers here.
+	//We could consider ArgsDFS as a 'mutable' structure within the graph.
+	return (ArgsDFS *) &(graph->dfs_args); 
+}
 
 //Visiting procedure for the DFS.
-//Should only be called after a call to elfGraph_DFS_visit_initialize().
-//elfGraph_DFS_visit_finalize() should be called to
+//Should only be called after a call to elfGraph_ArgsDFS_initialize().
+//elfGraph_ArgsDFS_finalize() should be called to
 //  clean resources used and to retrieve the produced vectors.
 static
 void elfGraph_DFS_visit(const ElfGraph *graph, int current){
 	ElfListIt *iterator = elfList_getIterator(graph->array[current]);
+	ArgsDFS *args = elfGraph_getArgsDFS(graph);
 	Edge *edge;
 
-	dfs_color[current] = 'g'; //gray
-	dfs_time_vec[current] = dfs_time++;
+	args->dfs_color[current] = 'g'; //gray
+	args->dfs_time_vec[current] = (args->dfs_time)++;
 
 	while(iterator != NULL){
 		edge = iterator->key;
-		if(dfs_color[edge->target] == 'w'){
-			dfs_pred[edge->target] = current;
+		if(args->dfs_color[edge->target] == 'w'){
+			args->dfs_pred[edge->target] = current;
 			elfGraph_DFS_visit(graph, edge->target);
 		}
 		iterator = iterator->next;
 	}
-	if(dfs_after_func) dfs_after_func(current, dfs_after_data);
-	dfs_finish_vec[current] = dfs_time++;
-	dfs_color[current] = 'b'; //black
+	if(args->dfs_after_func)
+		args->dfs_after_func(current, args->dfs_after_data);
+	args->dfs_finish_vec[current] = (args->dfs_time)++;
+	args->dfs_color[current] = 'b'; //black
 }
 
-//Initialize the static global variables for use in elfGraph_DFS_visit().
+//Initialize the ArgsDFS variables for use in DFS algorithms.
 static inline
-void elfGraph_DFS_visit_initialize(const ElfGraph *graph){
+void elfGraph_ArgsDFS_initialize(const ElfGraph *graph){
+	ArgsDFS *p;
 	int i, n;
-	dfs_pred = malloc(sizeof(int) * graph->size);
-	dfs_color = malloc(sizeof(char) * graph->size);
-	dfs_time_vec = malloc(sizeof(int) * graph->size);
-	dfs_finish_vec = malloc(sizeof(int) * graph->size);
+
+	p = elfGraph_getArgsDFS(graph);
+
+	p->dfs_pred = malloc(sizeof(int) * graph->size);
+	p->dfs_color = malloc(sizeof(char) * graph->size);
+	p->dfs_time_vec = malloc(sizeof(int) * graph->size);
+	p->dfs_finish_vec = malloc(sizeof(int) * graph->size);
 	for(i = 0, n = graph->size; i < n; i++){
-		dfs_pred[i] = i;
-		dfs_color[i] = 'w'; //white
-		dfs_time_vec[i] = -1;
+		p->dfs_pred[i] = i;
+		p->dfs_color[i] = 'w'; //white
+		p->dfs_time_vec[i] = -1;
 	}
-	dfs_time = 0;
+	p->dfs_time = 0;
 }
 
-//Cleans resources used by DFS_visit and returns the desired vectors.
+//Sets ArgsDFS inner structures to a reset state, cleaning dangling pointers and such.
+static inline
+void elfGraph_ArgsDFS_reset(const ElfGraph *graph){
+	ArgsDFS *p = elfGraph_getArgsDFS(graph);
+
+	p->dfs_color = NULL;
+	p->dfs_pred = NULL;
+	p->dfs_time_vec = NULL;
+	p->dfs_finish_vec = NULL;
+	p->dfs_after_func = NULL;
+	p->dfs_after_data = NULL;
+}
+
+//Deallocates resources used by DFS_visit, cleans the graph's ArgsDFS structure,
+//  and returns the desired vectors.
 //If 'pred' is not NULL, it receives the vector of predecessors.
 //If 'time_vec' is not NULL, it receives the vector of time visited.
 //If 'finish_vec' is not NULL, it receives the vector of time finished.
 static inline
-void elfGraph_DFS_visit_finalize(int **pred_vec, int **time_vec, int **finish_vec){
-	free(dfs_color);
+void elfGraph_ArgsDFS_finalize(const ElfGraph *graph, int **pred_vec, int **time_vec, int **finish_vec){
+	ArgsDFS *args = elfGraph_getArgsDFS(graph);
+
+	free(args->dfs_color);
 	
-	if(pred_vec) *pred_vec = dfs_pred;
-	else free(dfs_pred);
+	if(pred_vec) *pred_vec = args->dfs_pred;
+	else free(args->dfs_pred);
 
-	if(time_vec) *time_vec = dfs_time_vec;
-	else free(dfs_time_vec);
+	if(time_vec) *time_vec = args->dfs_time_vec;
+	else free(args->dfs_time_vec);
 
-	if(finish_vec) *finish_vec = dfs_finish_vec;
-	else free(dfs_finish_vec);
+	if(finish_vec) *finish_vec = args->dfs_finish_vec;
+	else free(args->dfs_finish_vec);
 
-	dfs_color = NULL;
-	dfs_pred = NULL;
-	dfs_time_vec = NULL;
-	dfs_finish_vec = NULL;
-	dfs_after_func = NULL;
-	dfs_after_data = NULL;
+	elfGraph_ArgsDFS_reset(graph);
 }
 
 // Documented in header file.
-void elfGraph_DFS_registerAfterFunc(void (*func)(int vert, void *data), void *data){
+void elfGraph_DFS_registerAfterFunc(const ElfGraph *graph, void (*func)(int vert, void *data), void *data){
 	if(!func) ELF_DIE("Received NULL pointer");
-	dfs_after_func = func;
-	dfs_after_data = data;
+
+	ArgsDFS *p = elfGraph_getArgsDFS(graph);
+	p->dfs_after_func = func;
+	p->dfs_after_data = data;
 }
 
 // Documented in header file.
@@ -251,24 +283,25 @@ void elfGraph_DFS_src(const ElfGraph *graph, int src, int **pred_p, int **time_p
 	if(!graph) ELF_DIE("Received NULL pointer");
 	if(src >= graph->size || src < 0) ELF_DIE("Invalid source vertix");
 
-	elfGraph_DFS_visit_initialize(graph);
+	elfGraph_ArgsDFS_initialize(graph);
 	elfGraph_DFS_visit(graph, src);
-	elfGraph_DFS_visit_finalize(pred_p, time_p, finish_p);
+	elfGraph_ArgsDFS_finalize(graph, pred_p, time_p, finish_p);
 }
 
 // Documented in header file.
 void elfGraph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **finish_p){
 	if(!graph) ELF_DIE("Received NULL pointer");
 
-	elfGraph_DFS_visit_initialize(graph);
+	ArgsDFS *args = elfGraph_getArgsDFS(graph);
+	elfGraph_ArgsDFS_initialize(graph);
 
 	int i, n;
 	for(i = 0, n = elfGraph_size(graph); i < n; i++){
-		if( dfs_color[i] == 'w')
+		if( args->dfs_color[i] == 'w')
 			elfGraph_DFS_visit(graph, i);
 	}
 
-	elfGraph_DFS_visit_finalize(pred_p, time_p, finish_p);
+	elfGraph_ArgsDFS_finalize(graph, pred_p, time_p, finish_p);
 }
 
 
@@ -331,19 +364,20 @@ ElfList **elfGraph_stronglyConnectedComponents(const ElfGraph *graph){
 	//vector idx now contains indexes ordered from earliest finish-time to latest.
 
 	trans = elfGraph_transpose(graph);
-	elfGraph_DFS_visit_initialize(trans);
+	ArgsDFS *args = elfGraph_getArgsDFS(trans);
+	elfGraph_ArgsDFS_initialize(trans);
 	result = NULL;
 	size = 0;
 	for(i = n-1; i >= 0; i--){
-		if(dfs_color[idx[i]] == 'w'){
+		if(args->dfs_color[idx[i]] == 'w'){
 			result = (ElfList **) realloc(result, sizeof(ElfList *) * (size+1));
 			result[size] = elfList_new(ELF_POINTER_TO_INT_GREATER);
-			elfGraph_DFS_registerAfterFunc(insert_vertix_into_list, result[size]);
+			elfGraph_DFS_registerAfterFunc(trans, insert_vertix_into_list, result[size]);
 			size++;
 			elfGraph_DFS_visit(trans, idx[i]);
 		}
 	}
-	elfGraph_DFS_visit_finalize(NULL, NULL, NULL);
+	elfGraph_ArgsDFS_finalize(trans, NULL, NULL, NULL);
 	free(idx);
 	elfGraph_destroy(&trans);
 

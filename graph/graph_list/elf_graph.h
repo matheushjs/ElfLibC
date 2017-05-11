@@ -100,6 +100,12 @@ void elfGraph_DFS_registerAfterFunc(void (*func)(int vert, void *data), void *da
 	- Args:
 		func: function to register.
 
+ElfList **elfGraph_stronglyConnectedComponents(const ElfGraph *graph);
+	- Finds all the strongly connected components of a graph.
+	Return:
+		A NULL-terminated array of lists, each of which contains a component.
+		If graph is undirected, return NULL.
+
 int *elfGraph_BFS(const ElfGraph *graph, int src, int **dist_p);
 	- Performs a BFS in the graph, finding the distance/path from all vertexes to 'src'.
 	- Args:

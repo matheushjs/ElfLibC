@@ -272,11 +272,6 @@ void elfGraph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **f
 }
 
 static
-bool greater(void *a, void *b){
-	return ELF_POINTER_TO_INT(a) > ELF_POINTER_TO_INT(b) ? true : false;
-}
-
-static
 void insert_vertix_into_list(int vert, void *data){
 	printf("Adding: %d\n", vert);
 	elfList_insert(data, ELF_INT_TO_POINTER(vert));
@@ -335,7 +330,7 @@ ElfList **elfGraph_stronglyConnectedComponents(const ElfGraph *graph){
 	for(i = n-1; i >= 0; i--){
 		if(dfs_color[idx[i]] == 'w'){
 			result = (ElfList **) realloc(result, sizeof(ElfList *) * (size+1));
-			result[size] = elfList_new(greater);
+			result[size] = elfList_new(ELF_POINTER_TO_INT_GREATER);
 			elfGraph_DFS_registerAfterFunc(insert_vertix_into_list, result[size]);
 			size++;
 			elfGraph_DFS_visit(trans, idx[i]);

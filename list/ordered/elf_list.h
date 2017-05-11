@@ -9,6 +9,9 @@
 #define ELF_POINTER_TO_UINT(p) ((unsigned int) (unsigned long int) (p))
 //Credits: https://developer.gnome.org/glib/stable/glib-Type-Conversion-Macros.html
 
+#define ELF_POINTER_TO_INT_GREATER elfList_pointerToIntGreaterFunc
+#define ELF_POINTER_TO_UINT_GREATER elfList_pointerToUIntGreaterFunc
+
 typedef struct _ElfList ElfList;
 
 ElfList *elfList_new(bool (*greaterThan)(void*,void*));
@@ -39,6 +42,10 @@ struct _ElfListIt {
 };
 ElfListIt *elfList_getIterator(ElfList *list);
 
+/* Convenience Functions */
+bool elfList_pointerToIntGreaterFunc(void *a, void *b);
+bool elfList_pointerToUIntGreaterFunc(void *a, void *b);
+
 
 /* Documentation
 
@@ -48,6 +55,11 @@ ELF_POINTER_TO_INT(p)
 ELF_POINTER_TO_UINT(p)
 	- Macros for type casting from signed/unsigned integers to pointers.
 	- Useful since this queue data structure can only store void pointers.
+
+
+ELF_POINTER_TO_INT_GREATER
+ELF_POINTER_TO_UINT_GREATER
+	- Convenience macros for using as the greaterThan function when instantiating a list.
 
 ElfList
 	- Ordered list of void*
@@ -124,6 +136,10 @@ ElfListIt *elfList_getIterator(ElfList *list);
 	- Iterators become dangling if origin list is destroyed.
 
 
+bool elfList_pointerToIntGreaterFunc(void *a, void *b);
+bool elfList_pointerToUIntGreaterFunc(void *a, void *b);
+	- Convenience functions for using as the greaterThan function when instantiating a list.
+	- Can also use the macros like ELF_POINTER_TO_INT_GREATER
 */
 
 #endif

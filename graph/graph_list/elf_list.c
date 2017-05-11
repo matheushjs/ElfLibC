@@ -288,3 +288,11 @@ ElfListIt *elfList_getIterator(ElfList *list){
 	if(!list) ELF_DIE("Received null pointer");
 	return list->first;
 }
+
+bool elfList_pointerToIntGreaterFunc(void *a, void *b){
+	return ELF_POINTER_TO_INT(a) > ELF_POINTER_TO_INT(b) ? true : false;
+}
+
+bool elfList_pointerToUIntGreaterFunc(void *a, void *b){
+	return ELF_POINTER_TO_UINT(a) > ELF_POINTER_TO_UINT(b) ? true : false;
+}

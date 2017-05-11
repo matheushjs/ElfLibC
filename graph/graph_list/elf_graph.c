@@ -170,7 +170,8 @@ static char *dfs_color = NULL;      //color vector
 static int *dfs_time_vec = NULL;    //visit time vector
 static int *dfs_finish_vec = NULL;  //finishing time vector
 static int dfs_time = 0;            //records current "time"
-static void (*dfs_after_func) (int vert) = NULL; // function to execute on vertix finishing
+static void (*dfs_after_func) (int vert, void *data) = NULL; // function to execute on vertix finishing
+static void *dfs_after_data = NULL;
 
 //Visiting procedure for the DFS.
 //Should only be called after a call to elfGraph_DFS_visit_initialize().
@@ -192,7 +193,7 @@ void elfGraph_DFS_visit(const ElfGraph *graph, int current){
 		}
 		iterator = iterator->next;
 	}
-	if(dfs_after_func) dfs_after_func(current);
+	if(dfs_after_func) dfs_after_func(current, dfs_after_data);
 	dfs_finish_vec[current] = dfs_time++;
 	dfs_color[current] = 'b'; //black
 }
@@ -235,12 +236,14 @@ void elfGraph_DFS_visit_finalize(int **pred_vec, int **time_vec, int **finish_ve
 	dfs_time_vec = NULL;
 	dfs_finish_vec = NULL;
 	dfs_after_func = NULL;
+	dfs_after_data = NULL;
 }
 
 // Documented in header file.
-void elfGraph_DFS_registerAfterFunc(void (*func)(int vert)){
+void elfGraph_DFS_registerAfterFunc(void (*func)(int vert, void *data), void *data){
 	if(!func) ELF_DIE("Received NULL pointer");
 	dfs_after_func = func;
+	dfs_after_data = data;
 }
 
 // Documented in header file.
@@ -266,6 +269,86 @@ void elfGraph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **f
 	}
 
 	elfGraph_DFS_visit_finalize(pred_p, time_p, finish_p);
+}
+
+static
+bool greater(void *a, void *b){
+	return ELF_POINTER_TO_INT(a) > ELF_POINTER_TO_INT(b) ? true : false;
+}
+
+static
+void insert_vertix_into_list(int vert, void *data){
+	printf("Adding: %d\n", vert);
+	elfList_insert(data, ELF_INT_TO_POINTER(vert));
+}
+
+/* The idea is to return an array of lists, each list corresponding to a component
+ * Each list is terminated by a '-1'.
+ * Why this decision?
+ *     - What I'm thinking is that the user might also want 2 graphs, 1 graph for connected components
+ *     and 1 graph for the inner edges of each component. Returning an array of lists would make it
+ *     easier to create another function that returns these 2 graphs.
+ *     - TODO: To implement what is above:
+ *     For each list V[i]:
+ *         For each integer I in V[i]:
+ *             Find the adjacency list of I in the original graph
+ *             For each integer K in the adjacency list:
+ *                 if K is in V: add the I-K edge to the graph inner[V[i]]
+ *                 else: add the edge between components containing K and I to the
+ *                       graph outer.
+ */
+ElfList **elfGraph_stronglyConnectedComponents(const ElfGraph *graph){
+	int i, n, j, size, aux, *finish, *idx;
+	ElfList **result;
+	ElfGraph *trans;
+
+	n = elfGraph_size(graph);
+	idx = malloc(sizeof(int) * n); //Vector of indexes
+	for(i = 0; i < n; i++)
+		idx[i] = i; //Initialize indexes
+	elfGraph_DFS_all(graph, NULL, NULL, &finish);
+
+	//TODO: Add ElfVector to the project, with efficient sorting methods.
+
+	// Sort indexes decrescently based on finish vector.
+	for(i = 1; i < n; i++){
+		for(j = i-1; j >= 0; j--){
+			if(finish[j+1] < finish[j]){
+				aux = finish[j];
+				finish[j] = finish[j+1];
+				finish[j+1] = aux;
+
+				aux = idx[j];
+				idx[j] = idx[j+1];
+				idx[j+1] = aux;
+			}
+		}
+	}
+	free(finish);
+
+	//vector idx now contains indexes ordered from earliest finish-time to latest.
+
+	trans = elfGraph_transpose(graph);
+	elfGraph_DFS_visit_initialize(trans);
+	result = NULL;
+	size = 0;
+	for(i = n-1; i >= 0; i--){
+		if(dfs_color[idx[i]] == 'w'){
+			result = (ElfList **) realloc(result, sizeof(ElfList *) * (size+1));
+			result[size] = elfList_new(greater);
+			elfGraph_DFS_registerAfterFunc(insert_vertix_into_list, result[size]);
+			size++;
+			elfGraph_DFS_visit(trans, idx[i]);
+		}
+	}
+	elfGraph_DFS_visit_finalize(NULL, NULL, NULL);
+	free(idx);
+	elfGraph_destroy(&trans);
+
+	result = (ElfList **) realloc(result, sizeof(ElfList *) * (size+1));
+	result[size] = NULL;
+
+	return result;
 }
 
 // Documented in header file.

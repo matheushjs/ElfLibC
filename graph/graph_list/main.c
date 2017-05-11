@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <elf_list.h>
 #include <elf_graph.h>
 
 //Recursive procedure that prints the path from 'source' to 'target',
@@ -56,19 +57,30 @@ void solve2(ElfGraph *graph){
 	free(pred_array);
 }
 
+void print(void *d){
+	printf("(%d) ", ELF_POINTER_TO_INT(d));
+}
+
 int main(int argc, char *argv[]){
 	int size, edges;
+	ElfList **lists, **aux;
+
 	scanf("%d %d", &size, &edges);
 	
 	ElfGraph *graph = elfGraph_new(size, true);
 	elfGraph_readFromFileVE(graph, stdin, edges);
 
-	ElfGraph *graph2 = elfGraph_transpose(graph);
+	aux = lists = elfGraph_stronglyConnectedComponents(graph);
+	
+	while(*aux != NULL){
+		elfList_traverse(*aux, print);
+		printf("\n");
+		elfList_destroy(aux);
+		aux++;
+	}
 
-	elfGraph_print(graph);
-	elfGraph_print(graph2);
+	free(lists);
 
 	elfGraph_destroy(&graph);
-	elfGraph_destroy(&graph2);
 	return 0;
 }

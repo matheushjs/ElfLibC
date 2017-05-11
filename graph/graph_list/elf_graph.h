@@ -6,6 +6,8 @@ typedef struct _ElfGraph ElfGraph;
 #include <stdio.h>
 #include <stdbool.h>
 
+#include <elf_list.h>
+
 ElfGraph *elfGraph_new(int N, bool oriented);
 void elfGraph_destroy(ElfGraph **graph_p);
 int elfGraph_size(const ElfGraph *graph);
@@ -19,7 +21,8 @@ void elfGraph_readFromFileVEW(ElfGraph *graph, FILE *fp, int lim);
 
 void elfGraph_DFS_src(const ElfGraph *graph, int src, int **pred_p, int **time_p, int **finish_p);
 void elfGraph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **finish_p);
-void elfGraph_DFS_registerAfterFunc(void (*func)(int vert));
+void elfGraph_DFS_registerAfterFunc(void (*func)(int vert, void *data), void *data);
+ElfList **elfGraph_stronglyConnectedComponents(const ElfGraph *graph);
 
 int *elfGraph_BFS(const ElfGraph *graph, int src, int **dist_p);
 
@@ -88,11 +91,12 @@ void elfGraph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **f
 		time_p: if not NULL, receives the vector of time visited.
 		finish_p: if not NULL, receives the vector of time finished.
 
-void elfGraph_DFS_registerAfterFunc(void (*func)(int vert)){
+void elfGraph_DFS_registerAfterFunc(void (*func)(int vert, void *data), void *data);
 	- Registers a function to be executed in each vertix after all adjacent vertexes have
 		been visited.
 	- Once registered, the function is executed only for ONE DFS, meaning multiple DFS requires
 		multiple function registries.
+	- For each vertex N, func will be called as func(N, data);
 	- Args:
 		func: function to register.
 

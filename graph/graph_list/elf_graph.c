@@ -271,6 +271,8 @@ void elfGraph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **f
 	elfGraph_DFS_visit_finalize(pred_p, time_p, finish_p);
 }
 
+
+//Function for registering in the DFS algorithms.
 static
 void insert_vertix_into_list(int vert, void *data){
 	printf("Adding: %d\n", vert);
@@ -309,8 +311,7 @@ ElfList **elfGraph_stronglyConnectedComponents(const ElfGraph *graph){
 		idx[i] = i; //Initialize indexes
 	elfGraph_DFS_all(graph, NULL, NULL, &finish);
 
-	//TODO: Add ElfVector to the project, with efficient sorting methods.
-
+	//TODO: efficient sorting.
 	// Sort indexes decrescently based on finish vector.
 	for(i = 1; i < n; i++){
 		for(j = i-1; j >= 0; j--){

@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <elf_set.h>
 
-void printSet(ElfSet *set, int size){
+void printSet(ElfSet *set){
 	int i;
+	int size = elfSet_size(set);
+
 	for(i = 0; i < size; i++){
 		printf("%3d ", i);
 	}
@@ -15,14 +17,19 @@ void printSet(ElfSet *set, int size){
 
 int main(int argc, char *argv[]){
 	ElfSet *set;
-	int a, b;
+	int a, b, size;
 
-	set = elfSet_new(20);
+	printf("How many elements?\n");
+	scanf("%d", &size);
 
+	set = elfSet_new(size);
+
+	printf("Just keep typing 2 numbers to perform union operations. Type a letter to end.\n");
 	while( scanf("%d %d", &a, &b) == 2 ){
-		if( ((unsigned char) a) > 19 || ((unsigned char) b) > 19) continue;
+		if( ((unsigned char) a) > 19 || ((unsigned char) b) > 19) //Fancy array bounds-checking
+			continue;
 		elfSet_union(set, a, b);
-		printSet(set, 20);
+		printSet(set);
 	}
 
 	elfSet_destroy(&set);

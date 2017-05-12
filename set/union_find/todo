@@ -1,0 +1,6 @@
+Make a set that also contains a hashTable
+While handling elements which are integers, each integer maps to a void* stored in the hashTable
+Each void* can be accessed through the hashTable by calling a generic function hashing( void* ),
+  which should be given to the ElfSet constructor function
+
+For this, though, we need a hashtable TAD.

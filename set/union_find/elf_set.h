@@ -5,6 +5,7 @@ typedef struct _ElfSet ElfSet;
 
 ElfSet *elfSet_new(int size);
 void elfSet_destroy(ElfSet **set_p);
+int elfSet_size(ElfSet *set);
 int elfSet_find(ElfSet *set, int elem);
 void elfSet_union(ElfSet *set, int e1, int e2);
 
@@ -20,6 +21,9 @@ ElfSet *elfSet_new(int size);
 
 void elfSet_destroy(ElfSet **set_p);
 	- Deallocates memory allocated for a set.
+
+int elfSet_size(ElfSet *set);
+	- Returns the number of elements in the set.
 
 int elfSet_find(ElfSet *set, int elem);
 	- Returns the identifier of the set that contains element 'elem'.

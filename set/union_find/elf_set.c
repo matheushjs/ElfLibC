@@ -8,6 +8,7 @@ typedef struct _ElfSet {
 	int size;      //Number of elements
 } ElfSet;
 
+// Documented in header file.
 ElfSet *elfSet_new(int size){
 	ElfSet *set = malloc(sizeof(ElfSet));
 	set->id = malloc(sizeof(int) * size);
@@ -20,6 +21,7 @@ ElfSet *elfSet_new(int size){
 	return set;
 }
 
+// Documented in header file.
 void elfSet_destroy(ElfSet **set_p){
 	ElfSet *set;
 	if(set_p){
@@ -31,6 +33,12 @@ void elfSet_destroy(ElfSet **set_p){
 	}
 }
 
+// Documented in header file.
+int elfSet_size(ElfSet *set){
+	return set->size;
+}
+
+// Documented in header file.
 int elfSet_find(ElfSet *set, int elem){
 	if( set->id[elem] == elem ){
 		return elem;
@@ -41,6 +49,7 @@ int elfSet_find(ElfSet *set, int elem){
 	}
 }
 
+// Documented in header file.
 void elfSet_union(ElfSet *set, int e1, int e2){
 	int parent1, parent2;
 	parent1 = elfSet_find(set, e1);

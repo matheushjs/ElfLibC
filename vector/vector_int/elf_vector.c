@@ -1,12 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include <elf_vector.h>
 
 #define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
 #define ELF_MAX(X,Y) ((X)>(Y)?X:Y)
 #define ELF_MIN(X,Y) ((X)<(Y)?X:Y)
+#define ELF_ABS(X) ((X)<0?-(X):X)
 
 /* This vector structure starts with size 0.
  * User may only require operations to be done in elements already existent in the vector.
@@ -94,6 +96,41 @@ ElfVector *elfVector_new_withValue(int size, int value){
 		for(i = 0; i < size; i++)
 			new->vector[i] = value;
 	}
+
+	return new;
+}
+
+// Documented in header file.
+ElfVector *elfVector_new_random(int size, int min, int max){
+	if(size < 0){
+		fprintf(stderr, "Received negative size at %s.", __func__);
+		size = 0;
+	}
+
+	ElfVector *new;
+	static int salt = 0;
+
+	new = malloc(sizeof(ElfVector));
+	new->size = size;
+
+	int capacity = nextpow2(size, INITIAL_CAPACITY);
+	new->capacity = capacity;
+	printf("CAP: %d\n", capacity);
+	new->vector = malloc(sizeof(int) * capacity);
+
+	srand(time(NULL)+salt);
+	salt++;
+
+	int i, delta;
+	if(max < min){
+		i = max;
+		max = min;
+		min = max;
+	}
+	
+	delta = max-min+1;
+	for(i = 0; i < size; i++)
+		new->vector[i] = min + (rand()%delta);
 
 	return new;
 }

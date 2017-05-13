@@ -5,6 +5,8 @@ typedef struct _ElfVector ElfVector;
 
 ElfVector *elfVector_new();
 ElfVector *elfVector_new_withValue(int size, int value);
+ElfVector *elfVector_new_random(int size, int min, int max);
+
 void elfVector_destroy(ElfVector **vec_p);
 void elfVector_print(const ElfVector *elf);
 int elfVector_size(const ElfVector *elf);
@@ -24,6 +26,11 @@ ElfVector *elfVector_new();
 ElfVector *elfVector_new_withValue(int size, int value);
 	- Returns a new vector, containing 'size' elemente with value 'value'.
 	- If 'value' is 0, elements are initialized using 'calloc'.
+
+ElfVector *elfVector_new_random(int size, int min, int max);
+	- Returns a new vector, containing 'size' random elements.
+	- Elements will be between 'min' (inclusive) and 'max' (inclusive).
+	- Inverting 'min' with 'max' does not matter.
 
 void elfVector_destroy(ElfVector **vec_p);
 	- Frees memory allocated for the vector.

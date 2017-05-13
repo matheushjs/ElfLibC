@@ -98,3 +98,10 @@ void elfVector_destroy(ElfVector **vec_p){
 		*vec_p = NULL;
 	}
 }
+
+// Documented in header file.
+void elfVector_print(const ElfVector *elf){
+	int i, n;
+	for(i = 0, n = elf->size; i < n; i++)
+		printf("%d ", elf->vector[i]);
+}

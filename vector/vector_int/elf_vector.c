@@ -105,6 +105,8 @@ void elfVector_destroy(ElfVector **vec_p){
 
 // Documented in header file.
 void elfVector_print(const ElfVector *elf){
+	if(!elf) ELF_DIE("NULL pointer received!");
+
 	int i, n;
 	for(i = 0, n = elf->size; i < n; i++)
 		printf("%d ", elf->vector[i]);
@@ -112,11 +114,14 @@ void elfVector_print(const ElfVector *elf){
 
 // Documented in header file.
 int elfVector_size(const ElfVector *elf){
+	if(!elf) ELF_DIE("NULL pointer received!");
 	return elf->size;
 }
 
 // Documented in header file.
 void elfVector_pushBack(ElfVector *elf, int value){
+	if(!elf) ELF_DIE("NULL pointer received!");
+
 	int idx = elf->size;
 	if(idx == elf->capacity)
 		elfVector_grow(elf);
@@ -127,6 +132,8 @@ void elfVector_pushBack(ElfVector *elf, int value){
 
 // Documented in header file.
 int elfVector_popBack(ElfVector *elf){
+	if(!elf) ELF_DIE("NULL pointer received!");
+
 	int retval, idx;
 	
 	idx = (elf->size -= 1);
@@ -141,6 +148,8 @@ int elfVector_popBack(ElfVector *elf){
 
 // Documented in header file.
 int elfVector_get(ElfVector *elf, int index){
+	if(!elf) ELF_DIE("NULL pointer received!");
+
 	if(index < 0 || index >= elf->size){
 		fprintf(stderr, "Index out of bounds (%d) received at %s.\n", index, __func__);
 		return 0;
@@ -151,6 +160,8 @@ int elfVector_get(ElfVector *elf, int index){
 
 // Documented in header file.
 void elfVector_put(ElfVector *elf, int index, int value){
+	if(!elf) ELF_DIE("NULL pointer received!");
+
 	if(index < 0 || index >= elf->size){
 		fprintf(stderr, "Index out of bounds (%d) received at %s.\n", index, __func__);
 		return;

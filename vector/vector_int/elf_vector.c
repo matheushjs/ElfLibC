@@ -30,7 +30,7 @@ int nextpow2(int num, int min){
 	int pow = 1;
 	while(pow < num)
 		pow <<= 1;
-	return ELF_MIN(pow,min);
+	return ELF_MAX(pow,min);
 }
 
 // Grows the vector once
@@ -75,6 +75,11 @@ ElfVector *elfVector_new(){
 
 // Documented in header file.
 ElfVector *elfVector_new_withValue(int size, int value){
+	if(size < 0){
+		fprintf(stderr, "Received negative size at %s.", __func__);
+		size = 0;
+	}
+
 	ElfVector *new;
 	new = malloc(sizeof(ElfVector));
 	new->size = size;

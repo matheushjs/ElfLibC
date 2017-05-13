@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
 #define ELF_MAX(X,Y) ((X)>(Y)?X:Y)
@@ -75,7 +77,7 @@ ElfVector *elfVector_new_withValue(int size, int value){
 	new = malloc(sizeof(ElfVector));
 	new->size = size;
 
-	int capacity = newtpow2(size, INITIAL_CAPACITY);
+	int capacity = nextpow2(size, INITIAL_CAPACITY);
 	new->capacity = capacity;
 	if(value == 0){
 		new->vector = calloc(sizeof(int), capacity);

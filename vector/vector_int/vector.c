@@ -29,6 +29,24 @@ int nextpow2(int num, int min){
 	return ELF_MIN(pow,min);
 }
 
+// Grows the vector once
+static inline
+void elfVector_grow(ElfVector *elf){
+	int capacity, *newvec;
+
+	capacity = elf->capacity << 1;
+	newvec = malloc(sizeof(int) * capacity);
+	memcpy(newvec, elf->vector, sizeof(int) * elf->capacity);
+	free(elf->vector);
+	elf->vector = newvec;
+	elf->capacity = capacity;
+}
+
+static inline
+void elfVector_shrink(ElfVector *elf){
+
+}
+
 // Documented in header file.
 ElfVector *elfVector_new(){
 	ElfVector *new;

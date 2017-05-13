@@ -115,7 +115,6 @@ ElfVector *elfVector_new_random(int size, int min, int max){
 
 	int capacity = nextpow2(size, INITIAL_CAPACITY);
 	new->capacity = capacity;
-	printf("CAP: %d\n", capacity);
 	new->vector = malloc(sizeof(int) * capacity);
 
 	srand(time(NULL)+salt);

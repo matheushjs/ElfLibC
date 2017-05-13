@@ -34,7 +34,7 @@ int main(int argc, char *argv[]){
 	test(vec);
 	elfVector_destroy(&vec);
 
-	vec = elfVector_new_random(100, -10, 10);
+	vec = elfVector_new_random(10, -10, 10);
 	test(vec);
 	elfVector_destroy(&vec);
 

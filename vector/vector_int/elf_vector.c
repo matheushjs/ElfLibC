@@ -36,15 +36,27 @@ void elfVector_grow(ElfVector *elf){
 
 	capacity = elf->capacity << 1;
 	newvec = malloc(sizeof(int) * capacity);
+
 	memcpy(newvec, elf->vector, sizeof(int) * elf->capacity);
 	free(elf->vector);
+
 	elf->vector = newvec;
 	elf->capacity = capacity;
 }
 
+// Shrinks the vector once
 static inline
 void elfVector_shrink(ElfVector *elf){
+	int capacity, *newvec;
 
+	capacity = elf->capacity >> 1;
+	newvec = malloc(sizeof(int) * capacity);
+
+	memcpy(newvec, elf->vector, sizeof(int) * capacity);
+	free(elf->vector);
+	
+	elf->vector = newvec;
+	elf->capacity = capacity;
 }
 
 // Documented in header file.
@@ -75,4 +87,14 @@ ElfVector *elfVector_new_withValue(int size, int value){
 	}
 
 	return new;
+}
+
+// Documented in header file.
+void elfVector_destroy(ElfVector **vec_p){
+	if(vec_p){
+		ElfVector *vec = *vec_p;
+		free(vec->vector);
+		free(vec);
+		*vec_p = NULL;
+	}
 }

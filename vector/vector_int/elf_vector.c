@@ -109,6 +109,11 @@ void elfVector_print(const ElfVector *elf){
 }
 
 // Documented in header file.
+int elfVector_size(ElfVector *elf){
+	return elf->size;
+}
+
+// Documented in header file.
 void elfVector_pushBack(ElfVector *elf, int value){
 	int idx = elf->size;
 	if(idx == elf->capacity)
@@ -116,4 +121,18 @@ void elfVector_pushBack(ElfVector *elf, int value){
 
 	(elf->size)++;
 	elf->vector[idx] = value;
+}
+
+// Documented in header file.
+int elfVector_popBack(ElfVector *elf){
+	int retval, idx;
+	
+	idx = (elf->size -= 1);
+	retval = elf->vector[idx];
+
+	// Shrinks only if at 25% of capacity.
+	if(elf->capacity != INITIAL_CAPACITY && idx == (elf->capacity >> 2))
+		elfVector_shrink(elf);
+
+	return retval;
 }

@@ -138,3 +138,23 @@ int elfVector_popBack(ElfVector *elf){
 
 	return retval;
 }
+
+// Documented in header file.
+int elfVector_get(ElfVector *elf, int index){
+	if(index < 0 || index >= elf->size){
+		fprintf(stderr, "Index out of bounds (%d) received at %s.\n", index, __func__);
+		return 0;
+	}
+
+	return elf->vector[index];
+}
+
+// Documented in header file.
+void elfVector_put(ElfVector *elf, int index, int value){
+	if(index < 0 || index >= elf->size){
+		fprintf(stderr, "Index out of bounds (%d) received at %s.\n", index, __func__);
+		return;
+	}
+
+	elf->vector[index] = value;
+}

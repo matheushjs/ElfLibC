@@ -8,6 +8,10 @@ void test(ElfVector *vec){
 	for(i = 0; i < 10; i++)
 		elfVector_pushBack(vec, i);
 	printf("Vector has %d elements.\n", elfVector_size(vec));
+	elfVector_put(vec, 0, 727272);
+	elfVector_put(vec, 727272, 727272);
+	printf("First element is %d.\n", elfVector_get(vec, 0));
+	printf("Last element is %d.\n", elfVector_get(vec, elfVector_size(vec)-1));
 
 	elfVector_print(vec);
 	printf("\n");

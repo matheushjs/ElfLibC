@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <elf_vector.h>
+
 #define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
 #define ELF_MAX(X,Y) ((X)>(Y)?X:Y)
 #define ELF_MIN(X,Y) ((X)<(Y)?X:Y)
@@ -109,7 +111,7 @@ void elfVector_print(const ElfVector *elf){
 }
 
 // Documented in header file.
-int elfVector_size(ElfVector *elf){
+int elfVector_size(const ElfVector *elf){
 	return elf->size;
 }
 

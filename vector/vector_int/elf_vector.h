@@ -7,7 +7,7 @@ ElfVector *elfVector_new();
 ElfVector *elfVector_new_withValue(int size, int value);
 void elfVector_destroy(ElfVector **vec_p);
 void elfVector_print(const ElfVector *elf);
-int elfVector_size(ElfVector *elf);
+int elfVector_size(const ElfVector *elf);
 void elfVector_pushBack(ElfVector *elf, int value);
 int elfVector_popBack(ElfVector *elf);
 

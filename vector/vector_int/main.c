@@ -3,7 +3,7 @@
 #include <elf_vector.h>
 
 void test(ElfVector *vec){
-	int i;
+	int i, max, min;
 
 	for(i = 0; i < 10; i++)
 		elfVector_pushBack(vec, i);
@@ -12,6 +12,8 @@ void test(ElfVector *vec){
 	elfVector_put(vec, 727272, 727272);
 	printf("First element is %d.\n", elfVector_get(vec, 0));
 	printf("Last element is %d.\n", elfVector_get(vec, elfVector_size(vec)-1));
+	elfVector_maxmin(vec, &max, &min);
+	printf("maxmin are %d, %d\n", max, min);
 
 	elfVector_print(vec);
 	printf("\n");

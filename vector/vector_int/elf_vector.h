@@ -14,6 +14,7 @@ void elfVector_pushBack(ElfVector *elf, int value);
 int elfVector_popBack(ElfVector *elf);
 int elfVector_get(ElfVector *elf, int index);
 void elfVector_put(ElfVector *elf, int index, int value);
+void elfVector_maxmin(ElfVector *elf, int *max, int *min);
 
 /* DOCUMENTATION
  
@@ -57,6 +58,10 @@ int elfVector_get(ElfVector *elf, int index);
 void elfVector_put(ElfVector *elf, int index, int value);
 	- Replaces with 'value' the value in position 'index'.
 	- If 'index' is out of bounds, prints an error message. Vector is not modified.
+
+void elfVector_maxmin(ElfVector *elf, int *max, int *min);
+	- Finds the maximum and minimum numbers within the vector.
+	- Returns on 'max' and 'min' if each is not NULL.
 
  */
 

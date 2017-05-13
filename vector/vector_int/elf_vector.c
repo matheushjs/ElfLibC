@@ -210,3 +210,24 @@ void elfVector_put(ElfVector *elf, int index, int value){
 
 	elf->vector[index] = value;
 }
+
+// Documented in header file.
+void elfVector_maxmin(ElfVector *elf, int *max, int *min){
+	if(!elf) ELF_DIE("NULL pointer received!");
+	if(elf->size == 0){
+		fprintf(stderr, "Can't get maxmin of an empty vector, at %s.\n", __func__);
+		return;
+	}
+
+	int aux, i, n, ma, mi;
+
+	ma = mi = elf->vector[0];
+	for(i = 1, n = elf->size; i < n; i++){
+		aux = elf->vector[i];
+		if(aux > ma) ma = aux;
+		else if(aux < mi) mi = aux;
+	}
+
+	if(max) *max = ma;
+	if(min) *min = mi;
+}

@@ -7,6 +7,7 @@ ElfVector *elfVector_new();
 ElfVector *elfVector_new_withValue(int size, int value);
 void elfVector_destroy(ElfVector **vec_p);
 void elfVector_print(const ElfVector *elf);
+void elfVector_pushBack(ElfVector *elf, int value);
 
 /* DOCUMENTATION
  
@@ -26,6 +27,9 @@ void elfVector_destroy(ElfVector **vec_p);
 void elfVector_print(const ElfVector *elf);
 	- Prints the vector contents separated by spaces.
 	- Print is not ended with a newline.
+
+void elfVector_pushBack(ElfVector *elf, int value){
+	- Appends 'value' to the end of the vector.
 
  */
 

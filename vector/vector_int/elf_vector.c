@@ -107,3 +107,13 @@ void elfVector_print(const ElfVector *elf){
 	for(i = 0, n = elf->size; i < n; i++)
 		printf("%d ", elf->vector[i]);
 }
+
+// Documented in header file.
+void elfVector_pushBack(ElfVector *elf, int value){
+	int idx = elf->size;
+	if(idx == elf->capacity)
+		elfVector_grow(elf);
+
+	(elf->size)++;
+	elf->vector[idx] = value;
+}

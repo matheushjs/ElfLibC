@@ -341,6 +341,7 @@ int elfVector_front(const ElfVector *elf){
 
 // Documented in header file.
 int elfVector_search(const ElfVector *elf, int value){
+	if(!elf) ELF_DIE("NULL pointer received!");
 	int i, n;
 	const int *vec;
 
@@ -356,6 +357,7 @@ int elfVector_search(const ElfVector *elf, int value){
 
 // Documented in header file.
 int elfVector_count(const ElfVector *elf, int value){
+	if(!elf) ELF_DIE("NULL pointer received!");
 	int i, n, count;
 	const int *vec;
 
@@ -424,6 +426,7 @@ int binary_search_descending(int *vec, int size, int value){
 
 // Documented in header file.
 int elfVector_search_sorted(const ElfVector *elf, int value){
+	if(!elf) ELF_DIE("NULL pointer received!");
 	int size, back, front;
 
 	size = elf->size;
@@ -443,6 +446,7 @@ int elfVector_search_sorted(const ElfVector *elf, int value){
 
 // Documented in header file.
 int elfVector_count_sorted(const ElfVector *elf, int value){
+	if(!elf) ELF_DIE("NULL pointer received!");
 	int count, i, n, idx;
 	const int *vec;
 

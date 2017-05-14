@@ -38,6 +38,20 @@ void test(ElfVector *vec){
 	printf("Index of 172172172: %d\n", elfVector_search_sorted(vec, 172172172));
 	printf("Count of 172172172: %d\n", elfVector_count_sorted(vec, 172172172));
 
+	elfVector_insert(vec, 0, 91);
+	elfVector_insert(vec, elfVector_size(vec)-1, 92);
+	elfVector_insert(vec, 2, 93);
+	elfVector_insert(vec, 101, 94);
+	elfVector_print(vec);
+	printf("\n");
+	printf("Removed: %d %d %d %d\n",
+			elfVector_remove(vec, 0),
+			elfVector_remove(vec, elfVector_size(vec)-2),
+			elfVector_remove(vec, 2),
+			elfVector_remove(vec, 101));
+	printf("Removing last element: %d\n", elfVector_remove(vec, elfVector_size(vec)-1));
+
+	printf("Popping: ");
 	while(elfVector_size(vec) != 0)
 		printf("%d ", elfVector_popBack(vec));
 	printf("\n");

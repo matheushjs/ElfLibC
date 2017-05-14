@@ -27,6 +27,9 @@ int elfVector_count(const ElfVector *elf, int value);
 int elfVector_search_sorted(const ElfVector *elf, int value);
 int elfVector_count_sorted(const ElfVector *elf, int value);
 
+void elfVector_insert(ElfVector *elf, int index, int value);
+int elfVector_remove(ElfVector *elf, int index);
+
 
 /* DOCUMENTATION
  
@@ -114,6 +117,22 @@ int elfVector_count_sorted(const ElfVector *elf, int value);
 	- If the vector is not sorted, behavior is undefined.
 	- Binary search.
 	- Returns the counting.
+
+void elfVector_insert(ElfVector *elf, int index, int value);
+	- Inserts 'value' behind the value in position 'index'.
+	- The inserted value then becomes the value in position 'index'.
+	  A warning message is printed if index is out of bounds.
+	- The given 'index' must be within the vector bounds [0, size-1].
+	- Expensive operation. Consider using lists if inserting is done frequently.
+
+int elfVector_remove(ElfVector *elf, int index);
+	- Removes the value in position 'index', shifting all following elements to the left.
+	- The given 'index' must be within the vector bounds [0, size-1].
+	  A warning message is printed if index is out of bounds.
+	- Expensive operation. Consider using lists if removal is done frequently.
+	- Return:
+		the removed value
+		0 if index is out of bounds
 
 */
 

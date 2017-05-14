@@ -467,3 +467,57 @@ int elfVector_count_sorted(const ElfVector *elf, int value){
 
 	return count;
 }
+
+// Documented in header file.
+void elfVector_insert(ElfVector *elf, int index, int value){
+	if(!elf) ELF_DIE("NULL pointer received!");
+
+	if(index < 0 || index >= elf->size){
+		fprintf(stderr, "Index out of bounds (%d) received at %s.\n", index, __func__);
+		return;
+	}
+
+	int *vec, size, last, delta;
+
+	// Store last element
+	last = elfVector_back(elf);
+	vec = elf->vector;
+	size = elf->size;
+
+	// Shift-right all elements but last one
+	delta = size - index - 1; //Number of elements to move, minus the last element
+	memmove(vec+index+1, vec+index, sizeof(int) * delta);
+
+	// Insert value
+	vec[index] = value;
+
+	// Push back the last value again
+	elfVector_pushBack(elf, last); //Add the last element once again.
+}
+
+// Documented in header file.
+int elfVector_remove(ElfVector *elf, int index){
+	if(!elf) ELF_DIE("NULL pointer received!");
+
+	if(index < 0 || index >= elf->size){
+		fprintf(stderr, "Index out of bounds (%d) received at %s.\n", index, __func__);
+		return 0;
+	}
+
+	int *vec, size, value, delta;
+
+	// Store element being removed
+	vec = elf->vector;
+	size = elf->size;
+	value = vec[index];
+
+	//shift-left all elements to the right of 'index'
+	delta = size - index - 1;
+	memmove(vec+index, vec+index+1, sizeof(int) * delta);
+	
+	// Pop the last element (it's been shifted-left anyway)
+	// Popping is necessary for shrinking purposes.
+	elfVector_popBack(elf);
+
+	return value;
+}

@@ -25,14 +25,18 @@ void test(ElfVector *vec){
 	elfVector_print(vec);
 	printf("\n");
 	printf("Index of 1: %d\n", elfVector_search_sorted(vec, 1));
+	printf("Count of 1: %d\n", elfVector_count_sorted(vec, 1));
 	printf("Index of 172172172: %d\n", elfVector_search_sorted(vec, 172172172));
+	printf("Count of 172172172: %d\n", elfVector_count_sorted(vec, 172172172));
 
 	printf("Sorted: ");
 	elfVector_qsort_descend(vec);
 	elfVector_print(vec);
 	printf("\n");
 	printf("Index of 1: %d\n", elfVector_search_sorted(vec, 1));
+	printf("Count of 1: %d\n", elfVector_count_sorted(vec, 1));
 	printf("Index of 172172172: %d\n", elfVector_search_sorted(vec, 172172172));
+	printf("Count of 172172172: %d\n", elfVector_count_sorted(vec, 172172172));
 
 	while(elfVector_size(vec) != 0)
 		printf("%d ", elfVector_popBack(vec));

@@ -440,3 +440,26 @@ int elfVector_search_sorted(const ElfVector *elf, int value){
 		return binary_search_descending(elf->vector, size, value);
 	}
 }
+
+// Documented in header file.
+int elfVector_count_sorted(const ElfVector *elf, int value){
+	int count, i, n, idx;
+	const int *vec;
+
+	idx = elfVector_search_sorted(elf, value);
+	if(idx < 0) return 0;
+
+	count = 0;
+	n = elf->size;
+	vec = elf->vector;
+
+	// Count elements to the right
+	for(i = idx; i < n && vec[i] == value; i++)
+		count++;
+
+	// Count elements to the left
+	for(i = idx-1; i >= 0 && vec[i] == value; i--)
+		count++;
+
+	return count;
+}

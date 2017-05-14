@@ -25,6 +25,8 @@ int elfVector_search(const ElfVector *elf, int value);
 int elfVector_count(const ElfVector *elf, int value);
 
 int elfVector_search_sorted(const ElfVector *elf, int value);
+int elfVector_count_sorted(const ElfVector *elf, int value);
+
 
 /* DOCUMENTATION
  
@@ -106,6 +108,12 @@ int elfVector_search_sorted(const ElfVector *elf, int value);
 	- Returns:
 		The index of first 'value' found, if it exists.
 		-1 if vector does not contain 'value'.
+
+int elfVector_count_sorted(const ElfVector *elf, int value);
+	- Counts how many times 'value' appear in the vector, which should be sorted (crescently or not, doesn't matter).
+	- If the vector is not sorted, behavior is undefined.
+	- Binary search.
+	- Returns the counting.
 
 */
 

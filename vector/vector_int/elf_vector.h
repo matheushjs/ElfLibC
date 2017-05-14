@@ -16,6 +16,9 @@ int elfVector_get(ElfVector *elf, int index);
 void elfVector_put(ElfVector *elf, int index, int value);
 void elfVector_maxmin(ElfVector *elf, int *max, int *min);
 
+void elfVector_qsort_ascend(ElfVector *elf);
+void elfVector_qsort_descend(ElfVector *elf);
+
 /* DOCUMENTATION
  
 typedef ElfVector;
@@ -62,6 +65,12 @@ void elfVector_put(ElfVector *elf, int index, int value);
 void elfVector_maxmin(ElfVector *elf, int *max, int *min);
 	- Finds the maximum and minimum numbers within the vector.
 	- Returns on 'max' and 'min' if each is not NULL.
+
+void elfVector_qsort_ascend(ElfVector *elf);
+void elfVector_qsort_descend(ElfVector *elf);
+	- Sorts elements of the vector.
+	- Uses quicksort algorithm. Pivot is calculated by taking the median among the edge elements and the midle one,
+	so it should be really hard to reach the worst case O(n^2) scenario.
 
  */
 

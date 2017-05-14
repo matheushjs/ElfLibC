@@ -9,6 +9,7 @@
 #define ELF_MAX(X,Y) ((X)>(Y)?X:Y)
 #define ELF_MIN(X,Y) ((X)<(Y)?X:Y)
 #define ELF_ABS(X) ((X)<0?-(X):X)
+#define ELF_MEDIAN(X, Y, Z) (X<=Y?(X>=Z?X:(Z<=Y?Z:Y)):(Y>=Z?Y:(X<=Z?X:Z)))
 
 /* This vector structure starts with size 0.
  * User may only require operations to be done in elements already existent in the vector.
@@ -230,4 +231,98 @@ void elfVector_maxmin(ElfVector *elf, int *max, int *min){
 
 	if(max) *max = ma;
 	if(min) *min = mi;
+}
+
+// Partition procedure of quicksort.
+// Selects a pivot among the elemnts being sorted.
+// Separate the vector in 2 parts:
+// Part 1 has only elements lower than or equal to pivot.
+// Part 2 has only elements higher than or equal to pivot.
+static
+void partition_ascend(int *vec, int left, int right, int *left_of_mid, int *right_of_mid){
+	int pivot, aux;
+
+	pivot = ELF_MEDIAN(vec[left], vec[right], vec[(left+right)/2]);
+	
+	while(left <= right){
+		while(vec[left] < pivot) left++;
+		while(vec[right] > pivot) right--;
+		if(left > right) break;
+		
+		// Swap
+		aux = vec[left];
+		vec[left] = vec[right];
+		vec[right] = aux;
+
+		left++;
+		right--;
+	}
+
+	// left/right inverted positions after applying the partition procedure.
+	*left_of_mid = right;
+	*right_of_mid = left;
+}
+
+// Descending equivalent of partition_ascend.
+static
+void partition_descend(int *vec, int left, int right, int *left_of_mid, int *right_of_mid){
+	int pivot, aux;
+
+	pivot = ELF_MEDIAN(vec[left], vec[right], vec[(left+right)/2]);
+	
+	while(left <= right){
+		while(vec[left] > pivot) left++;
+		while(vec[right] < pivot) right--;
+		if(left > right) break;
+		
+		// Swap
+		aux = vec[left];
+		vec[left] = vec[right];
+		vec[right] = aux;
+
+		left++;
+		right--;
+	}
+
+	// left/right inverted positions after applying the partition procedure.
+	*left_of_mid = right;
+	*right_of_mid = left;
+}
+
+// Recursive part of quicksort.
+static
+void quicksort_op_ascend(int *vec, int left, int right){
+	int i, j;
+
+	if(right <= left) return;
+	partition_ascend(vec, left, right, &i, &j);
+	quicksort_op_ascend(vec, left, i);
+	quicksort_op_ascend(vec, j, right);
+}
+
+// Descending equivalent of quicksort_op_ascend.
+static
+void quicksort_op_descend(int *vec, int left, int right){
+	int i, j;
+
+	if(right <= left) return;
+	partition_descend(vec, left, right, &i, &j);
+	quicksort_op_descend(vec, left, i);
+	quicksort_op_descend(vec, j, right);
+}
+
+// Documented in header file.
+void elfVector_qsort_ascend(ElfVector *elf){
+	if(!elf) ELF_DIE("NULL pointer received!");
+	if(elf->size <= 1) return;
+
+	quicksort_op_ascend(elf->vector, 0, elf->size - 1);
+}
+
+// Documented in header file.
+void elfVector_qsort_descend(ElfVector *elf){
+	if(!elf) ELF_DIE("NULL pointer received!");
+	if(elf->size <= 1) return;
+
+	quicksort_op_descend(elf->vector, 0, elf->size - 1);
 }

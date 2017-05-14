@@ -18,6 +18,16 @@ void test(ElfVector *vec){
 	elfVector_print(vec);
 	printf("\n");
 
+	printf("Sorted: ");
+	elfVector_qsort_ascend(vec);
+	elfVector_print(vec);
+	printf("\n");
+
+	printf("Sorted: ");
+	elfVector_qsort_descend(vec);
+	elfVector_print(vec);
+	printf("\n");
+
 	while(elfVector_size(vec) != 0)
 		printf("%d ", elfVector_popBack(vec));
 	printf("\n");

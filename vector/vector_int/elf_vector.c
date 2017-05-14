@@ -326,3 +326,15 @@ void elfVector_qsort_descend(ElfVector *elf){
 
 	quicksort_op_descend(elf->vector, 0, elf->size - 1);
 }
+
+// Documented in header file.
+int elfVector_back(const ElfVector *elf){
+	if(!elf) ELF_DIE("NULL pointer received!");
+	return elf->vector[elf->size-1];
+}
+
+// Documented in header file.
+int elfVector_front(const ElfVector *elf){
+	if(!elf) ELF_DIE("NULL pointer received!");
+	return elf->vector[0];
+}

@@ -19,6 +19,9 @@ void elfVector_maxmin(ElfVector *elf, int *max, int *min);
 void elfVector_qsort_ascend(ElfVector *elf);
 void elfVector_qsort_descend(ElfVector *elf);
 
+int elfVector_back(const ElfVector *elf);
+int elfVector_front(const ElfVector *elf);
+
 /* DOCUMENTATION
  
 typedef ElfVector;
@@ -71,6 +74,14 @@ void elfVector_qsort_descend(ElfVector *elf);
 	- Sorts elements of the vector.
 	- Uses quicksort algorithm. Pivot is calculated by taking the median among the edge elements and the midle one,
 	so it should be really hard to reach the worst case O(n^2) scenario.
+
+int elfVector_back(const ElfVector *elf);
+	- Returns the last element of the vector, without removing it.
+	- No checks regarding existence of the element are done. 
+
+int elfVector_front(const ElfVector *elf);
+	- Returns the first element of the vector, without removing it.
+	- No checks regarding existence of the element are done. 
 
  */
 

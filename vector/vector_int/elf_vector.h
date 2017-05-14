@@ -24,6 +24,8 @@ int elfVector_front(const ElfVector *elf);
 int elfVector_search(const ElfVector *elf, int value);
 int elfVector_count(const ElfVector *elf, int value);
 
+int elfVector_search_sorted(const ElfVector *elf, int value);
+
 /* DOCUMENTATION
  
 typedef ElfVector;
@@ -97,6 +99,14 @@ int elfVector_count(const ElfVector *elf, int value);
 	- Sequential search.
 	- Returns the counting.
 
- */
+int elfVector_search_sorted(const ElfVector *elf, int value);
+	- Searches for 'value' within the vector, which should be sorted (crescently or not, doesn't matter).
+	- If the vector is not sorted, behavior is undefined.
+	- Binary search.
+	- Returns:
+		The index of first 'value' found, if it exists.
+		-1 if vector does not contain 'value'.
+
+*/
 
 #endif

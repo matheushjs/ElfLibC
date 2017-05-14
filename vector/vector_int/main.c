@@ -14,6 +14,8 @@ void test(ElfVector *vec){
 	printf("Last element is %d.\n", elfVector_get(vec, elfVector_size(vec)-1));
 	elfVector_maxmin(vec, &max, &min);
 	printf("maxmin are %d, %d\n", max, min);
+	printf("Index of 1: %d\n", elfVector_search(vec, 1));
+	printf("Count of 1: %d\n", elfVector_count(vec, 1));
 
 	elfVector_print(vec);
 	printf("\n");
@@ -22,17 +24,22 @@ void test(ElfVector *vec){
 	elfVector_qsort_ascend(vec);
 	elfVector_print(vec);
 	printf("\n");
+	printf("Index of 1: %d\n", elfVector_search_sorted(vec, 1));
+	printf("Index of 172172172: %d\n", elfVector_search_sorted(vec, 172172172));
 
 	printf("Sorted: ");
 	elfVector_qsort_descend(vec);
 	elfVector_print(vec);
 	printf("\n");
+	printf("Index of 1: %d\n", elfVector_search_sorted(vec, 1));
+	printf("Index of 172172172: %d\n", elfVector_search_sorted(vec, 172172172));
 
 	while(elfVector_size(vec) != 0)
 		printf("%d ", elfVector_popBack(vec));
 	printf("\n");
 
 	printf("Vector has %d elements.\n", elfVector_size(vec));
+	printf("\n\n");
 }
 
 int main(int argc, char *argv[]){

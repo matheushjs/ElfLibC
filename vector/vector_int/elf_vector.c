@@ -370,30 +370,73 @@ int elfVector_count(const ElfVector *elf, int value){
 	return count;
 }
 
-
-
-/*
-// 0 1 2 3 4
-//       i j
-
-//Searches for 'value' within vector 'vec'.
+//Searches for 'value' within vector 'vec', which is considered as crescently sorted.
 //If found, returns the index of the value found,
 //  which is not necessarily the index of the first appearance of value.
 static
-int binary_search(int *vec, int size, int value){
-
-
-}
-
-
-// Documented in header file.
-bool elfVector_contains(const ElfVector *elf, int value){
-	int *vec, right, left, mid;
+int binary_search_ascending(int *vec, int size, int value){
+	int left, right, mid, aux;
 
 	left = 0;
-	right = elf->size-1;
-	vec = elf->vector;
+	right = size-1;
 
-	mid = (left+right)/2
+	do {
+		mid = (left+right)/2;
+		aux = vec[mid];
+		
+		if(aux == value){
+			return mid;
+		} else if(value < aux) {
+			right = mid-1;
+		} else {
+			left = mid+1;
+		}
+	} while(left <= right);
+
+	return -1;
 }
-*/
+
+//Searches for 'value' within vector 'vec', which is considered as decrescently sorted.
+//If found, returns the index of the value found,
+//  which is not necessarily the index of the first appearance of value.
+static
+int binary_search_descending(int *vec, int size, int value){
+	int left, right, mid, aux;
+	
+	left = 0;
+	right = size-1;
+
+	do {
+		mid = (left+right)/2;
+		aux = vec[mid];
+
+		if(aux == value){
+			return mid;
+		} else if(value > aux) {
+			right = mid-1;
+		} else {
+			left = mid+1;
+		}
+	} while(left <= right);
+
+	return -1;
+}
+
+// Documented in header file.
+int elfVector_search_sorted(const ElfVector *elf, int value){
+	int size, back, front;
+
+	size = elf->size;
+
+	if(size == 0) return -1;
+	if(size == 1) return elf->vector[0] == value ? 0 : -1;
+	
+	front = elf->vector[0];
+	back = elf->vector[size-1];
+
+	if(back > front){
+		return binary_search_ascending(elf->vector, size, value);
+	} else {
+		return binary_search_descending(elf->vector, size, value);
+	}
+}

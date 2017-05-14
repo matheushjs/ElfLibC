@@ -21,6 +21,8 @@ void elfVector_qsort_descend(ElfVector *elf);
 
 int elfVector_back(const ElfVector *elf);
 int elfVector_front(const ElfVector *elf);
+int elfVector_search(const ElfVector *elf, int value);
+int elfVector_count(const ElfVector *elf, int value);
 
 /* DOCUMENTATION
  
@@ -82,6 +84,18 @@ int elfVector_back(const ElfVector *elf);
 int elfVector_front(const ElfVector *elf);
 	- Returns the first element of the vector, without removing it.
 	- No checks regarding existence of the element are done. 
+
+int elfVector_search(const ElfVector *elf, int value);
+	- Searches for 'value' within the vector.
+	- Sequential search.
+	- Returns:
+		The index of first 'value' found, if it exists.
+		-1 if vector does not contain 'value'.
+
+int elfVector_count(const ElfVector *elf, int value);
+	- Counts how many times 'value' appear in the vector.
+	- Sequential search.
+	- Returns the counting.
 
  */
 

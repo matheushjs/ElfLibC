@@ -338,3 +338,62 @@ int elfVector_front(const ElfVector *elf){
 	if(!elf) ELF_DIE("NULL pointer received!");
 	return elf->vector[0];
 }
+
+// Documented in header file.
+int elfVector_search(const ElfVector *elf, int value){
+	int i, n;
+	const int *vec;
+
+	n = elf->size;
+	vec = elf->vector;
+	for(i = 0; i < n; i++){
+		if(vec[i] == value)
+			return i;
+	}
+
+	return -1;
+}
+
+// Documented in header file.
+int elfVector_count(const ElfVector *elf, int value){
+	int i, n, count;
+	const int *vec;
+
+	n = elf->size;
+	vec = elf->vector;
+	count = 0;
+	for(i = 0; i < n; i++){
+		if(vec[i] == value)
+			count++;
+	}
+
+	return count;
+}
+
+
+
+/*
+// 0 1 2 3 4
+//       i j
+
+//Searches for 'value' within vector 'vec'.
+//If found, returns the index of the value found,
+//  which is not necessarily the index of the first appearance of value.
+static
+int binary_search(int *vec, int size, int value){
+
+
+}
+
+
+// Documented in header file.
+bool elfVector_contains(const ElfVector *elf, int value){
+	int *vec, right, left, mid;
+
+	left = 0;
+	right = elf->size-1;
+	vec = elf->vector;
+
+	mid = (left+right)/2
+}
+*/

@@ -43,7 +43,6 @@ static void elf_edge_print(void *a);
 static inline void elfGraph_ArgsDFS_reset(const ElfGraph *graph);
 /**/
 
-
 // Documented in header file.
 ElfGraph *elfGraph_new(int N, bool oriented){
 	if(N < 0) ELF_DIE("Number of vertixes cannot be negative");

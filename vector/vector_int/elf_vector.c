@@ -246,6 +246,14 @@ void elfVector_put(ElfVector *elf, int index, int value){
 }
 
 // Documented in header file.
+void elfVector_swap(ElfVector *elf, int i, int j){
+	int aux, *vec = elf->vector;
+	aux = vec[i];
+	vec[i] = vec[j];
+	vec[j] = aux;
+}
+
+// Documented in header file.
 void elfVector_maxmin(ElfVector *elf, int *max, int *min){
 	if(!elf) ELF_DIE("NULL pointer received!");
 	if(elf->size == 0){

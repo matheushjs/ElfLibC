@@ -16,6 +16,7 @@ void elfVector_pushBack(ElfVector *elf, int value);
 int elfVector_popBack(ElfVector *elf);
 int elfVector_get(ElfVector *elf, int index);
 void elfVector_put(ElfVector *elf, int index, int value);
+void elfVector_swap(ElfVector *elf, int i, int j);
 void elfVector_maxmin(ElfVector *elf, int *max, int *min);
 
 void elfVector_qsort_ascend(ElfVector *elf);
@@ -85,6 +86,10 @@ int elfVector_get(ElfVector *elf, int index);
 void elfVector_put(ElfVector *elf, int index, int value);
 	- Replaces with 'value' the value in position 'index'.
 	- If 'index' is out of bounds, prints an error message. Vector is not modified.
+
+void elfVector_swap(ElfVector *elf, int i, int j);
+	- Swaps values 'i' and 'j' in the vector.
+	- For efficiency, no checks are made regarding pointer/index validity.
 
 void elfVector_maxmin(ElfVector *elf, int *max, int *min);
 	- Finds the maximum and minimum numbers within the vector.

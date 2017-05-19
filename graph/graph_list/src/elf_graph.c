@@ -365,7 +365,7 @@ ElfList **elfGraph_SCC(const ElfGraph *graph){
 	ArgsDFS *args = elfGraph_getArgsDFS(trans); //Get pointer to the inner DFS arguments structure.
 	result = NULL;
 	size = 0;
-	for(i = n-1; i >= 0; i--){
+	for(i = 0; i < n; i++){
 		idx = elfVector_get(indexes, i);
 		
 		//Find a white vertix

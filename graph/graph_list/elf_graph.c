@@ -5,6 +5,7 @@
 #include <elf_graph.h>
 #include <elf_list.h>
 #include <elf_queue.h>
+#include <elf_vector.h>
 
 #define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
 #define MAX(X,Y) X>Y?X:Y
@@ -308,7 +309,6 @@ void elfGraph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **f
 //Function for registering in the DFS algorithms.
 static
 void insert_vertix_into_list(int vert, void *data){
-	printf("Adding: %d\n", vert);
 	elfList_insert(data, ELF_INT_TO_POINTER(vert));
 }
 
@@ -334,53 +334,47 @@ ElfList **elfGraph_stronglyConnectedComponents(const ElfGraph *graph){
 		return NULL;
 	}
 
-	int i, n, j, size, aux, *finish, *idx;
+	int i, n, size, *finish, idx;
 	ElfList **result;
 	ElfGraph *trans;
 
-	n = elfGraph_size(graph);
-	idx = malloc(sizeof(int) * n); //Vector of indexes
-	for(i = 0; i < n; i++)
-		idx[i] = i; //Initialize indexes
+	// Get finishing-time vector.
 	elfGraph_DFS_all(graph, NULL, NULL, &finish);
 
-	//TODO: efficient sorting.
-	// Sort indexes decrescently based on finish vector.
-	for(i = 1; i < n; i++){
-		for(j = i-1; j >= 0; j--){
-			if(finish[j+1] < finish[j]){
-				aux = finish[j];
-				finish[j] = finish[j+1];
-				finish[j+1] = aux;
+	// Get indexes of vertixes, ordered from earliest finish-time to latest.
+	n = elfGraph_size(graph);
+	ElfVector *finish_vec = elfVector_new_fromArray(&finish, n);
+	ElfVector *indexes = elfVector_qsort_descendWithIndexes(finish_vec);
+	elfVector_destroy(&finish_vec);
 
-				aux = idx[j];
-				idx[j] = idx[j+1];
-				idx[j+1] = aux;
-			}
-		}
-	}
-	free(finish);
+	//vector indexes now contains indexes ordered from earliest finish-time to latest.
 
-	//vector idx now contains indexes ordered from earliest finish-time to latest.
-
+	// Transpose graph
 	trans = elfGraph_transpose(graph);
-	ArgsDFS *args = elfGraph_getArgsDFS(trans);
-	elfGraph_ArgsDFS_initialize(trans);
+	elfGraph_ArgsDFS_initialize(trans); // Initialize inner DFS arguments structure.
+	ArgsDFS *args = elfGraph_getArgsDFS(trans); //Get pointer to the inner DFS arguments structure.
 	result = NULL;
 	size = 0;
 	for(i = n-1; i >= 0; i--){
-		if(args->dfs_color[idx[i]] == 'w'){
+		idx = elfVector_get(indexes, i);
+		
+		//Find a white vertix
+		if(args->dfs_color[idx] == 'w'){
 			result = (ElfList **) realloc(result, sizeof(ElfList *) * (size+1));
 			result[size] = elfList_new(ELF_POINTER_TO_INT_GREATER);
-			elfGraph_DFS_registerAfterFunc(trans, insert_vertix_into_list, result[size]);
 			size++;
-			elfGraph_DFS_visit(trans, idx[i]);
+
+			// Visit that white vertix, adding all further white vertixes to this list.
+			elfGraph_DFS_registerAfterFunc(trans, insert_vertix_into_list, result[size]);
+			elfGraph_DFS_visit(trans, idx);
 		}
 	}
+	// Clean resources.
 	elfGraph_ArgsDFS_finalize(trans, NULL, NULL, NULL);
-	free(idx);
 	elfGraph_destroy(&trans);
+	elfVector_destroy(&indexes);
 
+	// NULL-terminate array of lists, where each list contains the vertexes of a component.
 	result = (ElfList **) realloc(result, sizeof(ElfList *) * (size+1));
 	result[size] = NULL;
 

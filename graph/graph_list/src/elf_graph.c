@@ -361,11 +361,11 @@ ElfList **elfGraph_stronglyConnectedComponents(const ElfGraph *graph){
 		if(args->dfs_color[idx] == 'w'){
 			result = (ElfList **) realloc(result, sizeof(ElfList *) * (size+1));
 			result[size] = elfList_new(ELF_POINTER_TO_INT_GREATER);
-			size++;
 
 			// Visit that white vertix, adding all further white vertixes to this list.
 			elfGraph_DFS_registerAfterFunc(trans, insert_vertix_into_list, result[size]);
 			elfGraph_DFS_visit(trans, idx);
+			size++;
 		}
 	}
 	// Clean resources.

@@ -22,7 +22,9 @@ void elfGraph_readFromFileVEW(ElfGraph *graph, FILE *fp, int lim);
 void elfGraph_DFS_src(const ElfGraph *graph, int src, int **pred_p, int **time_p, int **finish_p);
 void elfGraph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **finish_p);
 void elfGraph_DFS_registerAfterFunc(const ElfGraph *graph, void (*func)(int vert, void *data), void *data);
+
 ElfList **elfGraph_SCC(const ElfGraph *graph);
+ElfGraph *elfGraph_MST_prim(const ElfGraph *graph);
 
 int *elfGraph_BFS(const ElfGraph *graph, int src, int **dist_p);
 
@@ -107,6 +109,14 @@ ElfList **elfGraph_SCC(const ElfGraph *graph);
 	Return:
 		A NULL-terminated array of lists, each of which contains a component.
 		If graph is undirected, return NULL.
+
+ElfGraph *elfGraph_MST_prim(const ElfGraph *graph);
+	- Returns a Minimum Spanning Tree for the given graph.
+	- The graph is supposed to be connected. This function does not check whether the graph is
+	  connected or not. If it isn't, the behavior is undefined.
+	- Given graph cannot be oriented.
+	- Given graph can be weighted or not.
+	- The Prim algorithm for finding MST is applied.
 
 int *elfGraph_BFS(const ElfGraph *graph, int src, int **dist_p);
 	- Performs a BFS in the graph, finding the distance/path from all vertexes to 'src'.

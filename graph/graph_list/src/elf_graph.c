@@ -6,6 +6,7 @@
 #include <elf_list.h>
 #include <elf_queue.h>
 #include <elf_vector.h>
+#include <elf_pqueue.h>
 
 #define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
 #define MAX(X,Y) X>Y?X:Y
@@ -17,7 +18,7 @@ typedef struct _ArgsDFS {
 	int  *dfs_time_vec;    //visit time vector
 	int  *dfs_finish_vec;  //finishing time vector
 	int  dfs_time;         //records current "time"
-	void (*dfs_after_func) (int vert, void *data); // function to execute on vertix finishing
+	void (*dfs_after_func) (int vert, void *data); // function to execute on vertex finishing
 	void *dfs_after_data;  //Data to pass to dfs_after_func
 } ArgsDFS;
 
@@ -56,7 +57,7 @@ static inline void elfGraph_ArgsDFS_reset(const ElfGraph *graph);
 
 // Documented in header file.
 ElfGraph *elfGraph_new(int N, bool oriented){
-	if(N < 0) ELF_DIE("Number of vertixes cannot be negative");
+	if(N < 0) ELF_DIE("Number of vertexes cannot be negative");
 	ElfGraph *new = malloc(sizeof(ElfGraph));
 	new->size = N;
 	new->oriented = oriented;
@@ -91,7 +92,7 @@ int elfGraph_size(const ElfGraph *graph){
 // Documented in header file.
 void elfGraph_addEdge(ElfGraph *graph, int src, int dest, int weight){
 	if(!graph) ELF_DIE("Received NULL pointer");
-	if(src < 0 || dest < 0 || src >= graph->size || dest >= graph->size) ELF_DIE("Invalid vertix indexes");
+	if(src < 0 || dest < 0 || src >= graph->size || dest >= graph->size) ELF_DIE("Invalid vertex indexes");
 	
 	Edge *edge = malloc(sizeof(Edge));
 	edge->target = dest;
@@ -109,7 +110,7 @@ void elfGraph_addEdge(ElfGraph *graph, int src, int dest, int weight){
 // Documented in header file.
 void elfGraph_removeEdge(ElfGraph *graph, int src, int dest){
 	if(!graph) ELF_DIE("Received NULL pointer");
-	if(src < 0 || dest < 0 || src >= graph->size || dest >= graph->size) ELF_DIE("Invalid vertix indexes");
+	if(src < 0 || dest < 0 || src >= graph->size || dest >= graph->size) ELF_DIE("Invalid vertex indexes");
 	
 	Edge tmp = {.target = dest}, tmp2 = {.target = src};
 	elfList_removeValue(graph->array[src], &tmp);
@@ -171,7 +172,7 @@ void elfGraph_readFromFileVE(ElfGraph *graph, FILE *fp, int lim){
 	for(i = 0; i != lim; i++){ //lim = -1 means a forever loop.
 		if(fscanf(fp, "%d %d", &src, &dest) != 2) break;
 		if(src < 0 || dest < 0 || src >= graph->size || dest >= graph->size)
-			ELF_DIE("Invalid vertixes in file.");
+			ELF_DIE("Invalid vertexes in file.");
 		elfGraph_addEdge(graph, src, dest, 0);
 	}
 }
@@ -184,7 +185,7 @@ void elfGraph_readFromFileVEW(ElfGraph *graph, FILE *fp, int lim){
 	for(i = 0; i != lim; i++){ //lim = -1 means a forever loop.
 		if(fscanf(fp, "%d %d %d", &src, &dest, &wei) != 3) break;
 		if(src < 0 || dest < 0 || src >= graph->size || dest >= graph->size)
-			ELF_DIE("Invalid vertixes in file.");
+			ELF_DIE("Invalid vertexes in file.");
 		elfGraph_addEdge(graph, src, dest, wei);
 	}
 }
@@ -292,7 +293,7 @@ void elfGraph_DFS_registerAfterFunc(const ElfGraph *graph, void (*func)(int vert
 // Documented in header file.
 void elfGraph_DFS_src(const ElfGraph *graph, int src, int **pred_p, int **time_p, int **finish_p){
 	if(!graph) ELF_DIE("Received NULL pointer");
-	if(src >= graph->size || src < 0) ELF_DIE("Invalid source vertix");
+	if(src >= graph->size || src < 0) ELF_DIE("Invalid source vertex");
 
 	elfGraph_ArgsDFS_initialize(graph);
 	elfGraph_DFS_visit(graph, src);
@@ -315,28 +316,13 @@ void elfGraph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **f
 	elfGraph_ArgsDFS_finalize(graph, pred_p, time_p, finish_p);
 }
 
-
 //Function for registering in the DFS algorithms.
 static
-void insert_vertix_into_list(int vert, void *data){
+void insert_vertex_into_list(int vert, void *data){
 	elfList_insert(data, ELF_INT_TO_POINTER(vert));
 }
 
-/* The idea is to return an array of lists, each list corresponding to a component
- * Each list is terminated by a '-1'.
- * Why this decision?
- *     - What I'm thinking is that the user might also want 2 graphs, 1 graph for connected components
- *     and 1 graph for the inner edges of each component. Returning an array of lists would make it
- *     easier to create another function that returns these 2 graphs.
- *     - TODO: To implement what is above:
- *     For each list V[i]:
- *         For each integer I in V[i]:
- *             Find the adjacency list of I in the original graph
- *             For each integer K in the adjacency list:
- *                 if K is in V: add the I-K edge to the graph inner[V[i]]
- *                 else: add the edge between components containing K and I to the
- *                       graph outer.
- */
+// Documented in header file.
 ElfList **elfGraph_SCC(const ElfGraph *graph){
 	if(!graph) ELF_DIE("Received NULL pointer");
 	if(!graph->oriented){
@@ -351,10 +337,11 @@ ElfList **elfGraph_SCC(const ElfGraph *graph){
 	// Get finishing-time vector.
 	elfGraph_DFS_all(graph, NULL, NULL, &finish);
 
-	// Get indexes of vertixes, ordered from earliest finish-time to latest.
+	// Get indexes of vertexes, ordered from earliest finish-time to latest.
 	n = elfGraph_size(graph);
 	ElfVector *finish_vec = elfVector_new_fromArray(&finish, n);
 	ElfVector *indexes = elfVector_qsort_descendWithIndexes(finish_vec);
+
 	elfVector_destroy(&finish_vec);
 
 	//vector indexes now contains indexes ordered from earliest finish-time to latest.
@@ -368,13 +355,13 @@ ElfList **elfGraph_SCC(const ElfGraph *graph){
 	for(i = 0; i < n; i++){
 		idx = elfVector_get(indexes, i);
 		
-		//Find a white vertix
+		//Find a white vertex
 		if(args->dfs_color[idx] == 'w'){
 			result = (ElfList **) realloc(result, sizeof(ElfList *) * (size+1));
 			result[size] = elfList_new(ELF_POINTER_TO_INT_GREATER);
 
-			// Visit that white vertix, adding all further white vertixes to this list.
-			elfGraph_DFS_registerAfterFunc(trans, insert_vertix_into_list, result[size]);
+			// Visit that white vertex, adding all further white vertexes to this list.
+			elfGraph_DFS_registerAfterFunc(trans, insert_vertex_into_list, result[size]);
 			elfGraph_DFS_visit(trans, idx);
 			size++;
 		}
@@ -391,10 +378,93 @@ ElfList **elfGraph_SCC(const ElfGraph *graph){
 	return result;
 }
 
+/* Function for getting the Minimum Spanning Tree of a given Graph.
+ * PRIM algorithm is used.
+ * If graph is not *connected*, returns NULL
+ * Graph can be oriented or not.
+ * Graph can be weighted or not. Vertexes on graphs that are not weighted receive same weight 0.
+ * TODO: Function for finding MST from a given node only.
+ * TODO: Function for finding all connected components of a graph (Similar to SCC, but that also works with non-digraphs)
+ * TODO: Function for finding MST for each components
+ *
+ */
+ElfGraph *elfGraph_MST_prim(const ElfGraph *graph){
+	if(!graph) ELF_DIE("Received NULL pointer");
+	if(graph->oriented){
+		fprintf(stderr, "Cannot get MST of a directed graph.\n");
+		return NULL;
+	}
+
+	ElfGraph *MST = elfGraph_new(graph->size, graph->oriented);
+	if(graph->size <= 1) return MST; //Ensures has at least 2 vertexes.
+
+	// We have the limitation that our priority queue only stores a pair of integers (value, priority)
+	// We will use as priority the wright of the edge.
+	// As value, we will use a number that can be used to retrieve the Edge from another data structure.
+	ElfPQueue *pqueue = elfPQueue_new_minFirst();
+	
+	// For now, there will be 2 Vectors, for storing 1) target and 2) source vertexes.
+	// This solution is very fast as long as no edges are removed during the algorithm,
+	//   which means high memory usage.
+	// TODO: Change vectors for one of these:
+	//   1) A hashTable of linked lists (Potentially veeeery fast. Find a good hashing function).
+	//   2) A balanced search tree (log(n) insertion/removal, huge overheads, difficult implementation).
+	ElfVector *targets = elfVector_new();
+	ElfVector *sources = elfVector_new();
+
+	// Array for tracking which vertexes are already in the MST.
+	char *visited = calloc(sizeof(char), graph->size);
+
+	// Add an edge to the initial vertex to the queue
+	elfVector_pushBack(targets, 0);  //MUST BE 0
+	elfVector_pushBack(sources, -1); //MUST BE NEGATIVE
+	elfPQueue_push(pqueue, 0, 0);
+
+	int i, n;
+	int idx, wei, tgt, src;
+	const ElfList *list;
+	const Edge *edge;
+	while(elfPQueue_size(pqueue) != 0){
+		idx = elfPQueue_pop(pqueue, &wei);
+		tgt = elfVector_get(targets, idx);
+		src = elfVector_get(sources, idx);
+		// 'src', 'tgt', 'wei' are information about the Edge popped from the queue.
+
+		// If target is already in the MST, continue
+		if(visited[tgt] != 0) continue;
+		visited[tgt] = 1; // Mark as visited
+
+		// Add edge to the MST
+		if(src >= 0){ //If negative, it's the first vertex
+			elfGraph_addEdge(MST, src, tgt, wei);
+		}
+
+		// Now analyzing edges parting from the target vertex.
+		int current = tgt;
+
+		// Get adjacency list of vertex
+		list = graph->array[current];
+		n = elfList_size(list);
+		for(i = 0; i < n; i++){
+			edge = elfList_get(list, i);
+
+			// If target of edge has not been visted, add to the priority queue.
+			if(!visited[edge->target]){
+				idx = elfVector_size(targets);
+				elfVector_pushBack(targets, edge->target);
+				elfVector_pushBack(sources, current);
+				elfPQueue_push(pqueue, idx, edge->weight);
+			}
+		}
+	}
+
+	return MST;
+}
+
 // Documented in header file.
 int *elfGraph_BFS(const ElfGraph *graph, int src, int **dist_p){
 	if(!graph) ELF_DIE("Received NULL pointer");
-	if(src >= graph->size || src < 0) ELF_DIE("Invalid source vertix");
+	if(src >= graph->size || src < 0) ELF_DIE("Invalid source vertex");
 
 	//Allocate and initialize vectors
 	int *pred, *dist_vec;

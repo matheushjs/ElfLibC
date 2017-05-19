@@ -61,9 +61,10 @@ void print(void *d){
 	printf("(%d) ", ELF_POINTER_TO_INT(d));
 }
 
-int main(int argc, char *argv[]){
-	int size, edges;
+//test SCC
+void solve3(){
 	ElfList **lists, **aux;
+	int edges, size;
 
 	scanf("%d %d", &size, &edges);
 	
@@ -80,7 +81,25 @@ int main(int argc, char *argv[]){
 	}
 
 	free(lists);
+	elfGraph_destroy(&graph);
+}
+
+//Test Prim
+void solve4(){
+	int edges, size;
+	
+	scanf("%d %d", &size, &edges);
+	ElfGraph *graph = elfGraph_new(size, false);
+	elfGraph_readFromFileVE(graph, stdin, edges);
+
+	ElfGraph *mst = elfGraph_MST_prim(graph);
+	elfGraph_print(mst);
 
 	elfGraph_destroy(&graph);
+	elfGraph_destroy(&mst);
+}
+
+int main(int argc, char *argv[]){
+	solve4();
 	return 0;
 }

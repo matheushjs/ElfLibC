@@ -16,7 +16,7 @@ all: $(SRC)
 
 clean:
 	find -name "*~" -type f -exec $(RM) '{}' \;
-	rm $(BIN)
+	rm -f $(BIN)
 
 run:
 	./$(BIN)

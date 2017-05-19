@@ -35,11 +35,22 @@ typedef struct _ElfGraph {
 	                  //If this is altered, ElfGraph should still be considered const.
 } ElfGraph;
 
-/* Some needed static functions declarations (Implemented later in this file). */
-static bool elf_edge_greater(void *a, void *b);
-static bool elf_edge_equal(void *a, void *b);
-static void elf_edge_print(void *a);
+/* Some needed static functions */
+static
+bool elf_edge_greater(void *a, void *b){
+	return ((Edge *) a)->target > ((Edge *) b)->target ? true : false;
+}
+static
+bool elf_edge_equal(void *a, void *b){
+	return ((Edge *) a)->target == ((Edge *) b)->target ? true : false;
+}
+static
+void elf_edge_print(void *a){
+	printf("%d(%d) ", ((Edge *) a)->target, ((Edge *) a)->weight);
+}
+/**/
 
+/* Some needed declarations (used before implemented) */
 static inline void elfGraph_ArgsDFS_reset(const ElfGraph *graph);
 /**/
 
@@ -431,19 +442,4 @@ int *elfGraph_BFS(const ElfGraph *graph, int src, int **dist_p){
 	else free(dist_vec);
 
 	return pred;
-}
-
-
-
-/*
- * Implementation of static functions
- */
-static bool elf_edge_greater(void *a, void *b){
-	return ((Edge *) a)->target > ((Edge *) b)->target ? true : false;
-}
-static bool elf_edge_equal(void *a, void *b){
-	return ((Edge *) a)->target == ((Edge *) b)->target ? true : false;
-}
-static void elf_edge_print(void *a){
-	printf("%d(%d) ", ((Edge *) a)->target, ((Edge *) a)->weight);
 }

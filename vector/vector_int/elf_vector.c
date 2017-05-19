@@ -155,6 +155,20 @@ ElfVector *elfVector_new_random(int size, int min, int max){
 }
 
 // Documented in header file.
+ElfVector *elfVector_new_fromOther(const ElfVector *elf){
+	if(!elf) ELF_DIE("NULL pointer received!");
+
+	ElfVector *new;
+	new = malloc(sizeof(ElfVector));
+	new->size = elf->size;
+	new->capacity = elf->capacity;
+	new->vector = malloc(sizeof(int) * new->capacity);
+	memcpy(new->vector, elf->vector, sizeof(int)*new->size);
+
+	return new;
+}
+
+// Documented in header file.
 void elfVector_destroy(ElfVector **vec_p){
 	if(vec_p){
 		ElfVector *vec = *vec_p;
@@ -257,8 +271,10 @@ void elfVector_maxmin(ElfVector *elf, int *max, int *min){
 // Separate the vector in 2 parts:
 // Part 1 has only elements lower than or equal to pivot.
 // Part 2 has only elements higher than or equal to pivot.
+//
+// 'unison' is a vector whose elements should be reordered in unison with 'vec'.
 static
-void partition_ascend(int *vec, int left, int right, int *left_of_mid, int *right_of_mid){
+void partition_ascend(int *vec, int left, int right, int *left_of_mid, int *right_of_mid, int *unison){
 	int pivot, aux;
 
 	pivot = ELF_MEDIAN(vec[left], vec[right], vec[(left+right)/2]);
@@ -273,6 +289,12 @@ void partition_ascend(int *vec, int left, int right, int *left_of_mid, int *righ
 		vec[left] = vec[right];
 		vec[right] = aux;
 
+		if(unison){
+			aux = unison[left];
+			unison[left] = unison[right];
+			unison[right] = aux;
+		}
+
 		left++;
 		right--;
 	}
@@ -284,7 +306,7 @@ void partition_ascend(int *vec, int left, int right, int *left_of_mid, int *righ
 
 // Descending equivalent of partition_ascend.
 static
-void partition_descend(int *vec, int left, int right, int *left_of_mid, int *right_of_mid){
+void partition_descend(int *vec, int left, int right, int *left_of_mid, int *right_of_mid, int *unison){
 	int pivot, aux;
 
 	pivot = ELF_MEDIAN(vec[left], vec[right], vec[(left+right)/2]);
@@ -299,6 +321,12 @@ void partition_descend(int *vec, int left, int right, int *left_of_mid, int *rig
 		vec[left] = vec[right];
 		vec[right] = aux;
 
+		if(unison){
+			aux = unison[left];
+			unison[left] = unison[right];
+			unison[right] = aux;
+		}
+
 		left++;
 		right--;
 	}
@@ -310,24 +338,24 @@ void partition_descend(int *vec, int left, int right, int *left_of_mid, int *rig
 
 // Recursive part of quicksort.
 static
-void quicksort_op_ascend(int *vec, int left, int right){
+void quicksort_op_ascend(int *vec, int left, int right, int *unison){
 	int i, j;
 
 	if(right <= left) return;
-	partition_ascend(vec, left, right, &i, &j);
-	quicksort_op_ascend(vec, left, i);
-	quicksort_op_ascend(vec, j, right);
+	partition_ascend(vec, left, right, &i, &j, unison);
+	quicksort_op_ascend(vec, left, i, unison);
+	quicksort_op_ascend(vec, j, right, unison);
 }
 
 // Descending equivalent of quicksort_op_ascend.
 static
-void quicksort_op_descend(int *vec, int left, int right){
+void quicksort_op_descend(int *vec, int left, int right, int *unison){
 	int i, j;
 
 	if(right <= left) return;
-	partition_descend(vec, left, right, &i, &j);
-	quicksort_op_descend(vec, left, i);
-	quicksort_op_descend(vec, j, right);
+	partition_descend(vec, left, right, &i, &j, unison);
+	quicksort_op_descend(vec, left, i, unison);
+	quicksort_op_descend(vec, j, right, unison);
 }
 
 // Documented in header file.
@@ -335,7 +363,7 @@ void elfVector_qsort_ascend(ElfVector *elf){
 	if(!elf) ELF_DIE("NULL pointer received!");
 	if(elf->size <= 1) return;
 
-	quicksort_op_ascend(elf->vector, 0, elf->size - 1);
+	quicksort_op_ascend(elf->vector, 0, elf->size - 1, NULL);
 }
 
 // Documented in header file.
@@ -343,7 +371,39 @@ void elfVector_qsort_descend(ElfVector *elf){
 	if(!elf) ELF_DIE("NULL pointer received!");
 	if(elf->size <= 1) return;
 
-	quicksort_op_descend(elf->vector, 0, elf->size - 1);
+	quicksort_op_descend(elf->vector, 0, elf->size - 1, NULL);
+}
+
+// Documented in header file.
+ElfVector *elfVector_qsort_ascendWithIndexes(ElfVector *elf){
+	if(!elf) ELF_DIE("NULL pointer received!");
+
+	int i, n;
+	ElfVector *indexes = elfVector_new();
+
+	n = elf->size;
+	for(i = 0; i < n; i++)
+		elfVector_pushBack(indexes, i);
+	if(n <= 1) return indexes;
+
+	quicksort_op_ascend(elf->vector, 0, n-1, indexes->vector);
+	return indexes;
+}
+
+// Documented in header file.
+ElfVector *elfVector_qsort_descendWithIndexes(ElfVector *elf){
+	if(!elf) ELF_DIE("NULL pointer received!");
+
+	int i, n;
+	ElfVector *indexes = elfVector_new();
+
+	n = elf->size;
+	for(i = 0; i < n; i++)
+		elfVector_pushBack(indexes, i);
+	if(n <= 1) return indexes;
+
+	quicksort_op_descend(elf->vector, 0, n-1, indexes->vector);
+	return indexes;
 }
 
 // Documented in header file.

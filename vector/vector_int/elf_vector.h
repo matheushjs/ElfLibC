@@ -7,6 +7,7 @@ ElfVector *elfVector_new();
 ElfVector *elfVector_new_withValue(int size, int value);
 ElfVector *elfVector_new_fromArray(int **array, int size);
 ElfVector *elfVector_new_random(int size, int min, int max);
+ElfVector *elfVector_new_fromOther(const ElfVector *elf);
 
 void elfVector_destroy(ElfVector **vec_p);
 void elfVector_print(const ElfVector *elf);
@@ -19,6 +20,8 @@ void elfVector_maxmin(ElfVector *elf, int *max, int *min);
 
 void elfVector_qsort_ascend(ElfVector *elf);
 void elfVector_qsort_descend(ElfVector *elf);
+ElfVector *elfVector_qsort_ascendWithIndexes(ElfVector *elf);
+ElfVector *elfVector_qsort_descendWithIndexes(ElfVector *elf);
 
 int elfVector_back(const ElfVector *elf);
 int elfVector_front(const ElfVector *elf);
@@ -53,6 +56,9 @@ ElfVector *elfVector_new_random(int size, int min, int max);
 	- Returns a new vector, containing 'size' random elements.
 	- Elements will be between 'min' (inclusive) and 'max' (inclusive).
 	- Inverting 'min' with 'max' does not matter.
+
+ElfVector *elfVector_new_fromOther(const ElfVector *elf);
+	- Returns a new vector, which is a copy of 'elf'.
 
 void elfVector_destroy(ElfVector **vec_p);
 	- Frees memory allocated for the vector.
@@ -89,6 +95,20 @@ void elfVector_qsort_descend(ElfVector *elf);
 	- Sorts elements of the vector.
 	- Uses quicksort algorithm. Pivot is calculated by taking the median among the edge elements and the midle one,
 	so it should be really hard to reach the worst case O(n^2) scenario.
+
+ElfVector *elfVector_qsort_ascendWithIndexes(ElfVector *elf);
+ElfVector *elfVector_qsort_descendWithIndexes(ElfVector *elf);
+	- Sorts elements of the vector, as the other _qsort_ functions.
+	- Returns a vector containing the index of elements prior to the sorting.
+	- Example:
+		- Before sorting
+			Vector: 1 0 4 3
+			Indexes: 0 1 2 3
+		
+		- After sorting (Elements in Indexes are swapped in unison with elements in Vector)
+			Vector: 0 1 3 4
+			Indexes: 1 0 3 2
+	- WARNING: Sorting is UNSTABLE. Order among elements of same value is not maintained.
 
 int elfVector_back(const ElfVector *elf);
 	- Returns the last element of the vector, without removing it.

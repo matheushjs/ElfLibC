@@ -22,10 +22,14 @@ void test(ElfVector *vec){
 	elfVector_print(vec);
 	printf("\n");
 
+	ElfVector *indexes = elfVector_qsort_ascendWithIndexes(vec);
 	printf("Sorted: ");
-	elfVector_qsort_ascend(vec);
 	elfVector_print(vec);
 	printf("\n");
+	printf("Indexes: ");
+	elfVector_print(indexes);
+	printf("\n");
+	elfVector_destroy(&indexes);
 	printf("Index of 1: %d\n", elfVector_search_sorted(vec, 1));
 	printf("Count of 1: %d\n", elfVector_count_sorted(vec, 1));
 	printf("Index of 172172172: %d\n", elfVector_search_sorted(vec, 172172172));
@@ -63,11 +67,13 @@ void test(ElfVector *vec){
 }
 
 int main(int argc, char *argv[]){
-	ElfVector *vec;
+	ElfVector *vec, *vec2;
 
 	vec = elfVector_new_withValue(10, 1);
-	test(vec);
+	vec2 = elfVector_new_fromOther(vec);
+	test(vec2);
 	elfVector_destroy(&vec);
+	elfVector_destroy(&vec2);
 
 	vec = elfVector_new();
 	test(vec);

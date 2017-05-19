@@ -5,6 +5,7 @@ typedef struct _ElfVector ElfVector;
 
 ElfVector *elfVector_new();
 ElfVector *elfVector_new_withValue(int size, int value);
+ElfVector *elfVector_new_fromArray(int **array, int size);
 ElfVector *elfVector_new_random(int size, int min, int max);
 
 void elfVector_destroy(ElfVector **vec_p);
@@ -42,6 +43,11 @@ ElfVector *elfVector_new();
 ElfVector *elfVector_new_withValue(int size, int value);
 	- Returns a new vector, containing 'size' elemente with value 'value'.
 	- If 'value' is 0, elements are initialized using 'calloc'.
+
+ElfVector *elfVector_new_fromArray(int **array, int size);
+	- Returns a vector constructed with elements in 'array'.
+	- 'array' should be a pointer to a dynamically allocated array of integers.
+	- The pointer to int* is stolen, then set to NULL.
 
 ElfVector *elfVector_new_random(int size, int min, int max);
 	- Returns a new vector, containing 'size' random elements.

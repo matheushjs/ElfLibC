@@ -1,4 +1,6 @@
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <elf_vector.h>
 
@@ -72,6 +74,16 @@ int main(int argc, char *argv[]){
 	elfVector_destroy(&vec);
 
 	vec = elfVector_new_random(10, -10, 10);
+	test(vec);
+	elfVector_destroy(&vec);
+
+	int array[] = {10, 1, 9, 2, 8, 3, 7, 4, 6, 5};
+	int *mem = NULL;
+	
+	mem = malloc(sizeof(array));
+	memcpy(mem, array, sizeof(array));
+
+	vec = elfVector_new_fromArray(&mem, 10);
 	test(vec);
 	elfVector_destroy(&vec);
 

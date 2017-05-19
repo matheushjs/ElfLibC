@@ -102,6 +102,25 @@ ElfVector *elfVector_new_withValue(int size, int value){
 }
 
 // Documented in header file.
+ElfVector *elfVector_new_fromArray(int **array, int size){
+	if(!*array) ELF_DIE("NULL pointer received!");
+	if(size < 0){
+		fprintf(stderr, "Received negative size at %s.", __func__);
+		size = 0;
+	}
+
+	ElfVector *new;
+	new = malloc(sizeof(ElfVector));
+	new->size = size;
+	new->capacity = nextpow2(size, INITIAL_CAPACITY);
+	new->vector = realloc(*array, sizeof(int) * new->capacity);
+
+	*array = NULL; //Steal pointer.
+
+	return new;
+}
+
+// Documented in header file.
 ElfVector *elfVector_new_random(int size, int min, int max){
 	if(size < 0){
 		fprintf(stderr, "Received negative size at %s.", __func__);

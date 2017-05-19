@@ -32,7 +32,7 @@ ElfGraph
 	- Graph implemented with an adjacency list.
 	- Can be oriented or not.
 	- Size must be specified on instantiation.
-	- Double edges are not allowed.
+	- Double edges are not allowed (cannot be MULTIGRAPH).
  
 ElfGraph *elfGraph_new(int N, bool oriented);
 	- Returns a graph with N vertixes, indexed from 0 to N-1.

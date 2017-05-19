@@ -326,7 +326,7 @@ void insert_vertix_into_list(int vert, void *data){
  *                 else: add the edge between components containing K and I to the
  *                       graph outer.
  */
-ElfList **elfGraph_stronglyConnectedComponents(const ElfGraph *graph){
+ElfList **elfGraph_SCC(const ElfGraph *graph){
 	if(!graph) ELF_DIE("Received NULL pointer");
 	if(!graph->oriented){
 		fprintf(stderr, "Cannot get strongly connected components of an undirected graph.\n");

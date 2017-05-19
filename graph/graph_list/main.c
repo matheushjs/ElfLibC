@@ -70,7 +70,7 @@ int main(int argc, char *argv[]){
 	ElfGraph *graph = elfGraph_new(size, true);
 	elfGraph_readFromFileVE(graph, stdin, edges);
 
-	aux = lists = elfGraph_stronglyConnectedComponents(graph);
+	aux = lists = elfGraph_SCC(graph);
 	
 	while(*aux != NULL){
 		elfList_traverse(*aux, print);

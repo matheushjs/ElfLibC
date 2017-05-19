@@ -22,7 +22,7 @@ void elfGraph_readFromFileVEW(ElfGraph *graph, FILE *fp, int lim);
 void elfGraph_DFS_src(const ElfGraph *graph, int src, int **pred_p, int **time_p, int **finish_p);
 void elfGraph_DFS_all(const ElfGraph *graph, int **pred_p, int **time_p, int **finish_p);
 void elfGraph_DFS_registerAfterFunc(const ElfGraph *graph, void (*func)(int vert, void *data), void *data);
-ElfList **elfGraph_stronglyConnectedComponents(const ElfGraph *graph);
+ElfList **elfGraph_SCC(const ElfGraph *graph);
 
 int *elfGraph_BFS(const ElfGraph *graph, int src, int **dist_p);
 
@@ -101,7 +101,8 @@ void elfGraph_DFS_registerAfterFunc(const ElfGraph *graph, void (*func)(int vert
 		func: function to register.
 		data: data to be passed to 'func' when it's called.
 
-ElfList **elfGraph_stronglyConnectedComponents(const ElfGraph *graph);
+ElfList **elfGraph_SCC(const ElfGraph *graph);
+	- SCC standing for Strongly Connected Components
 	- Finds all the strongly connected components of a graph.
 	Return:
 		A NULL-terminated array of lists, each of which contains a component.

@@ -458,6 +458,12 @@ ElfGraph *elfGraph_MST_prim(const ElfGraph *graph){
 		}
 	}
 
+	//Clean Resources
+	elfVector_destroy(&targets);
+	elfVector_destroy(&sources);
+	elfPQueue_destroy(&pqueue);
+	free(visited);
+
 	return MST;
 }
 

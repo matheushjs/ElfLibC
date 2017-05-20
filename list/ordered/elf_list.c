@@ -339,7 +339,7 @@ int elfList_removeValueF(ElfList *list_p, void *data, void(*free_f)(void*)){
 		count++;
 		aux = curr;
 		curr = curr->next;
-		if(free_f) free_f(aux);
+		if(free_f) free_f(aux->key);
 		list_p->size--;
 	}
 	

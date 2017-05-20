@@ -52,7 +52,7 @@ int main(int argc, char *argv[]){
 	for(i = 0; i < 21; i++)
 		elfList_insertUnique(list, ELF_INT_TO_POINTER(i%7));
 	print_list(list);
-	printf("%d\n", elfList_size(list));
+	printf("size: %d\n", elfList_size(list));
 
 	elfList_destroy(&list);
 

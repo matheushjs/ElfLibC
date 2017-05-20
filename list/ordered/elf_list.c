@@ -11,6 +11,23 @@
 //should be called ElfListIt.
 typedef struct _ElfListIt Node;
 
+//Structure that holds information needed for optimizations.
+typedef struct _Optimus {
+	const Node *prior_node;   //Records a pointer to a Node.
+	int prior_idx;      //Index of the recorded Node.
+
+	/* WORD OF CAUTION
+	 * 
+	 * In functions that change the order of elements (insert/remove),
+	 * this Optimus structure can be either updated with a valid state
+	 * or invalidated.
+	 *
+	 * This structure wa made to optimize specifically the get() function,
+	 * and there really is no need to optimize other operations, even though
+	 * it is possible.
+	 */
+} Optimus;
+
 //List will be crescently ordered, based on the 'greater' function.
 //If the greater function is actually a lower function, it will be sorted decrescently.
 typedef struct _ElfList ElfList;
@@ -19,11 +36,26 @@ struct _ElfList {
 	bool (*greater)(void *a, void *b); // true if (a > b)
 	bool (*equal)(void *a, void *b); //true if (a == b)
 	int size;
+
+	Optimus opt;  //Mutable component of ElfList.
+	              //If opt is changed, ElfList may still be considered const.
 };
 
 static inline
 Node *node_new(){
 	return (Node *) calloc(sizeof(Node), 1);
+}
+
+static inline
+Optimus *optimus_fromElfList(const ElfList *list){
+	return (Optimus *) &list->opt;
+}
+
+static inline
+void optimus_updatePrior(const Optimus *opt, const Node *node, int idx){
+	//Optimus' const qualifier is discarded since it's a mutable component.
+	((Optimus *) opt)->prior_node = node;
+	((Optimus *) opt)->prior_idx = idx;
 }
 
 /*
@@ -35,6 +67,7 @@ ElfList *elfList_new(bool (*greaterThan)(void*,void*)){
 	ElfList *list = calloc(sizeof(ElfList), 1);
 	list->greater = greaterThan;
 	list->equal = NULL;
+	optimus_updatePrior(&list->opt, NULL, -1);
 	return list;
 }
 
@@ -43,6 +76,7 @@ ElfList *elfList_newWithEqual(bool (*greaterThan)(void*,void*), bool (*equal)(vo
 	ElfList *list = calloc(sizeof(ElfList), 1);
 	list->greater = greaterThan;
 	list->equal = equal;
+	optimus_updatePrior(&list->opt, NULL, -1);
 	return list;
 }
 
@@ -56,12 +90,18 @@ void elfList_insert(ElfList *list_p, void *data){
 	new->key = data;
 	list_p->size++;
 
+	int index = 0;
 	Node *curr = list.first;
 	Node *prev = NULL;
 	while(curr != NULL && !list.greater(curr->key, data)){ // while curr < data
 		prev = curr;
 		curr = curr->next;
+		index++;
 	}
+
+	//Update the optimization structures.
+	Optimus *opt = optimus_fromElfList(list_p);
+	optimus_updatePrior(opt, prev, index-1);
 
 	if(prev == NULL){
 		new->next = list_p->first;
@@ -134,6 +174,10 @@ void *elfList_removeIndex(ElfList *list, int index){
 	}
 	free(cur);
 
+	//Update the optimization structures (works even if index==0).
+	Optimus *opt = optimus_fromElfList(list);
+	optimus_updatePrior(opt, prev, index-1);
+
 	list->size--;
 	return key;
 }
@@ -146,15 +190,28 @@ int elfList_size(const ElfList *list){
 
 // Documented in header file.
 void *elfList_get(const ElfList *list, int index){
-	int i;
+	int countdown;
 
 	if(!list) ELF_DIE("Received null pointer");
 	if(index < 0 || index >= list->size) return NULL;
 	
-	Node *cur = list->first;
+	//Check if optimizing is possible.
+	Optimus *opt = optimus_fromElfList(list);
+	const Node *cur;
 
-	for(i = 0; i < index; i++)
+	if(opt->prior_node != NULL && opt->prior_idx <= index){
+		cur = opt->prior_node;
+		countdown = index - opt->prior_idx;
+	} else {
+		cur = list->first;
+		countdown = index;
+	}
+
+	for(countdown--; countdown >= 0; countdown--)
 		cur = cur->next;
+
+	//Update the optimization structures.
+	optimus_updatePrior(opt, cur, index);
 
 	return cur->key;
 }
@@ -178,16 +235,23 @@ bool elfList_insertUnique(ElfList *list_p, void *data){
 	if(!list_p->equal) ELF_DIE("List does not have equal() function");
 
 	ElfList list = *list_p; //For efficiency
+	int count;
 	
 	Node *new = node_new();
 	new->key = data;
 
 	Node *curr = list.first;
 	Node *prev = NULL;
+	count = 0;
 	while(curr != NULL && list.greater(data, curr->key)){ // while data > curr
 		prev = curr;
 		curr = curr->next;
+		count++;
 	}
+
+	//Update the optimization structures (works even if count==0).
+	Optimus *opt = optimus_fromElfList(list_p);
+	optimus_updatePrior(opt, prev, count-1);
 
 	if(curr != NULL && list.equal(curr->key, data)){
 		free(new);
@@ -255,15 +319,21 @@ int elfList_removeValueF(ElfList *list_p, void *data, void(*free_f)(void*)){
 
 	ElfList list = *list_p; //For efficiency
 	Node *prev, *curr = list.first;
-	
+
+	int count = 0;
 	prev = NULL; //previous node
 	while(curr != NULL && list.greater(data, curr->key)){
 		prev = curr;
 		curr = curr->next;
+		count++;
 	}
+
+	//Update the optimization structures (works even if count==0).
+	Optimus *opt = optimus_fromElfList(list_p);
+	optimus_updatePrior(opt, prev, count-1);
 	
 	//At this point, 'prev' holds the last node before the nodes that will be removed.
-	int count = 0;
+	count = 0;
 	Node *aux;
 	while(curr != NULL && list.equal(curr->key, data)){
 		count++;

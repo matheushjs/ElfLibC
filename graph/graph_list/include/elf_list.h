@@ -22,17 +22,17 @@ void elfList_insert(ElfList *list_p, void *data);
 void elfList_destroy(ElfList **list_p);
 void elfList_destroyF(ElfList **list_p, void (*func)(void*));
 void *elfList_removeIndex(ElfList *list, int index);
-int elfList_size(const ElfList *list);
+int  elfList_size(const ElfList *list);
 void *elfList_get(const ElfList *list, int index);
 void elfList_traverse(ElfList *list, void(*func)(void*));
 
 /* Functions accepted only by lists with an equality function */
 bool elfList_insertUnique(ElfList *list_p, void *data);
-int elfList_indexOf(ElfList *list_p, void *data);
+int  elfList_indexOf(ElfList *list_p, void *data);
 bool elfList_contains(ElfList *list, void *data);
-int elfList_count(ElfList *list_p, void *data);
-int elfList_removeValueF(ElfList *list_p, void *data, void(*free_f)(void*));
-int elfList_removeValue(ElfList *list, void *data);
+int  elfList_count(ElfList *list_p, void *data);
+int  elfList_removeValueF(ElfList *list_p, void *data, void(*free_f)(void*));
+int  elfList_removeValue(ElfList *list, void *data);
 
 /* Functions on iterators */
 typedef struct _ElfListIt ElfListIt;
@@ -96,6 +96,8 @@ int elfList_size(const ElfList *list);
 void *elfList_get(const ElfList *list, int index);
 	- Returns the element at index 'index'.
 	- If 'index' is out of range, returns NULL.
+	- OPTIMIZATION NOTE: this function is optimized for the case where
+	  it is consecutively called with 'index' growing crescently.
 
 void elfList_traverse(ElfList *list, void(*func)(void*));
 	- Traverses all nodes in the list, applying 'func' in each stored pointer.

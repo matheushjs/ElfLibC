@@ -13,6 +13,7 @@ void elfSet_union(ElfSet *set, int e1, int e2);
  
 typedef ElfSet
 	- Structure that represents a set that uses Union-Find algorithms.
+	- Elements stored are integers. Each element is characterized by it's set.
 	- If the set holds N elements, they are mandatorily numbered from 0 to N-1.
  
 ElfSet *elfSet_new(int size);

@@ -24,3 +24,5 @@ For when these happen, use the following standards:
 **[namespace]\[specific_type]\[specific_implementation]\[data_structure]**
 
 **e.g. ElfIntHashSet**
+
+You may omit the type or implementation for one of the ambiguous instances. The priority goes to the most generic, which should be void pointer.

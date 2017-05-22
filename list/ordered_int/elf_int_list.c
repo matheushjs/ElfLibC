@@ -1,19 +1,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include <elf_list.h>
+#include <elf_int_list.h>
 
 #define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
 
 //For the convenience of writing shorter code,
 //the node structure used in this source file is
 //simply called Node. The structure to be exported
-//should be called ElfListIt.
-typedef struct _ElfListIt Node;
+//should be called ElfIntListIt.
+typedef struct _ElfIntListIt Node;
 
 //List will be crescently ordered.
-typedef struct _ElfList ElfList;
-struct _ElfList {
+typedef struct _ElfIntList ElfIntList;
+struct _ElfIntList {
 	Node *first;
 	int size;
 };
@@ -26,12 +26,12 @@ Node *node_new(){
 }
 
 // Documented in header file.
-ElfList *elfList_new(){
-	return calloc(sizeof(ElfList), 1);
+ElfIntList *elfIntList_new(){
+	return calloc(sizeof(ElfIntList), 1);
 }
 
 // Documented in header file.
-void elfList_insert(ElfList *list, int key){
+void elfIntList_insert(ElfIntList *list, int key){
 	if(!list) ELF_DIE("Received null pointer");
 	if(key == ELF_INVALID_INT) ELF_DIE("Attempted to insert ELF_INVALID_INT");
 	
@@ -56,7 +56,7 @@ void elfList_insert(ElfList *list, int key){
 }
 
 // Documented in header file.
-bool elfList_insertUnique(ElfList *list, int key){
+bool elfIntList_insertUnique(ElfIntList *list, int key){
 	if(!list) ELF_DIE("Received null pointer");
 	if(key == ELF_INVALID_INT) ELF_DIE("Attempted to insert ELF_INVALID_INT");
 
@@ -86,7 +86,7 @@ bool elfList_insertUnique(ElfList *list, int key){
 }
 
 // Documented in header file.
-int elfList_indexOf(ElfList *list, int key){
+int elfIntList_indexOf(ElfIntList *list, int key){
 	if(!list) ELF_DIE("Received null pointer");
 	
 	Node *curr = list->first;
@@ -101,14 +101,14 @@ int elfList_indexOf(ElfList *list, int key){
 }
 
 // Documented in header file.
-bool elfList_contains(ElfList *list, int key){
-	if(elfList_indexOf(list, key) != -1)
+bool elfIntList_contains(ElfIntList *list, int key){
+	if(elfIntList_indexOf(list, key) != -1)
 		return true;
 	else return false;
 }
 
 // Documented in header file.
-int elfList_count(ElfList *list, int key){
+int elfIntList_count(ElfIntList *list, int key){
 	if(!list) ELF_DIE("Received null pointer");
 
 	Node *curr = list->first;
@@ -125,8 +125,8 @@ int elfList_count(ElfList *list, int key){
 }
 
 // Documented in header file.
-void elfList_destroy(ElfList **list_p){
-	ElfList *list = *list_p;
+void elfIntList_destroy(ElfIntList **list_p){
+	ElfIntList *list = *list_p;
 	Node *node, *aux;
 
 	if(list){
@@ -142,7 +142,7 @@ void elfList_destroy(ElfList **list_p){
 }
 
 // Documented in header file.
-int elfList_remove(ElfList *list, int index){
+int elfIntList_remove(ElfIntList *list, int index){
 	int i;
 	int key;
 	
@@ -173,13 +173,13 @@ int elfList_remove(ElfList *list, int index){
 }
 
 // Documented in header file.
-int elfList_size(const ElfList *list){
+int elfIntList_size(const ElfIntList *list){
 	if(!list) ELF_DIE("Received null pointer");
 	return list->size;
 }
 
 // Documented in header file.
-int elfList_get(const ElfList *list, int index){
+int elfIntList_get(const ElfIntList *list, int index){
 	int i;
 
 	if(!list) ELF_DIE("Received null pointer");
@@ -194,7 +194,7 @@ int elfList_get(const ElfList *list, int index){
 }
 
 // Documented in header file.
-void elfList_traverse(ElfList *list, void(*func)(int)){
+void elfIntList_traverse(ElfIntList *list, void(*func)(int)){
 	Node *cur;
 	
 	if(!list) ELF_DIE("Received null pointer");
@@ -207,7 +207,7 @@ void elfList_traverse(ElfList *list, void(*func)(int)){
 }
 
 // Documented in header file.
-ElfListIt *elfList_getIterator(ElfList *list){
+ElfIntListIt *elfIntList_getIterator(ElfIntList *list){
 	if(!list) ELF_DIE("Received null pointer");
 	return list->first;
 }

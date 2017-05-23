@@ -7,6 +7,7 @@
 #include <elf_queue.h>
 #include <elf_vector.h>
 #include <elf_pqueue.h>
+#include <elf_int_uf_set.h>
 
 #define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
 #define MAX(X,Y) X>Y?X:Y
@@ -463,6 +464,62 @@ ElfGraph *elfGraph_MST_prim(const ElfGraph *graph){
 	elfVector_destroy(&sources);
 	elfPQueue_destroy(&pqueue);
 	free(visited);
+
+	return MST;
+}
+
+// Documented in header file.
+ElfGraph *elfGraph_MST_kruskal(const ElfGraph *graph){
+	// Initialize disjoint set
+	ElfIntUFSet *set = elfIntUFSet_new(graph->size);
+
+	// Initialize 'targets' and 'sources' vector
+	ElfVector *targets = elfVector_new();
+	ElfVector *sources = elfVector_new();
+
+	// Initialize a priority queue
+	ElfPQueue *pqueue = elfPQueue_new_minFirst();
+
+	// Initialize a 'MST' graph
+	ElfGraph *MST = elfGraph_new(graph->size, graph->oriented);
+
+	// Add all edges to the pqueue, 'targets' and 'sources'.
+	int i, m, j, n, counter = 0;
+	for(i = 0, m = graph->size; i < m; i++){
+		ElfList *list = graph->array[i];
+		for(j = 0, n = elfList_size(list); j < n; j++){
+			Edge *e = elfList_get(list, j);
+			
+			elfVector_pushBack(sources, i);
+			elfVector_pushBack(targets, e->target);
+			elfPQueue_push(pqueue, counter, e->weight);
+			counter++;
+		}
+	}
+
+	// while pqueue.not_empty:
+	//   k = pqueue.pop
+	//
+	//   if set(k.target) != set(k.source):
+	//     MST.add_edge(k.source, k.target, k.weight)
+	//     union(k.target, k.source)
+	int idx, src, tgt, wei;
+	while(elfPQueue_size(pqueue) != 0){
+		idx = elfPQueue_pop(pqueue, &wei);
+		src = elfVector_get(sources, idx);
+		tgt = elfVector_get(targets, idx);
+		
+		if(elfIntUFSet_find(set, src) != elfIntUFSet_find(set, tgt)){
+			elfGraph_addEdge(MST, src, tgt, wei);
+			elfIntUFSet_union(set, src, tgt);
+		}
+	}
+	
+	//Clean used resources
+	elfVector_destroy(&targets);
+	elfVector_destroy(&sources);
+	elfPQueue_destroy(&pqueue);
+	elfIntUFSet_destroy(&set);
 
 	return MST;
 }

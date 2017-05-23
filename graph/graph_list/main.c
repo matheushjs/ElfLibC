@@ -90,7 +90,7 @@ void solve4(){
 	
 	scanf("%d %d", &size, &edges);
 	ElfGraph *graph = elfGraph_new(size, false);
-	elfGraph_readFromFileVE(graph, stdin, edges);
+	elfGraph_readFromFileVEW(graph, stdin, edges);
 
 	ElfGraph *mst = elfGraph_MST_prim(graph);
 	elfGraph_print(mst);
@@ -99,7 +99,27 @@ void solve4(){
 	elfGraph_destroy(&mst);
 }
 
+//Test Kruskal
+void solve5(){
+	int edges, size;
+	
+	scanf("%d %d", &size, &edges);
+	ElfGraph *graph = elfGraph_new(size, false);
+	elfGraph_readFromFileVEW(graph, stdin, edges);
+
+	ElfGraph *mst = elfGraph_MST_kruskal(graph);
+	elfGraph_print(mst);
+
+	elfGraph_destroy(&graph);
+	elfGraph_destroy(&mst);
+}
+
 int main(int argc, char *argv[]){
+	printf("Prim:\n");
 	solve4();
+
+	fseek(stdin, 0, SEEK_SET);
+	printf("\n\nKruskal:\n");
+	solve5();
 	return 0;
 }

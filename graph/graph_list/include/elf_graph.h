@@ -25,6 +25,7 @@ void elfGraph_DFS_registerAfterFunc(const ElfGraph *graph, void (*func)(int vert
 
 ElfList **elfGraph_SCC(const ElfGraph *graph);
 ElfGraph *elfGraph_MST_prim(const ElfGraph *graph);
+ElfGraph *elfGraph_MST_kruskal(const ElfGraph *graph);
 
 int *elfGraph_BFS(const ElfGraph *graph, int src, int **dist_p);
 
@@ -117,6 +118,14 @@ ElfGraph *elfGraph_MST_prim(const ElfGraph *graph);
 	- Given graph cannot be oriented.
 	- Given graph can be weighted or not.
 	- The Prim algorithm for finding MST is applied.
+
+ElfGraph *elfGraph_MST_kruskal(const ElfGraph *graph);
+	- Returns a Minimum Spanning Tree for the given graph.
+	- The graph is supposed to be connected. This function does not check whether the graph is
+	  connected or not. If it isn't, the behavior is undefined.
+	- Given graph cannot be oriented.
+	- Given graph can be weighted or not.
+	- The Kruskal algorithm for finding MST is applied.
 
 int *elfGraph_BFS(const ElfGraph *graph, int src, int **dist_p);
 	- Performs a BFS in the graph, finding the distance/path from all vertexes to 'src'.

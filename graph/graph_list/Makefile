@@ -4,7 +4,7 @@ CFLAGS=-Wall -O1 -std=c99 -Wno-unused-result
 LDFLAGS=
 
 # Files
-SRC=src/elf_graph.c src/elf_queue.c src/elf_list.c src/elf_vector.c src/elf_pqueue.c main.c
+SRC=src/elf_graph.c src/elf_queue.c src/elf_list.c src/elf_vector.c src/elf_pqueue.c src/elf_int_uf_set.c  main.c
 INCLUDE=./include/
 BIN=prog
 

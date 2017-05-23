@@ -473,29 +473,29 @@ ElfGraph *elfGraph_MST_kruskal(const ElfGraph *graph){
 	// Initialize disjoint set
 	ElfIntUFSet *set = elfIntUFSet_new(graph->size);
 
-	// Initialize 'targets' and 'sources' vector
+	// Initialize 'targets', 'sources', 'weights' vector
 	ElfIntVector *targets = elfIntVector_new();
 	ElfIntVector *sources = elfIntVector_new();
-
-	// Initialize a priority queue
-	ElfPQueue *pqueue = elfPQueue_new_minFirst();
+	ElfIntVector *weights = elfIntVector_new();
 
 	// Initialize a 'MST' graph
 	ElfGraph *MST = elfGraph_new(graph->size, graph->oriented);
 
-	// Add all edges to the pqueue, 'targets' and 'sources'.
-	int i, m, j, n, counter = 0;
+	// Add all edges to the vectors
+	int i, m, j, n;
 	for(i = 0, m = graph->size; i < m; i++){
 		ElfList *list = graph->array[i];
 		for(j = 0, n = elfList_size(list); j < n; j++){
-			Edge *e = elfList_get(list, j);
+			Edge *e = elfList_get(list, j); // O(1) because of optimizations in sequential get()'s.
 			
 			elfIntVector_pushBack(sources, i);
 			elfIntVector_pushBack(targets, e->target);
-			elfPQueue_push(pqueue, counter, e->weight);
-			counter++;
+			elfIntVector_pushBack(weights, e->weight);
 		}
 	}
+
+	// Get sorted indexes of edges, with increasing weight
+	ElfIntVector *indexes = elfIntVector_qsort_ascendWithIndexes(weights);
 
 	// while pqueue.not_empty:
 	//   k = pqueue.pop
@@ -504,8 +504,9 @@ ElfGraph *elfGraph_MST_kruskal(const ElfGraph *graph){
 	//     MST.add_edge(k.source, k.target, k.weight)
 	//     union(k.target, k.source)
 	int idx, src, tgt, wei;
-	while(elfPQueue_size(pqueue) != 0){
-		idx = elfPQueue_pop(pqueue, &wei);
+	for(i = 0, m = elfIntVector_size(indexes); i < m; i++){
+		idx = elfIntVector_get(indexes, i);
+		wei = elfIntVector_get(weights, i); // Because it was sorted too
 		src = elfIntVector_get(sources, idx);
 		tgt = elfIntVector_get(targets, idx);
 		
@@ -518,7 +519,8 @@ ElfGraph *elfGraph_MST_kruskal(const ElfGraph *graph){
 	//Clean used resources
 	elfIntVector_destroy(&targets);
 	elfIntVector_destroy(&sources);
-	elfPQueue_destroy(&pqueue);
+	elfIntVector_destroy(&weights);
+	elfIntVector_destroy(&indexes);
 	elfIntUFSet_destroy(&set);
 
 	return MST;

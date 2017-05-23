@@ -126,6 +126,7 @@ ElfGraph *elfGraph_MST_kruskal(const ElfGraph *graph);
 	- Given graph cannot be oriented.
 	- Given graph can be weighted or not.
 	- The Kruskal algorithm for finding MST is applied.
+	- O(V*E), always worse than PRIM algorithm.
 
 int *elfGraph_BFS(const ElfGraph *graph, int src, int **dist_p);
 	- Performs a BFS in the graph, finding the distance/path from all vertexes to 'src'.

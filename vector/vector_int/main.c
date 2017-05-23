@@ -2,86 +2,86 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <elf_vector.h>
+#include <elf_int_vector.h>
 
-void test(ElfVector *vec){
+void test(ElfIntVector *vec){
 	int i, max, min;
 
 	for(i = 0; i < 10; i++)
-		elfVector_pushBack(vec, i);
-	printf("Vector has %d elements.\n", elfVector_size(vec));
-	elfVector_put(vec, 0, 727272);
-	elfVector_put(vec, 727272, 727272);
-	printf("First element is %d.\n", elfVector_get(vec, 0));
-	printf("Last element is %d.\n", elfVector_get(vec, elfVector_size(vec)-1));
-	elfVector_maxmin(vec, &max, &min);
+		elfIntVector_pushBack(vec, i);
+	printf("Vector has %d elements.\n", elfIntVector_size(vec));
+	elfIntVector_put(vec, 0, 727272);
+	elfIntVector_put(vec, 727272, 727272);
+	printf("First element is %d.\n", elfIntVector_get(vec, 0));
+	printf("Last element is %d.\n", elfIntVector_get(vec, elfIntVector_size(vec)-1));
+	elfIntVector_maxmin(vec, &max, &min);
 	printf("maxmin are %d, %d\n", max, min);
-	printf("Index of 1: %d\n", elfVector_search(vec, 1));
-	printf("Count of 1: %d\n", elfVector_count(vec, 1));
+	printf("Index of 1: %d\n", elfIntVector_search(vec, 1));
+	printf("Count of 1: %d\n", elfIntVector_count(vec, 1));
 
-	elfVector_print(vec);
+	elfIntVector_print(vec);
 	printf("\n");
 
-	ElfVector *indexes = elfVector_qsort_ascendWithIndexes(vec);
+	ElfIntVector *indexes = elfIntVector_qsort_ascendWithIndexes(vec);
 	printf("Sorted: ");
-	elfVector_print(vec);
+	elfIntVector_print(vec);
 	printf("\n");
 	printf("Indexes: ");
-	elfVector_print(indexes);
+	elfIntVector_print(indexes);
 	printf("\n");
-	elfVector_destroy(&indexes);
-	printf("Index of 1: %d\n", elfVector_search_sorted(vec, 1));
-	printf("Count of 1: %d\n", elfVector_count_sorted(vec, 1));
-	printf("Index of 172172172: %d\n", elfVector_search_sorted(vec, 172172172));
-	printf("Count of 172172172: %d\n", elfVector_count_sorted(vec, 172172172));
+	elfIntVector_destroy(&indexes);
+	printf("Index of 1: %d\n", elfIntVector_search_sorted(vec, 1));
+	printf("Count of 1: %d\n", elfIntVector_count_sorted(vec, 1));
+	printf("Index of 172172172: %d\n", elfIntVector_search_sorted(vec, 172172172));
+	printf("Count of 172172172: %d\n", elfIntVector_count_sorted(vec, 172172172));
 
 	printf("Sorted: ");
-	elfVector_qsort_descend(vec);
-	elfVector_print(vec);
+	elfIntVector_qsort_descend(vec);
+	elfIntVector_print(vec);
 	printf("\n");
-	printf("Index of 1: %d\n", elfVector_search_sorted(vec, 1));
-	printf("Count of 1: %d\n", elfVector_count_sorted(vec, 1));
-	printf("Index of 172172172: %d\n", elfVector_search_sorted(vec, 172172172));
-	printf("Count of 172172172: %d\n", elfVector_count_sorted(vec, 172172172));
+	printf("Index of 1: %d\n", elfIntVector_search_sorted(vec, 1));
+	printf("Count of 1: %d\n", elfIntVector_count_sorted(vec, 1));
+	printf("Index of 172172172: %d\n", elfIntVector_search_sorted(vec, 172172172));
+	printf("Count of 172172172: %d\n", elfIntVector_count_sorted(vec, 172172172));
 
-	elfVector_insert(vec, 0, 91);
-	elfVector_insert(vec, elfVector_size(vec)-1, 92);
-	elfVector_insert(vec, 2, 93);
-	elfVector_insert(vec, 101, 94);
-	elfVector_print(vec);
+	elfIntVector_insert(vec, 0, 91);
+	elfIntVector_insert(vec, elfIntVector_size(vec)-1, 92);
+	elfIntVector_insert(vec, 2, 93);
+	elfIntVector_insert(vec, 101, 94);
+	elfIntVector_print(vec);
 	printf("\n");
 	printf("Removed: %d %d %d %d\n",
-			elfVector_remove(vec, 0),
-			elfVector_remove(vec, elfVector_size(vec)-2),
-			elfVector_remove(vec, 2),
-			elfVector_remove(vec, 101));
-	printf("Removing last element: %d\n", elfVector_remove(vec, elfVector_size(vec)-1));
+			elfIntVector_remove(vec, 0),
+			elfIntVector_remove(vec, elfIntVector_size(vec)-2),
+			elfIntVector_remove(vec, 2),
+			elfIntVector_remove(vec, 101));
+	printf("Removing last element: %d\n", elfIntVector_remove(vec, elfIntVector_size(vec)-1));
 
 	printf("Popping: ");
-	while(elfVector_size(vec) != 0)
-		printf("%d ", elfVector_popBack(vec));
+	while(elfIntVector_size(vec) != 0)
+		printf("%d ", elfIntVector_popBack(vec));
 	printf("\n");
 
-	printf("Vector has %d elements.\n", elfVector_size(vec));
+	printf("Vector has %d elements.\n", elfIntVector_size(vec));
 	printf("\n\n");
 }
 
 int main(int argc, char *argv[]){
-	ElfVector *vec, *vec2;
+	ElfIntVector *vec, *vec2;
 
-	vec = elfVector_new_withValue(10, 1);
-	vec2 = elfVector_new_fromOther(vec);
+	vec = elfIntVector_new_withValue(10, 1);
+	vec2 = elfIntVector_new_fromOther(vec);
 	test(vec2);
-	elfVector_destroy(&vec);
-	elfVector_destroy(&vec2);
+	elfIntVector_destroy(&vec);
+	elfIntVector_destroy(&vec2);
 
-	vec = elfVector_new();
+	vec = elfIntVector_new();
 	test(vec);
-	elfVector_destroy(&vec);
+	elfIntVector_destroy(&vec);
 
-	vec = elfVector_new_random(10, -10, 10);
+	vec = elfIntVector_new_random(10, -10, 10);
 	test(vec);
-	elfVector_destroy(&vec);
+	elfIntVector_destroy(&vec);
 
 	int array[] = {10, 1, 9, 2, 8, 3, 7, 4, 6, 5};
 	int *mem = NULL;
@@ -89,9 +89,9 @@ int main(int argc, char *argv[]){
 	mem = malloc(sizeof(array));
 	memcpy(mem, array, sizeof(array));
 
-	vec = elfVector_new_fromArray(&mem, 10);
+	vec = elfIntVector_new_fromArray(&mem, 10);
 	test(vec);
-	elfVector_destroy(&vec);
+	elfIntVector_destroy(&vec);
 
 	return 0;
 }

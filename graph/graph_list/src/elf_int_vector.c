@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 
-#include <elf_vector.h>
+#include <elf_int_vector.h>
 
 #define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
 #define ELF_MAX(X,Y) ((X)>(Y)?X:Y)
@@ -20,11 +20,11 @@
 
 #define INITIAL_CAPACITY 16
 
-typedef struct _ElfVector {
+typedef struct _ElfIntVector {
 	int *vector;
 	int capacity;
 	int size;
-} ElfVector;
+} ElfIntVector;
 
 // Finds the lowest power of 2 that is higher than 'num'.
 // Returns the minimum between the lowest power of 2 and 'min'.
@@ -38,7 +38,7 @@ int nextpow2(int num, int min){
 
 // Grows the vector once
 static inline
-void elfVector_grow(ElfVector *elf){
+void elfIntVector_grow(ElfIntVector *elf){
 	int capacity, *newvec;
 
 	capacity = elf->capacity << 1;
@@ -53,7 +53,7 @@ void elfVector_grow(ElfVector *elf){
 
 // Shrinks the vector once
 static inline
-void elfVector_shrink(ElfVector *elf){
+void elfIntVector_shrink(ElfIntVector *elf){
 	int capacity, *newvec;
 
 	capacity = elf->capacity >> 1;
@@ -67,9 +67,9 @@ void elfVector_shrink(ElfVector *elf){
 }
 
 // Documented in header file.
-ElfVector *elfVector_new(){
-	ElfVector *new;
-	new = malloc(sizeof(ElfVector));
+ElfIntVector *elfIntVector_new(){
+	ElfIntVector *new;
+	new = malloc(sizeof(ElfIntVector));
 	new->size = 0;
 	new->capacity = INITIAL_CAPACITY;
 	new->vector = malloc(sizeof(int) * INITIAL_CAPACITY);
@@ -77,14 +77,14 @@ ElfVector *elfVector_new(){
 }
 
 // Documented in header file.
-ElfVector *elfVector_new_withValue(int size, int value){
+ElfIntVector *elfIntVector_new_withValue(int size, int value){
 	if(size < 0){
 		fprintf(stderr, "Received negative size at %s.", __func__);
 		size = 0;
 	}
 
-	ElfVector *new;
-	new = malloc(sizeof(ElfVector));
+	ElfIntVector *new;
+	new = malloc(sizeof(ElfIntVector));
 	new->size = size;
 
 	int capacity = nextpow2(size, INITIAL_CAPACITY);
@@ -102,15 +102,15 @@ ElfVector *elfVector_new_withValue(int size, int value){
 }
 
 // Documented in header file.
-ElfVector *elfVector_new_fromArray(int **array, int size){
+ElfIntVector *elfIntVector_new_fromArray(int **array, int size){
 	if(!*array) ELF_DIE("NULL pointer received!");
 	if(size < 0){
 		fprintf(stderr, "Received negative size at %s.", __func__);
 		size = 0;
 	}
 
-	ElfVector *new;
-	new = malloc(sizeof(ElfVector));
+	ElfIntVector *new;
+	new = malloc(sizeof(ElfIntVector));
 	new->size = size;
 	new->capacity = nextpow2(size, INITIAL_CAPACITY);
 	new->vector = realloc(*array, sizeof(int) * new->capacity);
@@ -121,16 +121,16 @@ ElfVector *elfVector_new_fromArray(int **array, int size){
 }
 
 // Documented in header file.
-ElfVector *elfVector_new_random(int size, int min, int max){
+ElfIntVector *elfIntVector_new_random(int size, int min, int max){
 	if(size < 0){
 		fprintf(stderr, "Received negative size at %s.", __func__);
 		size = 0;
 	}
 
-	ElfVector *new;
+	ElfIntVector *new;
 	static int salt = 0;
 
-	new = malloc(sizeof(ElfVector));
+	new = malloc(sizeof(ElfIntVector));
 	new->size = size;
 
 	int capacity = nextpow2(size, INITIAL_CAPACITY);
@@ -155,11 +155,11 @@ ElfVector *elfVector_new_random(int size, int min, int max){
 }
 
 // Documented in header file.
-ElfVector *elfVector_new_fromOther(const ElfVector *elf){
+ElfIntVector *elfIntVector_new_fromOther(const ElfIntVector *elf){
 	if(!elf) ELF_DIE("NULL pointer received!");
 
-	ElfVector *new;
-	new = malloc(sizeof(ElfVector));
+	ElfIntVector *new;
+	new = malloc(sizeof(ElfIntVector));
 	new->size = elf->size;
 	new->capacity = elf->capacity;
 	new->vector = malloc(sizeof(int) * new->capacity);
@@ -169,9 +169,9 @@ ElfVector *elfVector_new_fromOther(const ElfVector *elf){
 }
 
 // Documented in header file.
-void elfVector_destroy(ElfVector **vec_p){
+void elfIntVector_destroy(ElfIntVector **vec_p){
 	if(vec_p){
-		ElfVector *vec = *vec_p;
+		ElfIntVector *vec = *vec_p;
 		free(vec->vector);
 		free(vec);
 		*vec_p = NULL;
@@ -179,7 +179,7 @@ void elfVector_destroy(ElfVector **vec_p){
 }
 
 // Documented in header file.
-void elfVector_print(const ElfVector *elf){
+void elfIntVector_print(const ElfIntVector *elf){
 	if(!elf) ELF_DIE("NULL pointer received!");
 
 	int i, n;
@@ -188,25 +188,25 @@ void elfVector_print(const ElfVector *elf){
 }
 
 // Documented in header file.
-int elfVector_size(const ElfVector *elf){
+int elfIntVector_size(const ElfIntVector *elf){
 	if(!elf) ELF_DIE("NULL pointer received!");
 	return elf->size;
 }
 
 // Documented in header file.
-void elfVector_pushBack(ElfVector *elf, int value){
+void elfIntVector_pushBack(ElfIntVector *elf, int value){
 	if(!elf) ELF_DIE("NULL pointer received!");
 
 	int idx = elf->size;
 	if(idx == elf->capacity)
-		elfVector_grow(elf);
+		elfIntVector_grow(elf);
 
 	(elf->size)++;
 	elf->vector[idx] = value;
 }
 
 // Documented in header file.
-int elfVector_popBack(ElfVector *elf){
+int elfIntVector_popBack(ElfIntVector *elf){
 	if(!elf) ELF_DIE("NULL pointer received!");
 
 	int retval, idx;
@@ -216,13 +216,13 @@ int elfVector_popBack(ElfVector *elf){
 
 	// Shrinks only if at 25% of capacity.
 	if(elf->capacity != INITIAL_CAPACITY && idx == (elf->capacity >> 2))
-		elfVector_shrink(elf);
+		elfIntVector_shrink(elf);
 
 	return retval;
 }
 
 // Documented in header file.
-int elfVector_get(ElfVector *elf, int index){
+int elfIntVector_get(ElfIntVector *elf, int index){
 	if(!elf) ELF_DIE("NULL pointer received!");
 
 	if(index < 0 || index >= elf->size){
@@ -234,7 +234,7 @@ int elfVector_get(ElfVector *elf, int index){
 }
 
 // Documented in header file.
-void elfVector_put(ElfVector *elf, int index, int value){
+void elfIntVector_put(ElfIntVector *elf, int index, int value){
 	if(!elf) ELF_DIE("NULL pointer received!");
 
 	if(index < 0 || index >= elf->size){
@@ -246,7 +246,7 @@ void elfVector_put(ElfVector *elf, int index, int value){
 }
 
 // Documented in header file.
-void elfVector_swap(ElfVector *elf, int i, int j){
+void elfIntVector_swap(ElfIntVector *elf, int i, int j){
 	int aux, *vec = elf->vector;
 	aux = vec[i];
 	vec[i] = vec[j];
@@ -254,7 +254,7 @@ void elfVector_swap(ElfVector *elf, int i, int j){
 }
 
 // Documented in header file.
-void elfVector_maxmin(ElfVector *elf, int *max, int *min){
+void elfIntVector_maxmin(ElfIntVector *elf, int *max, int *min){
 	if(!elf) ELF_DIE("NULL pointer received!");
 	if(elf->size == 0){
 		fprintf(stderr, "Can't get maxmin of an empty vector, at %s.\n", __func__);
@@ -367,7 +367,7 @@ void quicksort_op_descend(int *vec, int left, int right, int *unison){
 }
 
 // Documented in header file.
-void elfVector_qsort_ascend(ElfVector *elf){
+void elfIntVector_qsort_ascend(ElfIntVector *elf){
 	if(!elf) ELF_DIE("NULL pointer received!");
 	if(elf->size <= 1) return;
 
@@ -375,7 +375,7 @@ void elfVector_qsort_ascend(ElfVector *elf){
 }
 
 // Documented in header file.
-void elfVector_qsort_descend(ElfVector *elf){
+void elfIntVector_qsort_descend(ElfIntVector *elf){
 	if(!elf) ELF_DIE("NULL pointer received!");
 	if(elf->size <= 1) return;
 
@@ -383,15 +383,15 @@ void elfVector_qsort_descend(ElfVector *elf){
 }
 
 // Documented in header file.
-ElfVector *elfVector_qsort_ascendWithIndexes(ElfVector *elf){
+ElfIntVector *elfIntVector_qsort_ascendWithIndexes(ElfIntVector *elf){
 	if(!elf) ELF_DIE("NULL pointer received!");
 
 	int i, n;
-	ElfVector *indexes = elfVector_new();
+	ElfIntVector *indexes = elfIntVector_new();
 
 	n = elf->size;
 	for(i = 0; i < n; i++)
-		elfVector_pushBack(indexes, i);
+		elfIntVector_pushBack(indexes, i);
 	if(n <= 1) return indexes;
 
 	quicksort_op_ascend(elf->vector, 0, n-1, indexes->vector);
@@ -399,15 +399,15 @@ ElfVector *elfVector_qsort_ascendWithIndexes(ElfVector *elf){
 }
 
 // Documented in header file.
-ElfVector *elfVector_qsort_descendWithIndexes(ElfVector *elf){
+ElfIntVector *elfIntVector_qsort_descendWithIndexes(ElfIntVector *elf){
 	if(!elf) ELF_DIE("NULL pointer received!");
 
 	int i, n;
-	ElfVector *indexes = elfVector_new();
+	ElfIntVector *indexes = elfIntVector_new();
 
 	n = elf->size;
 	for(i = 0; i < n; i++)
-		elfVector_pushBack(indexes, i);
+		elfIntVector_pushBack(indexes, i);
 	if(n <= 1) return indexes;
 
 	quicksort_op_descend(elf->vector, 0, n-1, indexes->vector);
@@ -415,19 +415,19 @@ ElfVector *elfVector_qsort_descendWithIndexes(ElfVector *elf){
 }
 
 // Documented in header file.
-int elfVector_back(const ElfVector *elf){
+int elfIntVector_back(const ElfIntVector *elf){
 	if(!elf) ELF_DIE("NULL pointer received!");
 	return elf->vector[elf->size-1];
 }
 
 // Documented in header file.
-int elfVector_front(const ElfVector *elf){
+int elfIntVector_front(const ElfIntVector *elf){
 	if(!elf) ELF_DIE("NULL pointer received!");
 	return elf->vector[0];
 }
 
 // Documented in header file.
-int elfVector_search(const ElfVector *elf, int value){
+int elfIntVector_search(const ElfIntVector *elf, int value){
 	if(!elf) ELF_DIE("NULL pointer received!");
 	int i, n;
 	const int *vec;
@@ -443,7 +443,7 @@ int elfVector_search(const ElfVector *elf, int value){
 }
 
 // Documented in header file.
-int elfVector_count(const ElfVector *elf, int value){
+int elfIntVector_count(const ElfIntVector *elf, int value){
 	if(!elf) ELF_DIE("NULL pointer received!");
 	int i, n, count;
 	const int *vec;
@@ -512,7 +512,7 @@ int binary_search_descending(int *vec, int size, int value){
 }
 
 // Documented in header file.
-int elfVector_search_sorted(const ElfVector *elf, int value){
+int elfIntVector_search_sorted(const ElfIntVector *elf, int value){
 	if(!elf) ELF_DIE("NULL pointer received!");
 	int size, back, front;
 
@@ -532,12 +532,12 @@ int elfVector_search_sorted(const ElfVector *elf, int value){
 }
 
 // Documented in header file.
-int elfVector_count_sorted(const ElfVector *elf, int value){
+int elfIntVector_count_sorted(const ElfIntVector *elf, int value){
 	if(!elf) ELF_DIE("NULL pointer received!");
 	int count, i, n, idx;
 	const int *vec;
 
-	idx = elfVector_search_sorted(elf, value);
+	idx = elfIntVector_search_sorted(elf, value);
 	if(idx < 0) return 0;
 
 	count = 0;
@@ -556,7 +556,7 @@ int elfVector_count_sorted(const ElfVector *elf, int value){
 }
 
 // Documented in header file.
-void elfVector_insert(ElfVector *elf, int index, int value){
+void elfIntVector_insert(ElfIntVector *elf, int index, int value){
 	if(!elf) ELF_DIE("NULL pointer received!");
 
 	if(index < 0 || index >= elf->size){
@@ -567,7 +567,7 @@ void elfVector_insert(ElfVector *elf, int index, int value){
 	int *vec, size, last, delta;
 
 	// Store last element
-	last = elfVector_back(elf);
+	last = elfIntVector_back(elf);
 	vec = elf->vector;
 	size = elf->size;
 
@@ -579,11 +579,11 @@ void elfVector_insert(ElfVector *elf, int index, int value){
 	vec[index] = value;
 
 	// Push back the last value again
-	elfVector_pushBack(elf, last); //Add the last element once again.
+	elfIntVector_pushBack(elf, last); //Add the last element once again.
 }
 
 // Documented in header file.
-int elfVector_remove(ElfVector *elf, int index){
+int elfIntVector_remove(ElfIntVector *elf, int index){
 	if(!elf) ELF_DIE("NULL pointer received!");
 
 	if(index < 0 || index >= elf->size){
@@ -604,7 +604,7 @@ int elfVector_remove(ElfVector *elf, int index){
 	
 	// Pop the last element (it's been shifted-left anyway)
 	// Popping is necessary for shrinking purposes.
-	elfVector_popBack(elf);
+	elfIntVector_popBack(elf);
 
 	return value;
 }

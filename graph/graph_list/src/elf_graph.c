@@ -5,7 +5,7 @@
 #include <elf_graph.h>
 #include <elf_list.h>
 #include <elf_queue.h>
-#include <elf_vector.h>
+#include <elf_int_vector.h>
 #include <elf_pqueue.h>
 #include <elf_int_uf_set.h>
 
@@ -340,10 +340,10 @@ ElfList **elfGraph_SCC(const ElfGraph *graph){
 
 	// Get indexes of vertexes, ordered from earliest finish-time to latest.
 	n = elfGraph_size(graph);
-	ElfVector *finish_vec = elfVector_new_fromArray(&finish, n);
-	ElfVector *indexes = elfVector_qsort_descendWithIndexes(finish_vec);
+	ElfIntVector *finish_vec = elfIntVector_new_fromArray(&finish, n);
+	ElfIntVector *indexes = elfIntVector_qsort_descendWithIndexes(finish_vec);
 
-	elfVector_destroy(&finish_vec);
+	elfIntVector_destroy(&finish_vec);
 
 	//vector indexes now contains indexes ordered from earliest finish-time to latest.
 
@@ -354,7 +354,7 @@ ElfList **elfGraph_SCC(const ElfGraph *graph){
 	result = NULL;
 	size = 0;
 	for(i = 0; i < n; i++){
-		idx = elfVector_get(indexes, i);
+		idx = elfIntVector_get(indexes, i);
 		
 		//Find a white vertex
 		if(args->dfs_color[idx] == 'w'){
@@ -370,7 +370,7 @@ ElfList **elfGraph_SCC(const ElfGraph *graph){
 	// Clean resources.
 	elfGraph_ArgsDFS_finalize(trans, NULL, NULL, NULL);
 	elfGraph_destroy(&trans);
-	elfVector_destroy(&indexes);
+	elfIntVector_destroy(&indexes);
 
 	// NULL-terminate array of lists, where each list contains the vertexes of a component.
 	result = (ElfList **) realloc(result, sizeof(ElfList *) * (size+1));
@@ -410,15 +410,15 @@ ElfGraph *elfGraph_MST_prim(const ElfGraph *graph){
 	// TODO: Change vectors for one of these:
 	//   1) A hashTable of linked lists (Potentially veeeery fast. Find a good hashing function).
 	//   2) A balanced search tree (log(n) insertion/removal, huge overheads, difficult implementation).
-	ElfVector *targets = elfVector_new();
-	ElfVector *sources = elfVector_new();
+	ElfIntVector *targets = elfIntVector_new();
+	ElfIntVector *sources = elfIntVector_new();
 
 	// Array for tracking which vertexes are already in the MST.
 	char *visited = calloc(sizeof(char), graph->size);
 
 	// Add an edge to the initial vertex to the queue
-	elfVector_pushBack(targets, 0);  //MUST BE 0
-	elfVector_pushBack(sources, -1); //MUST BE NEGATIVE
+	elfIntVector_pushBack(targets, 0);  //MUST BE 0
+	elfIntVector_pushBack(sources, -1); //MUST BE NEGATIVE
 	elfPQueue_push(pqueue, 0, 0);
 
 	int i, n;
@@ -427,8 +427,8 @@ ElfGraph *elfGraph_MST_prim(const ElfGraph *graph){
 	const Edge *edge;
 	while(elfPQueue_size(pqueue) != 0){
 		idx = elfPQueue_pop(pqueue, &wei);
-		tgt = elfVector_get(targets, idx);
-		src = elfVector_get(sources, idx);
+		tgt = elfIntVector_get(targets, idx);
+		src = elfIntVector_get(sources, idx);
 		// 'src', 'tgt', 'wei' are information about the Edge popped from the queue.
 
 		// If target is already in the MST, continue
@@ -451,17 +451,17 @@ ElfGraph *elfGraph_MST_prim(const ElfGraph *graph){
 
 			// If target of edge has not been visted, add to the priority queue.
 			if(!visited[edge->target]){
-				idx = elfVector_size(targets);
-				elfVector_pushBack(targets, edge->target);
-				elfVector_pushBack(sources, current);
+				idx = elfIntVector_size(targets);
+				elfIntVector_pushBack(targets, edge->target);
+				elfIntVector_pushBack(sources, current);
 				elfPQueue_push(pqueue, idx, edge->weight);
 			}
 		}
 	}
 
 	//Clean Resources
-	elfVector_destroy(&targets);
-	elfVector_destroy(&sources);
+	elfIntVector_destroy(&targets);
+	elfIntVector_destroy(&sources);
 	elfPQueue_destroy(&pqueue);
 	free(visited);
 
@@ -474,8 +474,8 @@ ElfGraph *elfGraph_MST_kruskal(const ElfGraph *graph){
 	ElfIntUFSet *set = elfIntUFSet_new(graph->size);
 
 	// Initialize 'targets' and 'sources' vector
-	ElfVector *targets = elfVector_new();
-	ElfVector *sources = elfVector_new();
+	ElfIntVector *targets = elfIntVector_new();
+	ElfIntVector *sources = elfIntVector_new();
 
 	// Initialize a priority queue
 	ElfPQueue *pqueue = elfPQueue_new_minFirst();
@@ -490,8 +490,8 @@ ElfGraph *elfGraph_MST_kruskal(const ElfGraph *graph){
 		for(j = 0, n = elfList_size(list); j < n; j++){
 			Edge *e = elfList_get(list, j);
 			
-			elfVector_pushBack(sources, i);
-			elfVector_pushBack(targets, e->target);
+			elfIntVector_pushBack(sources, i);
+			elfIntVector_pushBack(targets, e->target);
 			elfPQueue_push(pqueue, counter, e->weight);
 			counter++;
 		}
@@ -506,8 +506,8 @@ ElfGraph *elfGraph_MST_kruskal(const ElfGraph *graph){
 	int idx, src, tgt, wei;
 	while(elfPQueue_size(pqueue) != 0){
 		idx = elfPQueue_pop(pqueue, &wei);
-		src = elfVector_get(sources, idx);
-		tgt = elfVector_get(targets, idx);
+		src = elfIntVector_get(sources, idx);
+		tgt = elfIntVector_get(targets, idx);
 		
 		if(elfIntUFSet_find(set, src) != elfIntUFSet_find(set, tgt)){
 			elfGraph_addEdge(MST, src, tgt, wei);
@@ -516,8 +516,8 @@ ElfGraph *elfGraph_MST_kruskal(const ElfGraph *graph){
 	}
 	
 	//Clean used resources
-	elfVector_destroy(&targets);
-	elfVector_destroy(&sources);
+	elfIntVector_destroy(&targets);
+	elfIntVector_destroy(&sources);
 	elfPQueue_destroy(&pqueue);
 	elfIntUFSet_destroy(&set);
 

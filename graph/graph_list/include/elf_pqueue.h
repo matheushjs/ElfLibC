@@ -1,7 +1,7 @@
 #ifndef _ELF_PQUEUE_H
 #define _ELF_PQUEUE_H
 
-#include <elf_vector.h>
+#include <elf_int_vector.h>
 
 typedef struct _ElfPQueue ElfPQueue;
 

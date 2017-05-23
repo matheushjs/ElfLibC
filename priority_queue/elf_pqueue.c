@@ -3,7 +3,7 @@
 #include <limits.h>
 #include <stdbool.h>
 
-#include <elf_vector.h>
+#include <elf_int_vector.h>
 #include <elf_pqueue.h>
 
 #define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
@@ -13,8 +13,8 @@
 #define PARENT(X) ((X-1)/2)
 
 typedef struct _ElfPQueue {
-	ElfVector *values;
-	ElfVector *pr;
+	ElfIntVector *values;
+	ElfIntVector *pr;
 	bool maxFirst;
 } ElfPQueue;
 
@@ -22,8 +22,8 @@ typedef struct _ElfPQueue {
 ElfPQueue *elfPQueue_new_maxFirst(){
 	ElfPQueue *new;
 	new = malloc(sizeof(ElfPQueue));
-	new->values = elfVector_new();
-	new->pr = elfVector_new();
+	new->values = elfIntVector_new();
+	new->pr = elfIntVector_new();
 	new->maxFirst = true;
 
 	return new;
@@ -33,8 +33,8 @@ ElfPQueue *elfPQueue_new_maxFirst(){
 ElfPQueue *elfPQueue_new_minFirst(){
 	ElfPQueue *new;
 	new = malloc(sizeof(ElfPQueue));
-	new->values = elfVector_new();
-	new->pr = elfVector_new();
+	new->values = elfIntVector_new();
+	new->pr = elfIntVector_new();
 	new->maxFirst = false;
 
 	return new;
@@ -45,8 +45,8 @@ void elfPQueue_destroy(ElfPQueue **elf_p){
 	if(elf_p){
 		ElfPQueue *elf = *elf_p;
 
-		elfVector_destroy(&elf->values);
-		elfVector_destroy(&elf->pr);
+		elfIntVector_destroy(&elf->values);
+		elfIntVector_destroy(&elf->pr);
 		free(elf);
 		*elf_p = NULL;
 	}
@@ -54,7 +54,7 @@ void elfPQueue_destroy(ElfPQueue **elf_p){
 
 // Documented in header file.
 int elfPQueue_size(const ElfPQueue *elf){
-	return elfVector_size(elf->values);
+	return elfIntVector_size(elf->values);
 }
 
 //Pops-up element in position 'index', until it's in correct position.
@@ -65,12 +65,12 @@ void elfPQueue_heapify_up(ElfPQueue *elf, int index){
 
 	while(index != 0){
 		parent_idx = PARENT(index);
-		parent = elfVector_get(elf->pr, parent_idx);
-		child = elfVector_get(elf->pr, index);
+		parent = elfIntVector_get(elf->pr, parent_idx);
+		child = elfIntVector_get(elf->pr, index);
 
 		if(child > parent){
-			elfVector_swap(elf->pr, parent_idx, index);
-			elfVector_swap(elf->values, parent_idx, index);
+			elfIntVector_swap(elf->pr, parent_idx, index);
+			elfIntVector_swap(elf->values, parent_idx, index);
 			index = parent_idx;
 		} else break;
 	}
@@ -84,16 +84,16 @@ void elfPQueue_heapify_down(ElfPQueue *elf, int index){
 
 	size = elfPQueue_size(elf);
 	while(true){
-		cur = elfVector_get(elf->pr, index);
+		cur = elfIntVector_get(elf->pr, index);
 
 		hi_child = index;
 		if( RIGHT(index) < size
-		&& (right = elfVector_get(elf->pr, RIGHT(index))) > cur){
+		&& (right = elfIntVector_get(elf->pr, RIGHT(index))) > cur){
 			cur = right;
 			hi_child = RIGHT(index);
 		}
 		if( LEFT(index) < size
-		&& (left = elfVector_get(elf->pr, LEFT(index))) > cur){
+		&& (left = elfIntVector_get(elf->pr, LEFT(index))) > cur){
 			cur = left;
 			hi_child = LEFT(index);
 		}
@@ -101,8 +101,8 @@ void elfPQueue_heapify_down(ElfPQueue *elf, int index){
 		if(hi_child == index)
 			break;
 
-		elfVector_swap(elf->pr, hi_child, index);
-		elfVector_swap(elf->values, hi_child, index);
+		elfIntVector_swap(elf->pr, hi_child, index);
+		elfIntVector_swap(elf->values, hi_child, index);
 		index = hi_child;
 	}
 }
@@ -113,8 +113,8 @@ void elfPQueue_push(ElfPQueue *elf, int value, int priority){
 	if(!elf->maxFirst)
 		priority = -priority;
 
-	elfVector_pushBack(elf->values, value);
-	elfVector_pushBack(elf->pr, priority);
+	elfIntVector_pushBack(elf->values, value);
+	elfIntVector_pushBack(elf->pr, priority);
 	elfPQueue_heapify_up(elf, elfPQueue_size(elf) - 1);
 }
 
@@ -128,11 +128,11 @@ int elfPQueue_pop(ElfPQueue *elf, int *priority){
 		return INT_MIN;
 	}
 
-	elfVector_swap(elf->pr, 0, size-1);
-	elfVector_swap(elf->values, 0, size-1);
+	elfIntVector_swap(elf->pr, 0, size-1);
+	elfIntVector_swap(elf->values, 0, size-1);
 
-	int prio  = elfVector_popBack(elf->pr);
-	int value = elfVector_popBack(elf->values);
+	int prio  = elfIntVector_popBack(elf->pr);
+	int value = elfIntVector_popBack(elf->values);
 
 	if(size != 1) //Means size is 0 after popping.
 		elfPQueue_heapify_down(elf, 0);

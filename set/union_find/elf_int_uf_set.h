@@ -12,6 +12,7 @@ void elfIntUFSet_union(ElfIntUFSet *set, int e1, int e2);
 /* DOCUMENTATION
  
 typedef ElfIntUFSet
+	- Elf Integer Union-Find set
 	- Structure that represents a set that uses Union-Find algorithms.
 	- Elements stored are integers. Each element is characterized by it's set.
 	- If the set holds N elements, they are mandatorily numbered from 0 to N-1.

@@ -1,3 +1,5 @@
-priority queue
 avl tree
 other trees
+hash table (HashSet, HashDict)
+File manipulation (csv reader etc)
+

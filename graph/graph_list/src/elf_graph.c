@@ -64,7 +64,7 @@ ElfGraph *elfGraph_new(int N, bool oriented){
 	new->oriented = oriented;
 	new->array = calloc(sizeof(ElfList *), N);
 	for(N--; N >= 0; N--)
-		new->array[N] = elfList_newWithEqual(
+		new->array[N] = elfList_new_withEqual(
 			 elf_edge_greater, elf_edge_equal );
 
 	elfGraph_ArgsDFS_reset(new);

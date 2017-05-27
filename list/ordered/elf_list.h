@@ -15,7 +15,7 @@
 typedef struct _ElfList ElfList;
 
 ElfList *elfList_new(bool (*greaterThan)(void*,void*));
-ElfList *elfList_newWithEqual(bool (*greaterThan)(void*,void*), bool (*equal)(void*,void*));
+ElfList *elfList_new_withEqual(bool (*greaterThan)(void*,void*), bool (*equal)(void*,void*));
 
 /* Functions accepted by any list */
 void elfList_insert(ElfList *list_p, void *data);
@@ -72,7 +72,7 @@ ElfList *elfList_new(bool (*greaterThan)(void*,void*));
 	- greaterThan SHOULD NOT BE REFLEXIVE. This means a > b means b > a is FALSE.
 	- By not having 'equal', some operations are not supported.
 
-ElfList *elfList_newWithEqual(bool (*greaterThan)(void*,void*), bool (*equal)(void*,void*));
+ElfList *elfList_new_withEqual(bool (*greaterThan)(void*,void*), bool (*equal)(void*,void*));
 	- Returns a new list, using the function 'greaterThan' as ordering function,
 	  and 'equal' as equality function.
 	- greaterThan SHOULD NOT BE REFLEXIVE. This means a > b means b > a is FALSE.

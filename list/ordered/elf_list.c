@@ -72,7 +72,7 @@ ElfList *elfList_new(bool (*greaterThan)(void*,void*)){
 }
 
 // Documented in header file.
-ElfList *elfList_newWithEqual(bool (*greaterThan)(void*,void*), bool (*equal)(void*,void*)){
+ElfList *elfList_new_withEqual(bool (*greaterThan)(void*,void*), bool (*equal)(void*,void*)){
 	ElfList *list = calloc(sizeof(ElfList), 1);
 	list->greater = greaterThan;
 	list->equal = equal;

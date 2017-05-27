@@ -15,7 +15,7 @@
 typedef struct _ElfList ElfList;
 
 ElfList *elfList_new(bool (*greaterThan)(void*,void*));
-ElfList *elfList_newWithEqual(bool (*greaterThan)(void*,void*), bool (*equal)(void*,void*));
+ElfList *elfList_new_withEqual(bool (*greaterThan)(void*,void*), bool (*equal)(void*,void*));
 
 /* Functions accepted by any list */
 void elfList_insert(ElfList *list_p, void *data);

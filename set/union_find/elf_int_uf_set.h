@@ -15,7 +15,15 @@ typedef ElfIntUFSet
 	- Elf Integer Union-Find set
 	- Structure that represents a set that uses Union-Find algorithms.
 	- Elements stored are integers. Each element is characterized by it's set.
-	- If the set holds N elements, they are mandatorily numbered from 0 to N-1.
+	- When the user instantiates a new set of size N, the set contains N elements,
+	    numbered from 0 to N-1, which corresponds to their indexes in the array of 
+	    elements. Each element in this array is characterized by its set number, and
+	    each element begins as being in their own set (so element 5 starts on set 5).
+	- What matters here is that all elements start in different sets, and the user
+	    can apply the union() procedure on 2 elements so that they are contained in the
+	    same set. 2 elements A and B are contained in the same set if, and only if,
+	    _find(A) == _find(B). This is how the user should check if 2 elements are in the
+	    same set.
  
 ElfIntUFSet *elfIntUFSet_new(int size);
 	- Returns a new set with 'size' elements.

@@ -475,6 +475,7 @@ ElfGraph *elfGraph_MST_kruskal(const ElfGraph *graph){
 	ElfIntUFSet *set = elfIntUFSet_new(graph->size);
 
 	// Initialize 'targets', 'sources', 'weights' vector
+	// TODO: Use a vector that permits construction with capacity.
 	ElfIntVector *targets = elfIntVector_new();
 	ElfIntVector *sources = elfIntVector_new();
 	ElfIntVector *weights = elfIntVector_new();
@@ -528,7 +529,8 @@ ElfGraph *elfGraph_MST_kruskal(const ElfGraph *graph){
 }
 
 // Documented in header file.
-int elfGraph_dijkstra_withTarget(const ElfGraph *graph, int src, int tgt, int **predecessors){
+// TODO: Implement dijkstra from 'src' to all other vertexes
+int elfGraph_dijkstra_withTarget(const ElfGraph *graph, int src, int tgt, int **pred_p){
 	int *dist, *pred;
 	bool *visited;
 
@@ -575,6 +577,8 @@ int elfGraph_dijkstra_withTarget(const ElfGraph *graph, int src, int tgt, int **
 			if(tentative < dist[edge->target]){
 				dist[edge->target] = tentative;
 				pred[edge->target] = vertex;
+
+				//TODO: Use a priority queue that permits updating priorities
 				elfPQueue_push(pqueue, edge->target, dist[edge->target]);
 			}
 		}
@@ -585,8 +589,8 @@ int elfGraph_dijkstra_withTarget(const ElfGraph *graph, int src, int tgt, int **
 	free(visited);
 	elfPQueue_destroy(&pqueue);
 
-	if(predecessors)
-		*predecessors = pred;
+	if(pred_p)
+		*pred_p = pred;
 	else free(pred);
 
 	return distance;

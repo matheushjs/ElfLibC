@@ -26,7 +26,7 @@ void elfGraph_DFS_registerAfterFunc(const ElfGraph *graph, void (*func)(int vert
 ElfList **elfGraph_SCC(const ElfGraph *graph);
 ElfGraph *elfGraph_MST_prim(const ElfGraph *graph);
 ElfGraph *elfGraph_MST_kruskal(const ElfGraph *graph);
-int elfGraph_dijkstra_withTarget(const ElfGraph *graph, int src, int tgt, int **predecessors);
+int elfGraph_dijkstra_withTarget(const ElfGraph *graph, int src, int tgt, int **pred_p);
 
 int *elfGraph_BFS(const ElfGraph *graph, int src, int **dist_p);
 
@@ -135,7 +135,7 @@ int elfGraph_dijkstra_withTarget(const ElfGraph *graph, int src, int tgt, int **
 	- Return:
 	    - The distance between these vertexes. Will be INT_MAX if 'tgt' could not be reached
 		  from 'src.
-		- predecessors: if this argument is not NULL, it receives the vector of predecessors
+		- pred_p: if this argument is not NULL, it receives the vector of predecessors
 		  obtained during the algorithm.
 
 int *elfGraph_BFS(const ElfGraph *graph, int src, int **dist_p);

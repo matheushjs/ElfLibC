@@ -26,6 +26,7 @@ void elfGraph_DFS_registerAfterFunc(const ElfGraph *graph, void (*func)(int vert
 ElfList **elfGraph_SCC(const ElfGraph *graph);
 ElfGraph *elfGraph_MST_prim(const ElfGraph *graph);
 ElfGraph *elfGraph_MST_kruskal(const ElfGraph *graph);
+int elfGraph_dijkstra_withTarget(const ElfGraph *graph, int src, int tgt, int **predecessors);
 
 int *elfGraph_BFS(const ElfGraph *graph, int src, int **dist_p);
 
@@ -127,6 +128,15 @@ ElfGraph *elfGraph_MST_kruskal(const ElfGraph *graph);
 	- Given graph can be weighted or not.
 	- The Kruskal algorithm for finding MST is applied.
 	- O(V*E), always worse than PRIM algorithm.
+
+int elfGraph_dijkstra_withTarget(const ElfGraph *graph, int src, int tgt, int **predecessors);
+	- Performs the dijkstra algorithm in the graph, in order to find the shortest path from
+	  vertex 'src' to vertex 'tgt'.
+	- Return:
+	    - The distance between these vertexes. Will be INT_MAX if 'tgt' could not be reached
+		  from 'src.
+		- predecessors: if this argument is not NULL, it receives the vector of predecessors
+		  obtained during the algorithm.
 
 int *elfGraph_BFS(const ElfGraph *graph, int src, int **dist_p);
 	- Performs a BFS in the graph, finding the distance/path from all vertexes to 'src'.

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <limits.h>
 
 #include <elf_graph.h>
 #include <elf_list.h>
@@ -524,6 +525,71 @@ ElfGraph *elfGraph_MST_kruskal(const ElfGraph *graph){
 	elfIntUFSet_destroy(&set);
 
 	return MST;
+}
+
+// Documented in header file.
+int elfGraph_dijkstra_withTarget(const ElfGraph *graph, int src, int tgt, int **predecessors){
+	int *dist, *pred;
+	bool *visited;
+
+	//Allocate arrays
+	dist = malloc(sizeof(int) * graph->size);
+	pred = malloc(sizeof(int) * graph->size);
+	visited = malloc(sizeof(bool) * graph->size);
+
+	//Initialize arrays
+	int i, n;
+	for(i = 0, n = graph->size; i < n; i++){
+		dist[i] = INT_MAX;
+		pred[i] = i;
+		visited[i] = false;
+	}
+
+	//Initialize PQueue
+	ElfPQueue *pqueue = elfPQueue_new_minFirst();
+
+	//Initialize source vertex
+	dist[src] = 0;
+	elfPQueue_push(pqueue, src, 0);
+
+	const ElfList *list;
+	const Edge *edge;
+	int vertex, tentative;
+	while(elfPQueue_size(pqueue) != 0){
+		vertex = elfPQueue_pop(pqueue, NULL);
+		
+		//Don't visit same vertex again
+		if(visited[vertex]) continue;
+		visited[vertex] = true;
+		
+		//Reached target vertex, break loop
+		if(vertex == tgt) break;
+
+		list = graph->array[vertex];
+		//ElfList is optimized for O(1) sequential get()'s
+		for(i = 0, n = elfList_size(list); i < n; i++){
+			edge = elfList_get(list, i);
+			tentative = dist[vertex] + edge->weight;
+			
+			//Relax edge
+			if(tentative < dist[edge->target]){
+				dist[edge->target] = tentative;
+				pred[edge->target] = vertex;
+				elfPQueue_push(pqueue, edge->target, dist[edge->target]);
+			}
+		}
+	}
+
+	int distance = dist[tgt]; //Might be INT_MAX
+	free(dist);
+	free(visited);
+	elfPQueue_destroy(&pqueue);
+
+	if(predecessors)
+		*predecessors = pred;
+	else free(pred);
+
+	return distance;
 }
 
 // Documented in header file.

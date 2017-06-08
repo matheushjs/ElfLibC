@@ -114,12 +114,24 @@ void solve5(){
 	elfGraph_destroy(&mst);
 }
 
-int main(int argc, char *argv[]){
-	printf("Prim:\n");
-	solve4();
+//Test Dijkstra
+void solve6(){
+	int edges, size;
+	int *pred;
 
-	fseek(stdin, 0, SEEK_SET);
-	printf("\n\nKruskal:\n");
-	solve5();
+	scanf("%d %d", &size, &edges);
+	ElfGraph *graph = elfGraph_new(size, true);
+	elfGraph_readFromFileVEW(graph, stdin, edges);
+
+	int dist;
+	dist = elfGraph_dijkstra_withTarget(graph, 1, 4, &pred);
+	print_path(pred, 1, 4);
+	free(pred);
+
+	elfGraph_destroy(&graph);
+}
+
+int main(int argc, char *argv[]){
+	solve6();
 	return 0;
 }

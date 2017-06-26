@@ -27,13 +27,13 @@ typedef struct _ElfIntVector {
 } ElfIntVector;
 
 // Finds the lowest power of 2 that is higher than 'num'.
-// Returns the minimum between the lowest power of 2 and 'min'.
+// Returns the maximum between the lowest power of 2 and 'min'.
 static inline
 int nextpow2(int num, int min){
 	int pow = 1;
 	while(pow < num)
 		pow <<= 1;
-	return ELF_MAX(pow,min);
+	return ELF_MAX(pow,min); //TODO: There is something really wrong with this ELF_MAX. Fix it
 }
 
 // Grows the vector once

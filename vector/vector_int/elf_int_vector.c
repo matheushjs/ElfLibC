@@ -27,13 +27,12 @@ typedef struct _ElfIntVector {
 } ElfIntVector;
 
 // Finds the lowest power of 2 that is higher than 'num'.
-// Returns the maximum between the lowest power of 2 and 'min'.
 static inline
-int nextpow2(int num, int min){
+int nextpow2(int num){
 	int pow = 1;
 	while(pow < num)
 		pow <<= 1;
-	return ELF_MAX(pow,min); //TODO: There is something really wrong with this ELF_MAX. Fix it
+	return pow;
 }
 
 // Grows the vector once
@@ -87,7 +86,7 @@ ElfIntVector *elfIntVector_new_withValue(int size, int value){
 	new = malloc(sizeof(ElfIntVector));
 	new->size = size;
 
-	int capacity = nextpow2(size, INITIAL_CAPACITY);
+	int capacity = ELF_MAX(nextpow2(size), INITIAL_CAPACITY);
 	new->capacity = capacity;
 	if(value == 0){
 		new->vector = calloc(sizeof(int), capacity);
@@ -112,7 +111,7 @@ ElfIntVector *elfIntVector_new_fromArray(int **array, int size){
 	ElfIntVector *new;
 	new = malloc(sizeof(ElfIntVector));
 	new->size = size;
-	new->capacity = nextpow2(size, INITIAL_CAPACITY);
+	new->capacity = ELF_MAX(nextpow2(size), INITIAL_CAPACITY);
 	new->vector = realloc(*array, sizeof(int) * new->capacity);
 
 	*array = NULL; //Steal pointer.
@@ -133,7 +132,7 @@ ElfIntVector *elfIntVector_new_random(int size, int min, int max){
 	new = malloc(sizeof(ElfIntVector));
 	new->size = size;
 
-	int capacity = nextpow2(size, INITIAL_CAPACITY);
+	int capacity = ELF_MAX(nextpow2(size), INITIAL_CAPACITY);
 	new->capacity = capacity;
 	new->vector = malloc(sizeof(int) * capacity);
 

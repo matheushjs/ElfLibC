@@ -35,6 +35,8 @@ int elfIntVector_count_sorted(const ElfIntVector *elf, int value);
 void elfIntVector_insert(ElfIntVector *elf, int index, int value);
 int elfIntVector_remove(ElfIntVector *elf, int index);
 
+int *elfIntVector_getData(ElfIntVector *elf);
+
 
 /* DOCUMENTATION
  
@@ -165,6 +167,9 @@ int elfIntVector_remove(ElfIntVector *elf, int index);
 		the removed value
 		0 if index is out of bounds
 
+int *elfIntVector_getData(ElfIntVector *elf);
+	- Returns the inner array of the vector.
+	- Elements may be modified, but not removed/inserted.
 */
 
 #endif

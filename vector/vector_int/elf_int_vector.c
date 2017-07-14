@@ -608,3 +608,8 @@ int elfIntVector_remove(ElfIntVector *elf, int index){
 
 	return value;
 }
+
+// Documented in header file.
+int *elfIntVector_getData(ElfIntVector *elf){
+	return elf->vector;
+}

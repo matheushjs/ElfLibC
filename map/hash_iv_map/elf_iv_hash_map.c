@@ -162,6 +162,90 @@ int hashing(int key, int size){
 	return (int) size * x;
 }
 
+// For use in _shrink() and _grow() functions
+static int g_resize_newSize; // The new size of the buckets being regenerated.
+static ElfList **g_resize_buckets = NULL; // Pointer to the new buckets.
+static // Adds node 'node' to g_resize_buckets.
+void resize_addNode(Node *node){
+	int hash;
+	ElfList *list;
+
+	hash = hashing(node->key, g_resize_newSize);
+	list = g_resize_buckets[hash];
+	elfList_insert(list, node);
+}
+
+// Verifies the current load factor of the hashMap and shrinks it if needed.
+// The hashMap is shrunk only at a factor below 33%.
+// The hashMap is not shrunk below map->baseLevel.
+static
+void elfIVHashMap_shrink(ElfIVHashMap *elf){
+	const static double lowbound = 1/(double)3;
+	int newLevel, capacity, i, n;
+	double lambda;
+
+	// Check load factor
+	capacity = g_capacity_levels[elf->level];
+	lambda = elf->count / (double) capacity;
+	if(lambda > lowbound) return;
+
+	// Then we need to shrink the hashMap.
+	// Begin by checking the baseLevel
+	newLevel = elf->level - 1;
+	if(newLevel < elf->baseLevel) return;
+
+	// Get new capacity and set up global static variables
+	capacity = g_capacity_levels[newLevel];
+	g_resize_newSize = capacity;
+	g_resize_buckets = buckets_getInitialized(capacity);
+	
+	// Transfer nodes from old buckets to new ones
+	n = g_capacity_levels[elf->level];
+	for(i = 0; i < n; i++){
+		elfList_traverse(elf->buckets[i], (void(*)(void*)) resize_addNode);
+	}
+
+	// Swap and free due variables.
+	buckets_destroy(elf->buckets, n, NULL);
+	elf->buckets = g_resize_buckets;
+	elf->level = newLevel;
+	g_resize_buckets = NULL;
+}
+
+// Verifies the current load factor of the hashMap and grows it if needed.
+// The hashMap grows only at a factor above 66%.
+static
+void elfIVHashMap_grow(ElfIVHashMap *elf){
+	const static double upbound = 2 / (double)3;
+	int newLevel, capacity, i, n;
+	double lambda;
+
+	// Check load factor
+	capacity = g_capacity_levels[elf->level];
+	lambda = elf->count / (double) capacity;
+	if(lambda < upbound) return;
+	
+	// Then we need to grow the hashMap.
+	
+	// Get new capacity and set up global static variables
+	newLevel = elf->level + 1;
+	capacity = g_capacity_levels[newLevel];
+	g_resize_newSize = capacity;
+	g_resize_buckets = buckets_getInitialized(capacity);
+
+	// Transfer nodes
+	n = g_capacity_levels[elf->level];
+	for(i = 0; i < n; i++){
+		elfList_traverse(elf->buckets[i], (void(*)(void*)) resize_addNode);
+	}
+
+	// Swap and free due variables
+	buckets_destroy(elf->buckets, n, NULL);
+	elf->buckets = g_resize_buckets;
+	elf->level = newLevel;
+	g_resize_buckets = NULL;
+}
+
 // Documented in header file.
 void *elfIVHashMap_put(ElfIVHashMap *elf, int key, void *value){
 	int hash, i;
@@ -190,7 +274,7 @@ void *elfIVHashMap_put(ElfIVHashMap *elf, int key, void *value){
 	} else {
 		retvalue = NULL;
 		(elf->count)++;
-		//TODO: Grow
+		elfIVHashMap_grow(elf);
 	}
 
 	return retvalue;
@@ -224,7 +308,7 @@ void *elfIVHashMap_remove(ElfIVHashMap *elf, int key){
 	free(node);
 
 	(elf->count)--;
-	//TODO: Shrink
+	elfIVHashMap_shrink(elf);
 
 	return value;
 }

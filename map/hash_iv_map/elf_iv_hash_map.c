@@ -72,19 +72,37 @@ ElfList **buckets_getInitialized(int size){
 	return buckets;
 }
 
+// For use anywhere where nodes need to be freed.
+// Function to be run on the void* value.
+static void (*g_nodeFree_freeFunc)(void *) = NULL; 
+// Function that frees the node and applies freeFunc in each value stored in the nodes.
+static
+void g_nodeFree(void *node){
+	if(g_nodeFree_freeFunc != NULL){
+		g_nodeFree_freeFunc( ((Node *) node)->value);
+	}
+	free(node);
+}
+
 // Deallocates all memory for the buckets.
-// If 'func' is not null, runs the function over all the void* values.
+// if 'free_nodes' is true, every Node* passes through a call to free().
+// if 'value_free' is not NULL, every value stored in the nodes are passed through value_free().
+// if 'value_free' is given, but 'free_nodes' is false, 'value_free' has no effect.
 static inline
-void buckets_destroy(ElfList **buckets, int size, void (*func)(void *)){
+void buckets_destroy(ElfList **buckets, int size, bool free_nodes, void (*value_free)(void *)){
 	int i;
 
+	g_nodeFree_freeFunc = value_free;
+
 	for(i = 0; i < size; i++){
-		if(!func)
-			elfList_destroy(&buckets[i]);
+		if(free_nodes)
+			elfList_destroyF(&buckets[i], g_nodeFree);
 		else
-			elfList_destroyF(&buckets[i], func);
+			elfList_destroy(&buckets[i]);
 	}
 	free(buckets);
+
+	g_nodeFree_freeFunc = NULL;
 }
 
 // Documented in header file.
@@ -116,7 +134,7 @@ void elfIVHashMap_destroy_F(ElfIVHashMap **elf_p, void (*func)(void *data)){
 	ElfIVHashMap *elf = *elf_p;
 
 	if(elf){
-		buckets_destroy(elf->buckets, g_capacity_levels[elf->level], func);
+		buckets_destroy(elf->buckets, g_capacity_levels[elf->level], true, func);
 		free(elf);
 		*elf_p = NULL;
 	}
@@ -156,7 +174,7 @@ int hashing(int key, int size){
 		lock = 1;
 	}
 
-	x = phi * key;
+	x = phi * abs(key);
 	x -= floor(x);
 
 	return (int) size * x;
@@ -176,11 +194,11 @@ void resize_addNode(Node *node){
 }
 
 // Verifies the current load factor of the hashMap and shrinks it if needed.
-// The hashMap is shrunk only at a factor below 33%.
+// The hashMap is shrunk only at a factor below 20%.
 // The hashMap is not shrunk below map->baseLevel.
 static
 void elfIVHashMap_shrink(ElfIVHashMap *elf){
-	const static double lowbound = 1/(double)3;
+	const static double lowbound = 0.2;
 	int newLevel, capacity, i, n;
 	double lambda;
 
@@ -205,8 +223,8 @@ void elfIVHashMap_shrink(ElfIVHashMap *elf){
 		elfList_traverse(elf->buckets[i], (void(*)(void*)) resize_addNode);
 	}
 
-	// Swap and free due variables.
-	buckets_destroy(elf->buckets, n, NULL);
+	// Swap and free due variables. Nodes are not freed.
+	buckets_destroy(elf->buckets, n, false, NULL);
 	elf->buckets = g_resize_buckets;
 	elf->level = newLevel;
 	g_resize_buckets = NULL;
@@ -239,8 +257,8 @@ void elfIVHashMap_grow(ElfIVHashMap *elf){
 		elfList_traverse(elf->buckets[i], (void(*)(void*)) resize_addNode);
 	}
 
-	// Swap and free due variables
-	buckets_destroy(elf->buckets, n, NULL);
+	// Swap and free due variables. Nodes are not freed.
+	buckets_destroy(elf->buckets, n, false, NULL);
 	elf->buckets = g_resize_buckets;
 	elf->level = newLevel;
 	g_resize_buckets = NULL;
@@ -295,12 +313,12 @@ void *elfIVHashMap_remove(ElfIVHashMap *elf, int key){
 
 	// Search node
 	idx = elfList_indexOf(list, node);
+	free(node);
 
 	// Checks if elements does not exist.
 	if(idx < 0) return NULL;
 	
 	// Remove node
-	free(node);
 	node = elfList_removeIndex(list, idx);
 	
 	// Get its value
@@ -332,7 +350,6 @@ void *elfIVHashMap_get(const ElfIVHashMap *elf, int key){
 	// Get the value
 	node_p = elfList_get(list, idx);
 	value = node_p->value;
-	free(node_p);
 
 	return value;
 }

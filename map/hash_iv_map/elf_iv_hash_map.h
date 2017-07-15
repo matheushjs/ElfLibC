@@ -6,6 +6,14 @@ typedef struct _ElfIVHashMap ElfIVHashMap;
 ElfIVHashMap *elfIVHashMap_new();
 ElfIVHashMap *elfIVHashMap_new_withSize(int expectedSize);
 
+void elfIVHashMap_destroy_F(ElfIVHashMap **elf_p, void (*func)(void *data));
+void elfIVHashMap_destroy(ElfIVHashMap **elf_p);
+
+void elfIVHashMap_traverse(ElfIVHashMap *elf, void(*func)(int key, void* value));
+
+void *elfIVHashMap_put(ElfIVHashMap *elf, int key, void *value);
+void *elfIVHashMap_remove(ElfIVHashMap *elf, int key);
+
 /* DOCUMENTATION
 
 typedef ElfIVHashMap;
@@ -24,6 +32,27 @@ ElfIVHashMap *elfIVHashMap_new();
 ElfIVHashMap *elfIVHashMap_new_withSize(int expectedSize);
 	Returns a new HashMap prepared to always receive a number of elements equal to 'expectedSize' or more.
 
+void elfIVHashMap_destroy_F(ElfIVHashMap **elf_p, void (*func)(void *data));
+	Frees the memory allocated for the hashmap.
+	Every void* value stored will be passed to the function 'func', e.g. for freeing their memory.
+
+void elfIVHashMap_destroy(ElfIVHashMap **elf_p);
+	Frees the memory allocated for the hashmap.
+
+void elfIVHashMap_traverse(ElfIVHashMap *elf, void(*func)(int key, void* value));
+	Traverses all the elements stored in the hashmap.
+	Each key-value pair is passed through to function 'func'.
+
+void *elfIVHashMap_put(ElfIVHashMap *elf, int key, void *value);
+	Adds the given key-value pair to the hashmap.
+	Returns NULL if the pair was added and none has been replaced.
+	If an old pair with same 'key' existed, this pair is replaced by the new one
+	  and its value is returned.
+
+void *elfIVHashMap_remove(ElfIVHashMap *elf, int key);
+	Removes the key-value pair whose key is the given 'key'.
+	If it exists, returns the associated value.
+	If it doesn't exist, returns NULL, and the hashmap remains unaltered.
 */
 
 #endif

@@ -1,6 +1,14 @@
 #ifndef ELF_IV_HASH_MAP_H
 #define ELF_IV_HASH_MAP_H
 
+#include <stdbool.h>
+
+#define ELF_INT_TO_POINTER(i) ((void *) (long int) (i))
+#define ELF_UINT_TO_POINTER(i) ((void *) (unsigned long int) (i))
+#define ELF_POINTER_TO_INT(p) ((int) (long int) (p))
+#define ELF_POINTER_TO_UINT(p) ((unsigned int) (unsigned long int) (p))
+//Credits: https://developer.gnome.org/glib/stable/glib-Type-Conversion-Macros.html
+
 typedef struct _ElfIVHashMap ElfIVHashMap;
 
 ElfIVHashMap *elfIVHashMap_new();
@@ -15,9 +23,19 @@ void *elfIVHashMap_put(ElfIVHashMap *elf, int key, void *value);
 void *elfIVHashMap_remove(ElfIVHashMap *elf, int key);
 void *elfIVHashMap_get(const ElfIVHashMap *elf, int key);
 
-int elfIVHashMap_size(const ElfIVHashMap *elf);
+int    elfIVHashMap_size(const ElfIVHashMap *elf);
+int    elfIVHashMap_capacity(const ElfIVHashMap *elf);
+double elfIVHashMap_loadFactor(const ElfIVHashMap *elf);
+void   elfIVHashMap_printBucketsStatus(const ElfIVHashMap *elf);
 
 /* DOCUMENTATION
+
+ELF_INT_TO_POINTER(i)
+ELF_UINT_TO_POINTER(i)
+ELF_POINTER_TO_INT(p)
+ELF_POINTER_TO_UINT(p)
+	- Macros for type casting from signed/unsigned integers to pointers.
+	- Useful since this queue data structure can only store void pointers.
 
 typedef ElfIVHashMap;
 	A map of key-value pairs, where key is an integer, and value is a void pointer.
@@ -63,6 +81,16 @@ void *elfIVHashMap_get(const ElfIVHashMap *elf, int key);
 
 int elfIVHashMap_size(const ElfIVHashMap *elf);
 	Returns the number of key-value pairs in the hashMap.
+
+int elfIVHashMap_capacity(const ElfIVHashMap *elf);
+	Returns the number of buckets allocated in the hashMap.
+
+double elfIVHashMap_loadFactor(const ElfIVHashMap *elf);
+	Returns the actual load factor of the hashMap.
+
+void   elfIVHashMap_printBucketsStatus(const ElfIVHashMap *elf);
+	Prints the number of elements in each bucket of the hashMap.
+
 */
 
 #endif

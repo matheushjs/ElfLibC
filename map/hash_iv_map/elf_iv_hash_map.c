@@ -341,3 +341,24 @@ void *elfIVHashMap_get(const ElfIVHashMap *elf, int key){
 int elfIVHashMap_size(const ElfIVHashMap *elf){
 	return elf->count;
 }
+
+// Documented in header file.
+int elfIVHashMap_capacity(const ElfIVHashMap *elf){
+	return g_capacity_levels[elf->level];
+}
+
+// Documented in header file.
+double elfIVHashMap_loadFactor(const ElfIVHashMap *elf){
+	return elfIVHashMap_size(elf) / (double) elfIVHashMap_capacity(elf);
+}
+
+// Documented in header file.
+void elfIVHashMap_printBucketsStatus(const ElfIVHashMap *elf){
+	int i, n;
+
+	n = elfIVHashMap_capacity(elf);
+	for(i = 0; i < n; i++){
+		printf("%d ", elfList_size(elf->buckets[i]));
+	}
+	printf("\n");
+}

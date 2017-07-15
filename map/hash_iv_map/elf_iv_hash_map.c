@@ -229,12 +229,31 @@ void *elfIVHashMap_remove(ElfIVHashMap *elf, int key){
 	return value;
 }
 
+// Documented in header file.
 void *elfIVHashMap_get(const ElfIVHashMap *elf, int key){
-	//TODO
-	return NULL;
+	int hash, idx;
+	ElfList *list;
+	Node node, *node_p;
+	void *value;
+
+	hash = hashing(key, g_capacity_levels[elf->level]);
+	list = elf->buckets[hash];
+
+	node.key = key;
+	idx = elfList_indexOf(list, &node);
+	
+	// Check element existence
+	if(idx < 0) return NULL;
+
+	// Get the value
+	node_p = elfList_get(list, idx);
+	value = node_p->value;
+	free(node_p);
+
+	return value;
 }
 
+// Documented in header file.
 int elfIVHashMap_size(const ElfIVHashMap *elf){
-	//TODO
-	return 0;
+	return elf->count;
 }

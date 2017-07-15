@@ -13,6 +13,9 @@ void elfIVHashMap_traverse(ElfIVHashMap *elf, void(*func)(int key, void* value))
 
 void *elfIVHashMap_put(ElfIVHashMap *elf, int key, void *value);
 void *elfIVHashMap_remove(ElfIVHashMap *elf, int key);
+void *elfIVHashMap_get(const ElfIVHashMap *elf, int key);
+
+int elfIVHashMap_size(const ElfIVHashMap *elf);
 
 /* DOCUMENTATION
 
@@ -53,6 +56,13 @@ void *elfIVHashMap_remove(ElfIVHashMap *elf, int key);
 	Removes the key-value pair whose key is the given 'key'.
 	If it exists, returns the associated value.
 	If it doesn't exist, returns NULL, and the hashmap remains unaltered.
+
+void *elfIVHashMap_get(const ElfIVHashMap *elf, int key);
+	Returns the value associated with the given 'key'.
+	Returns NULL if there is no key-value pair whose key is 'key'.
+
+int elfIVHashMap_size(const ElfIVHashMap *elf);
+	Returns the number of key-value pairs in the hashMap.
 */
 
 #endif

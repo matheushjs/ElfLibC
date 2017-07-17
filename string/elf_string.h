@@ -7,7 +7,8 @@ char *elfString_lstrip(const char *str);
 
 char *elfString_dup(const char *str);
 
-char *elfString_format(const char *format, ...);
+char *elfString_format(const char *format, ...)
+	__attribute__((format(printf, 1, 2)));
 
 /* DOCUMENTATION
 

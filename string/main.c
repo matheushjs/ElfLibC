@@ -29,7 +29,7 @@ void format_test(){
 	printf("{%s}\n", test);
 	free(test);
 
-	test = elfString_format("%d %f %lf %s %p", 32, 0.5, 0.5, "are\ncool\nnumbers", test);
+	test = elfString_format("%d %f %lf [%s] %p", 32, 0.5, 0.5, "are\ncool\nnumbers", test);
 	printf("{%s}\n", test);
 	free(test);
 }

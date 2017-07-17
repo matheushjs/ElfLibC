@@ -89,3 +89,76 @@ char *elfString_format(const char *format, ...){
 
 	return result;
 }
+
+
+
+
+char **elfString_split(const char *str, const char *delimiter){
+	// NULL-terminated array of strings
+	return NULL;
+}
+
+char **elfString_splitLines(const char *str){
+	// NULL-terminated array of strings
+	return NULL;
+}
+
+char *elfString_join(const char *delimiter, ...){
+	va_list vl;
+	va_start(vl, delimiter);
+	va_end(vl);
+	return NULL;
+}
+
+char *elfString_center(const char *str){
+	return NULL;
+}
+
+int elfString_count(const char *str, const char *key){
+	// Only non-overlapping instances
+	return 0;
+}
+
+bool *elfString_endsWith(const char *str){
+	return false;
+}
+
+bool *elfString_startsWith(const char *str){
+	return false;
+}
+
+bool *elfString_find(const char *str){
+	return false;
+}
+
+char *elfString_replace(const char *str, const char *old, const char *new){
+	return NULL;
+}
+
+
+/*
+ * FUNCTIONS THAT REQUIRE UTF8 TREATMENT
+ *
+ * OR MAKE SPECIAL FUNCTIONS FOR UTF8 (I like this)
+ */
+
+char *elfString_capitalize(const char *str){
+	return NULL;
+}
+
+char *elfString_lower(const char *str){
+	return NULL;
+}
+
+char *elfString_upper(const char *str){
+	return NULL;
+}
+
+char *elfString_swapCase(const char *str){
+	return NULL;
+}
+
+char *elfString_title(const char *str){
+	// Pascal case everything
+	return NULL;
+}

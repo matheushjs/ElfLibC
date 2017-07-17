@@ -1,6 +1,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdio.h>
 
 // Documented in header file.
 char *elfString_lstrip(const char *str){
@@ -51,4 +54,38 @@ char *elfString_strip(const char *str){
 	res = elfString_lstrip(aux);
 	free(aux);
 	return res;
+}
+
+// Documented in header file.
+char *elfString_dup(const char *str){
+	int len;
+	char *result;
+
+	len = strlen(str);
+	result = malloc(sizeof(char) * (len + 1));
+	memcpy(result, str, len + 1);
+
+	return result;
+}
+
+// Documented in header file.
+char *elfString_format(const char *format, ...){
+	va_list vl, vc;
+	char *result, dummy;
+	int retval;
+
+	va_start(vl, format);
+
+	// Get ideal size
+	va_copy(vc, vl);
+	retval = vsnprintf(&dummy, 0, format, vc);
+	va_end(vc);
+
+	// Execute formatting
+	result = malloc(sizeof(char) * (retval + 1));
+	vsnprintf(result, retval + 1, format, vl);
+
+	va_end(vl);
+
+	return result;
 }

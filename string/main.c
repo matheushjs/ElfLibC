@@ -22,8 +22,21 @@ void strip_test(){
 	}
 }
 
+void format_test(){
+	char *test;
+
+	test = elfString_format("%d %s", 32, "is a cool number");
+	printf("{%s}\n", test);
+	free(test);
+
+	test = elfString_format("%d %f %lf %s %p", 32, 0.5, 0.5, "are\ncool\nnumbers", test);
+	printf("{%s}\n", test);
+	free(test);
+}
+
 int main(int argc, char *argv[]){
 	strip_test();
+	format_test();
 
 	return 0;
 }

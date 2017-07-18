@@ -2,6 +2,7 @@
 #define _ELF_STRING_H
 
 #include <stdarg.h>
+#include <stdbool.h>
 
 char *elfString_strip(const char *str);
 char *elfString_rstrip(const char *str);
@@ -24,6 +25,9 @@ char *elfString_center(const char *str, int width);
 int elfString_count(const char *str, const char *key);
 int elfString_find(const char *str, const char *key);
 char *elfString_replace(const char *str, const char *old, const char *neww);
+
+bool elfString_endsWith(const char *str, const char *key);
+bool elfString_startsWith(const char *str, const char *key);
 
 
 /* DOCUMENTATION
@@ -89,6 +93,13 @@ int elfString_find(const char *str, const char *key);
 
 char *elfString_replace(const char *str, const char *old, const char *neww);
 	Returns a string where all occurences of 'old' in 'str' are replaced by 'neww'.
+
+
+bool elfString_endsWith(const char *str, const char *key);
+	Returns true if 'str' ends with string 'key'.
+
+bool elfString_startsWith(const char *str, const char *key);
+	Returns true if 'str' starts with 'key'.
 
 */
 

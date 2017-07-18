@@ -367,12 +367,19 @@ char *elfString_replace(const char *str, const char *old, const char *neww){
 	return result;
 }
 
+// Documented in header file.
 bool elfString_endsWith(const char *str, const char *key){
-	return false;
+	int slen, klen;
+	slen = strlen(str);
+	klen = strlen(key);
+	if(klen > slen) return false;
+	else return strncmp(str + (slen - klen), key, klen) == 0 ? true : false;
 }
 
+// Documented in header file.
 bool elfString_startsWith(const char *str, const char *key){
-	return false;
+	int len = strlen(key);
+	return strncmp(str, key, len) == 0 ? true : false;
 }
 
 // Slice

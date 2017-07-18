@@ -180,6 +180,17 @@ void replace_test(){
 	free(str);
 }
 
+void swith_test(){
+	printf("%d\n", elfString_endsWith("Hello", "llo"));
+	printf("%d\n", elfString_endsWith("llo", "Hello"));
+	printf("%d\n", elfString_endsWith("Hello", ""));
+	printf("%d\n", elfString_endsWith("", "Hello"));
+	printf("%d\n", elfString_startsWith("Hello", "Hell"));
+	printf("%d\n", elfString_startsWith("llo", "Hello"));
+	printf("%d\n", elfString_startsWith("Hello", ""));
+	printf("%d\n", elfString_startsWith("", "Hello"));
+}
+
 int main(int argc, char *argv[]){
 	//strip_test();
 	//format_test();
@@ -187,7 +198,8 @@ int main(int argc, char *argv[]){
 	//join_test();
 	//center_test();
 	//countFind_test();
-	replace_test();
+	//replace_test();
+	swith_test();
 
 	return 0;
 }

@@ -5,6 +5,13 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include <elf_string_buf.h>
+#include <elf_string.h>
+
+/* Static functions defined later */
+static bool char_equals_any(char c, const char *accept);
+
+
 // Documented in header file.
 char *elfString_lstrip(const char *str){
 	int len, res_len, lead;
@@ -86,76 +93,6 @@ char *elfString_format(const char *format, ...){
 	vsnprintf(result, retval + 1, format, vl);
 
 	va_end(vl);
-
-	return result;
-}
-
-// Structure for building a string by appending characters or other strings.
-typedef struct _ElfStringBuf {
-	char *str;
-	int size;
-	int capacity;
-} ElfStringBuf;
-
-// Creates a new string buffer
-static
-ElfStringBuf *elfStringBuf_new(){
-	ElfStringBuf *elf;
-
-	elf = malloc(sizeof(ElfStringBuf));
-	elf->str = malloc(sizeof(char) * 8);
-	elf->size = 0;
-	elf->capacity = 8;
-
-	return elf;
-}
-
-// Destroys an existing string buffer
-static
-void elfStringBuf_destroy(ElfStringBuf **elf_p){
-	ElfStringBuf *elf = *elf_p;
-
-	if(elf){
-		free(elf->str);
-		free(elf);
-		*elf_p = NULL;
-	}
-}
-
-// Appends a character to the string buffer
-static
-void elfStringBuf_appendChar(ElfStringBuf *elf, char c){
-	elf->str[elf->size] = c;
-	elf->size += 1;
-	if(elf->size == elf->capacity){
-		elf->capacity <<= 1;
-		elf->str = realloc(elf->str, sizeof(char) * elf->capacity);
-	}
-}
-
-// Appends a string to the string buffer
-static
-void elfStringBuf_appendString(ElfStringBuf *elf, const char *str){
-	while( *str != '\0' )
-		elfStringBuf_appendChar(elf, *str);
-}
-
-// Gets the string within the ElfStringBuf, and resets the state of the ElfStringBuf
-// If 'size' is no NULL, it receives the lenth of the returned string, diregarding the '\0'.
-static
-char *elfStringBuf_getString(ElfStringBuf *elf, int *size){
-	char *result;
-	
-	result = elf->str;
-	result[elf->size] = '\0';
-	result = realloc(result, sizeof(char) * (elf->size + 1));
-
-	if(size)
-		*size = elf->size;
-
-	elf->str = malloc(sizeof(char) * 8);
-	elf->size = 0;
-	elf->capacity = 8;
 
 	return result;
 }

@@ -35,6 +35,7 @@ char *elfString_dup(const char *str);
 char *elfString_format(const char *format, ...);
 	Returns a string that is formatted using a printf-like 'format' argument.
 
+
 char **elfString_split(const char *str, const char *delimiter);
 	Splits the given string 'str' into tokens that are delimited by the whole string given
 	  in the parameter 'delimiter'.

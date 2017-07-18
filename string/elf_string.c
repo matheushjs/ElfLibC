@@ -90,12 +90,196 @@ char *elfString_format(const char *format, ...){
 	return result;
 }
 
+// Structure for building a string by appending characters or other strings.
+typedef struct _ElfStringBuf {
+	char *str;
+	int size;
+	int capacity;
+} ElfStringBuf;
 
+// Creates a new string buffer
+static
+ElfStringBuf *elfStringBuf_new(){
+	ElfStringBuf *elf;
 
+	elf = malloc(sizeof(ElfStringBuf));
+	elf->str = malloc(sizeof(char) * 8);
+	elf->size = 0;
+	elf->capacity = 8;
 
+	return elf;
+}
+
+// Destroys an existing string buffer
+static
+void elfStringBuf_destroy(ElfStringBuf **elf_p){
+	ElfStringBuf *elf = *elf_p;
+
+	if(elf){
+		free(elf->str);
+		free(elf);
+		*elf_p = NULL;
+	}
+}
+
+// Appends a character to the string buffer
+static
+void elfStringBuf_appendChar(ElfStringBuf *elf, char c){
+	elf->str[elf->size] = c;
+	elf->size += 1;
+	if(elf->size == elf->capacity){
+		elf->capacity <<= 1;
+		elf->str = realloc(elf->str, sizeof(char) * elf->capacity);
+	}
+}
+
+// Appends a string to the string buffer
+static
+void elfStringBuf_appendString(ElfStringBuf *elf, const char *str){
+	while( *str != '\0' )
+		elfStringBuf_appendChar(elf, *str);
+}
+
+// Gets the string within the ElfStringBuf, and resets the state of the ElfStringBuf
+// If 'size' is no NULL, it receives the lenth of the returned string, diregarding the '\0'.
+static
+char *elfStringBuf_getString(ElfStringBuf *elf, int *size){
+	char *result;
+	
+	result = elf->str;
+	result[elf->size] = '\0';
+	result = realloc(result, sizeof(char) * (elf->size + 1));
+
+	if(size)
+		*size = elf->size;
+
+	elf->str = malloc(sizeof(char) * 8);
+	elf->size = 0;
+	elf->capacity = 8;
+
+	return result;
+}
+
+// Documented in header file.
 char **elfString_split(const char *str, const char *delimiter){
-	// NULL-terminated array of strings
-	return NULL;
+	char **result, c;
+	const char *iter;
+	int delSize, resSize, curSize;
+	ElfStringBuf *newStr;
+
+	iter = str;
+	delSize = strlen(delimiter);
+	
+	// Protection against delimiter = "". Which would cause an eternal loop.
+	if(delSize == 0){
+		result = malloc(sizeof(char *) * 2);
+		result[0] = elfString_dup(str);
+		result[1] = NULL;
+		return result;
+	}
+
+	resSize = 0;
+	result = NULL;
+
+	// Initialize stringBuf
+	newStr = elfStringBuf_new();
+
+	while(true){
+		//Skip delimiter
+		while( strncmp(iter, delimiter, delSize) == 0){
+			iter += delSize;
+		}
+
+		//Read token
+		while( strncmp(iter, delimiter, delSize) != 0){
+			c = *iter;
+			if(c == '\0') break;
+			//Add character to the string
+			elfStringBuf_appendChar(newStr, c);
+			iter += 1;
+		}
+
+		// Allocate one more string
+		resSize += 1;
+		result = realloc(result, sizeof(char *) * resSize);
+
+		// Grab string on Buffer
+		result[resSize - 1] = elfStringBuf_getString(newStr, &curSize);
+
+		// If string is empty, we reached the end of 'str'.
+		// Notice that if it's empty, _getString() returns an empty string which should be freed.
+		if(curSize == 0){
+			free(result[resSize - 1]);
+			result[resSize - 1] = NULL; // NULL-termination
+			break;
+		}
+	}
+
+	elfStringBuf_destroy(&newStr);
+
+	return result;
+}
+
+// Verifies if 'c' is any character within 'accept'.
+static
+bool char_equals_any(char c, const char *accept){
+	while(*accept != '\0'){
+		if(c == *accept)
+			return true;
+		accept++;
+	}
+	return false;
+}
+
+// Documented in header file.
+char **elfString_split_bag(const char *str, const char *delimiterBag){
+	char **result, c;
+	const char *iter;
+	int resSize, curSize;
+	ElfStringBuf *newStr;
+
+	iter = str;
+	
+	resSize = 0;
+	result = NULL;
+
+	// Initialize stringBuf
+	newStr = elfStringBuf_new();
+
+	while(true){
+		//Skip delimiter
+		while( char_equals_any(*iter, delimiterBag) ){
+			iter += 1;
+		}
+
+		//Read token
+		while( !char_equals_any(*iter, delimiterBag) ){
+			c = *iter;
+			if(c == '\0') break;
+			//Add character to the string
+			elfStringBuf_appendChar(newStr, c);
+			iter += 1;
+		}
+
+		// Allocate one more string
+		resSize += 1;
+		result = realloc(result, sizeof(char *) * resSize);
+
+		// Grab string on Buffer
+		result[resSize - 1] = elfStringBuf_getString(newStr, &curSize);
+
+		// If string is empty, we reached the end of 'str'.
+		// Notice that if it's empty, _getString() returns an empty string which should be freed.
+		if(curSize == 0){
+			free(result[resSize - 1]);
+			result[resSize - 1] = NULL; // NULL-termination
+			break;
+		}
+	}
+
+	elfStringBuf_destroy(&newStr);
+
+	return result;
 }
 
 char **elfString_splitLines(const char *str){
@@ -134,6 +318,9 @@ bool *elfString_find(const char *str){
 char *elfString_replace(const char *str, const char *old, const char *new){
 	return NULL;
 }
+
+// Slice
+// Invert
 
 
 /*

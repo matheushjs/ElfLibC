@@ -191,6 +191,74 @@ void swith_test(){
 	printf("%d\n", elfString_startsWith("", "Hello"));
 }
 
+void slice_test(){
+	char *str;
+
+	str = elfString_slice("hello", 0, 1);
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_slice("hello", 1, 3);
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_slice("hello", 0, -1);
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_slice("hello", -5, -1);
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_slice("hello", 0, INT_MAX);
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_slice("hello", -5000, 0);
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_slice("hello", -5000, -5005);
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_slice("", 0, 0);
+	printf("{%s}\n", str);
+	free(str);
+}
+
+void invert_test(){
+	char *str;
+
+	str = elfString_invert(test_string);
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_invert("");
+	printf("{%s}\n", str);
+	free(str);
+}
+
+void case_test(){
+	char *str;
+
+	str = elfString_lower("heLlO");
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_upper("heLlO");
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_capitalize("heLlO");
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_swapCase("heLlO");
+	printf("{%s}\n", str);
+	free(str);
+}
+
 int main(int argc, char *argv[]){
 	//strip_test();
 	//format_test();
@@ -199,7 +267,10 @@ int main(int argc, char *argv[]){
 	//center_test();
 	//countFind_test();
 	//replace_test();
-	swith_test();
+	//swith_test();
+	//slice_test();
+	//invert_test();
+	case_test();
 
 	return 0;
 }

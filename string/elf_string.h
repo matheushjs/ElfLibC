@@ -3,6 +3,7 @@
 
 #include <stdarg.h>
 #include <stdbool.h>
+#include <limits.h>
 
 char *elfString_strip(const char *str);
 char *elfString_rstrip(const char *str);
@@ -29,6 +30,13 @@ char *elfString_replace(const char *str, const char *old, const char *neww);
 bool elfString_endsWith(const char *str, const char *key);
 bool elfString_startsWith(const char *str, const char *key);
 
+char *elfString_slice(const char *str, int left, int right);
+char *elfString_invert(const char *str);
+
+char *elfString_lower(const char *str);
+char *elfString_upper(const char *str);
+char *elfString_capitalize(const char *str);
+char *elfString_swapCase(const char *str);
 
 /* DOCUMENTATION
 
@@ -100,6 +108,42 @@ bool elfString_endsWith(const char *str, const char *key);
 
 bool elfString_startsWith(const char *str, const char *key);
 	Returns true if 'str' starts with 'key'.
+
+
+char *elfString_slice(const char *str, int left, int right);
+	Returns a new string that is a slice of 'str'.
+	'left' represents the index of the first character to be sliced.
+	'right' represents the index of the first character AFTER THE SLICE.
+	Negative numbers in 'left' or 'right' will represent indexes of characters when they are
+	  counted backwards from the end of 'str'. So if the string has 5 characters, and 'left'
+	  is -1, then left is equivalent to being 4, the index of the 5th character.
+	If 'left' or 'right' are out of bounds, they are replaced by the nearest valid value.
+	If 'left' is higher than 'right', they are swapped.
+	One may use INT_MAX as 'right' to slice to the end of the string.
+
+	Examples:
+		_slice("hello",  0,  1) equals "h"
+		_slice("hello",  1,  3) equals "el"
+		_slice("hello",  0, -1) equals "hell"
+		_slice("hello", -5, -1) equals "hell"
+		_slice("hello", 0, INT_MAX) equals "hello"
+
+char *elfString_invert(const char *str);
+	Returns a string that is 'str' inverted.
+
+
+char *elfString_lower(const char *str);
+	Returns a string that is 'str' in lowercase.
+
+char *elfString_upper(const char *str);
+	Returns a string that is 'str' in uppercase.
+
+char *elfString_capitalize(const char *str);
+	Returns a string that is 'str' with first character in uppercase.
+
+char *elfString_swapCase(const char *str);
+	Returns a string that is 'str' with all lowercase characters converted to uppercase,
+	  and all uppercase converted to lowercase.
 
 */
 

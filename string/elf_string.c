@@ -382,8 +382,142 @@ bool elfString_startsWith(const char *str, const char *key){
 	return strncmp(str, key, len) == 0 ? true : false;
 }
 
-// Slice
-// Invert
+// Documented in header file.
+char *elfString_slice(const char *str, int left, int right){
+	int len, aux, beg, end;
+
+	len = strlen(str);
+	
+	// Decide beginning character
+	// Should be the first sliced character
+	if(left >= 0){
+		beg = left;
+	} else {
+		beg = len + left;
+	}
+
+	// Decide end character
+	// Should be the first character after the slice 
+	if(right >= 0){
+		end = right;
+	} else {
+		end = len + right;
+	}
+
+	// Swap if inverted
+	if(beg > end){
+		aux = end;
+		end = beg;
+		beg = aux;
+	}
+
+	// Replace if out-of-bounds
+	if(beg < 0)
+		beg = 0;
+
+	// Replace if out-of-bounds
+	if(end >= len)
+		end = len;
+
+	int i;
+	ElfStringBuf *buf;
+	char *result;
+
+	buf = elfStringBuf_new();
+	for(i = beg; i < end; i++)
+		elfStringBuf_appendChar(buf, str[i]);
+	result = elfStringBuf_getString(buf, NULL);
+	elfStringBuf_destroy(&buf);
+
+	return result;
+}
+
+// Documented in header file.
+char *elfString_invert(const char *str){
+	int i, len;
+	ElfStringBuf *buf;
+
+	len = strlen(str);
+	buf = elfStringBuf_new();
+	for(i = len - 1; i >= 0; i--)
+		elfStringBuf_appendChar(buf, str[i]);
+	
+	char *result = elfStringBuf_getString(buf, NULL);
+	elfStringBuf_destroy(&buf);
+	return result;
+}
+
+// Documented in header file.
+char *elfString_lower(const char *str){
+	ElfStringBuf *buf;
+	char *result;
+
+	buf = elfStringBuf_new();
+	while( *str != '\0' ){
+		elfStringBuf_appendChar(buf, tolower(*str));
+		str++;
+	}
+
+	result = elfStringBuf_getString(buf, NULL);
+	elfStringBuf_destroy(&buf);
+
+	return result;
+}
+
+// Documented in header file.
+char *elfString_upper(const char *str){
+	ElfStringBuf *buf;
+	char *result;
+
+	buf = elfStringBuf_new();
+	while( *str != '\0' ){
+		elfStringBuf_appendChar(buf, toupper(*str));
+		str++;
+	}
+
+	result = elfStringBuf_getString(buf, NULL);
+	elfStringBuf_destroy(&buf);
+
+	return result;
+}
+
+// Documented in header file.
+char *elfString_capitalize(const char *str){
+	int len;
+	char *result;
+	
+	len = strlen(str);
+	result = malloc(sizeof(char) * (len + 1));
+	memcpy(result, str, len+1);
+	result[0] = toupper(result[0]);
+
+	return result;
+}
+
+// Documented in header file.
+char *elfString_swapCase(const char *str){
+	ElfStringBuf *buf;
+	char *result;
+
+	buf = elfStringBuf_new();
+	while( *str != '\0' ){
+		if(islower(*str))
+			elfStringBuf_appendChar(buf, toupper(*str));
+		else
+			elfStringBuf_appendChar(buf, tolower(*str));
+		str++;
+	}
+
+	result = elfStringBuf_getString(buf, NULL);
+	elfStringBuf_destroy(&buf);
+
+	return result;
+}
+
+char *elfString_title(const char *str){
+	// Pascal case everything
+	return NULL;
+}
 
 
 /*
@@ -391,24 +525,3 @@ bool elfString_startsWith(const char *str, const char *key){
  *
  * OR MAKE SPECIAL FUNCTIONS FOR UTF8 (I like this)
  */
-
-char *elfString_capitalize(const char *str){
-	return NULL;
-}
-
-char *elfString_lower(const char *str){
-	return NULL;
-}
-
-char *elfString_upper(const char *str){
-	return NULL;
-}
-
-char *elfString_swapCase(const char *str){
-	return NULL;
-}
-
-char *elfString_title(const char *str){
-	// Pascal case everything
-	return NULL;
-}

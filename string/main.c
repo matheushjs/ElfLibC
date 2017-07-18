@@ -257,6 +257,33 @@ void case_test(){
 	str = elfString_swapCase("heLlO");
 	printf("{%s}\n", str);
 	free(str);
+
+	str = elfString_title(test_string);
+	printf("{%s}\n", str);
+	free(str);
+
+
+
+	str = elfString_lower("");
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_upper("");
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_capitalize("");
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_swapCase("");
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_title("");
+	printf("{%s}\n", str);
+	free(str);
+
 }
 
 int main(int argc, char *argv[]){

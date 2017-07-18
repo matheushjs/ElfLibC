@@ -37,6 +37,7 @@ char *elfString_lower(const char *str);
 char *elfString_upper(const char *str);
 char *elfString_capitalize(const char *str);
 char *elfString_swapCase(const char *str);
+char *elfString_title(const char *str);
 
 /* DOCUMENTATION
 
@@ -145,6 +146,9 @@ char *elfString_swapCase(const char *str);
 	Returns a string that is 'str' with all lowercase characters converted to uppercase,
 	  and all uppercase converted to lowercase.
 
+char *elfString_title(const char *str);
+	Returns a string that is 'str' with all tokens capitalized.
+	Tokens are any substring that are composed of non-white/blankspace characters.
 */
 
 #endif

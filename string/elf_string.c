@@ -514,9 +514,39 @@ char *elfString_swapCase(const char *str){
 	return result;
 }
 
+// Documented in header file.
 char *elfString_title(const char *str){
-	// Pascal case everything
-	return NULL;
+	ElfStringBuf *buf;
+	char *result;
+
+	buf = elfStringBuf_new();
+
+	while(true){
+		// Skip whitespace
+		while(isspace(*str)){
+			elfStringBuf_appendChar(buf, *str);
+			str++;
+		}
+
+		// Check end of string
+		if(*str == '\0')
+			break;
+
+		// Capitalize character
+		elfStringBuf_appendChar(buf, toupper(*str));
+		str++;
+
+		// Skip non-whitespace
+		while(!isspace(*str) && *str != '\0'){
+			elfStringBuf_appendChar(buf, *str);
+			str++;
+		}
+	}
+
+	result = elfStringBuf_getString(buf, NULL);
+	elfStringBuf_destroy(&buf);
+
+	return result;
 }
 
 

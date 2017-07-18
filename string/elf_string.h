@@ -18,6 +18,10 @@ char **elfString_splitLines(const char *str);
 
 char *elfString_join(const char *delimiter, ...);
 
+char *elfString_center_fill(const char *str, int width, char fill);
+char *elfString_center(const char *str, int width);
+
+
 /* DOCUMENTATION
 
 char *elfString_strip(const char *str);
@@ -63,6 +67,14 @@ char *elfString_join(const char *delimiter, ...);
 	  between each of these strings.
 	'delimiter' is not inserted in the beginning or in the end of the resulting string.
 	Returns the resulting string.
+
+
+char *elfString_center_fill(const char *str, int width, char fill);
+	Returns a string whose content is the string 'str' centered within a space of 'width' characters,
+	  and the filling characters are chosen to be the given 'fill'.
+
+char *elfString_center(const char *str, int width);
+	Wrapper for the _center_fill() function, with 'fill' parameter being a space ' '.
 
 */
 

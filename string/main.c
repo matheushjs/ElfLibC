@@ -109,11 +109,36 @@ void join_test(){
 	free(str);
 }
 
+void center_test(){
+	char *str;
+
+	str = elfString_center_fill(" Hello ", 30, '*');
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_center_fill(" Hello ", 1, '*');
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_center_fill(" Hello ", 7, '*');
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_center(" Hello ", 10);
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_center(" Hello ", 11);
+	printf("{%s}\n", str);
+	free(str);
+}
+
 int main(int argc, char *argv[]){
 	//strip_test();
 	//format_test();
 	//split_test();
-	join_test();
+	//join_test();
+	center_test();
 
 	return 0;
 }

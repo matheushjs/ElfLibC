@@ -258,8 +258,44 @@ char *elfString_join(const char *delimiter, ...){
 	return result;
 }
 
-char *elfString_center(const char *str){
-	return NULL;
+// Documented in header file.
+char *elfString_center_fill(const char *str, int width, char fill){
+	int len, diff, left, right;
+	ElfStringBuf *buf;
+	char *result;
+
+	len = strlen(str);
+	diff = width - len;
+
+	// If 'str' is longer than 'width', return a duplicate.
+	if(diff <= 0)
+		return elfString_dup(str);
+
+	buf = elfStringBuf_new();
+
+	left = diff/2;
+	right = diff - left;
+
+	// Add leading fill
+	for(; left > 0; left--)
+		elfStringBuf_appendChar(buf, fill);
+
+	// Add string
+	elfStringBuf_appendString(buf, str);
+
+	// Add trailing fill
+	for(; right > 0; right--)
+		elfStringBuf_appendChar(buf, fill);
+
+	result = elfStringBuf_getString(buf, NULL);
+	elfStringBuf_destroy(&buf);
+
+	return result;
+}
+
+// Documented in header file.
+char *elfString_center(const char *str, int width){
+	return elfString_center_fill(str, width, ' ');
 }
 
 int elfString_count(const char *str, const char *key){

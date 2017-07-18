@@ -133,12 +133,61 @@ void center_test(){
 	free(str);
 }
 
+void countFind_test(){
+	int count, find;
+
+	count = elfString_count(test_string, "Donec");
+	find = elfString_find(test_string, "Donec");
+	printf("Donec: %d\n", count);
+	printf("Donec: %d\n", find);
+	find = elfString_find( ((char *) test_string) + find + 1, "Donec");
+	printf("Donec: %d\n", find);
+	
+	count = elfString_count("",  "");
+	find = elfString_find("", "");
+	printf("(empty): %d\n", count);
+	printf("(empty): %d\n", find);
+
+	count = elfString_count("", "Donec");
+	find = elfString_find("", "Donec");
+	printf("Donec: %d\n", count);
+	printf("Donec: %d\n", find);
+
+	count = elfString_count("hey", "");
+	find = elfString_find("hey", "");
+	printf("(empty): %d\n", count);
+	printf("(empty): %d\n", find);
+
+	count = elfString_count("aaaaaaa", "aa");
+	find = elfString_find("aaaaaaa", "aa");
+	printf("aa: %d\n", count);
+	printf("aa: %d\n", find);
+}
+
+void replace_test(){
+	char *str;
+
+	str = elfString_replace(test_string, "Donec", "   REPLACED   ");
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_replace(test_string, "", "   REPLACED   ");
+	printf("{%s}\n", str);
+	free(str);
+
+	str = elfString_replace(test_string, "C", "   REPLACED   ");
+	printf("{%s}\n", str);
+	free(str);
+}
+
 int main(int argc, char *argv[]){
 	//strip_test();
 	//format_test();
 	//split_test();
 	//join_test();
-	center_test();
+	//center_test();
+	//countFind_test();
+	replace_test();
 
 	return 0;
 }

@@ -21,6 +21,10 @@ char *elfString_join(const char *delimiter, ...);
 char *elfString_center_fill(const char *str, int width, char fill);
 char *elfString_center(const char *str, int width);
 
+int elfString_count(const char *str, const char *key);
+int elfString_find(const char *str, const char *key);
+char *elfString_replace(const char *str, const char *old, const char *neww);
+
 
 /* DOCUMENTATION
 
@@ -75,6 +79,16 @@ char *elfString_center_fill(const char *str, int width, char fill);
 
 char *elfString_center(const char *str, int width);
 	Wrapper for the _center_fill() function, with 'fill' parameter being a space ' '.
+
+int elfString_count(const char *str, const char *key);
+	Returns the number of non-overlapping occurences of 'key' within 'str'.
+
+int elfString_find(const char *str, const char *key);
+	Finds 'key' within 'str'. Returns the index in 'str' where the first occurence of 'key' happens.
+	If not found, returns a negative number.
+
+char *elfString_replace(const char *str, const char *old, const char *neww);
+	Returns a string where all occurences of 'old' in 'str' are replaced by 'neww'.
 
 */
 

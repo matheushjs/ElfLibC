@@ -298,25 +298,81 @@ char *elfString_center(const char *str, int width){
 	return elfString_center_fill(str, width, ' ');
 }
 
+// Documented in header file.
 int elfString_count(const char *str, const char *key){
-	// Only non-overlapping instances
-	return 0;
+	int len, count;
+
+	len = strlen(key);
+	if(len == 0) // Protection against infinite loop
+		return 0;
+
+	count = 0;
+	while(*str != '\0'){
+		if( strncmp(str, key, len) == 0){
+			count++;
+			str += len;
+		} else {
+			str += 1;
+		}
+	}
+
+	return count;
 }
 
-bool *elfString_endsWith(const char *str){
+// Documented in header file.
+int elfString_find(const char *str, const char *key){
+	int len, index;
+
+	len = strlen(key);
+	if(len == 0) // Protection against a bug
+		return -1;
+
+	index = 0;
+	while(*str != '\0'){
+		if( strncmp(str, key, len) == 0){
+			return index;
+		} else {
+			str += 1;
+			index++;
+		}
+	}
+
+	return -1;
+}
+
+// Documented in header file.
+char *elfString_replace(const char *str, const char *old, const char *neww){
+	ElfStringBuf *buf;
+	int len;
+	char *result;
+
+	len = strlen(old);
+	if(len == 0) // Protection against bugs
+		return elfString_dup(str);
+
+	buf = elfStringBuf_new();
+	while(*str != '\0'){
+		if( strncmp(str, old, len) == 0){
+			elfStringBuf_appendString(buf, neww);
+			str += len;
+		} else {
+			elfStringBuf_appendChar(buf, *str);
+			str += 1;
+		}
+	}
+	
+	result = elfStringBuf_getString(buf, NULL);
+	elfStringBuf_destroy(&buf);
+
+	return result;
+}
+
+bool elfString_endsWith(const char *str, const char *key){
 	return false;
 }
 
-bool *elfString_startsWith(const char *str){
+bool elfString_startsWith(const char *str, const char *key){
 	return false;
-}
-
-bool *elfString_find(const char *str){
-	return false;
-}
-
-char *elfString_replace(const char *str, const char *old, const char *new){
-	return NULL;
 }
 
 // Slice

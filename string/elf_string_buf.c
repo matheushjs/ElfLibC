@@ -42,8 +42,10 @@ void elfStringBuf_appendChar(ElfStringBuf *elf, char c){
 
 // Documented in header file.
 void elfStringBuf_appendString(ElfStringBuf *elf, const char *str){
-	while( *str != '\0' )
+	while( *str != '\0' ){
 		elfStringBuf_appendChar(elf, *str);
+		str++;
+	}
 }
 
 // Documented in header file.

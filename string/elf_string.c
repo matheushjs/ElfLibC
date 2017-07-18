@@ -219,16 +219,43 @@ char **elfString_split_bag(const char *str, const char *delimiterBag){
 	return result;
 }
 
+// Documented in header file.
 char **elfString_splitLines(const char *str){
-	// NULL-terminated array of strings
-	return NULL;
+	return elfString_split_bag(str, "\r\n");
 }
 
+// Documented in header file.
 char *elfString_join(const char *delimiter, ...){
 	va_list vl;
+	ElfStringBuf *buf;
+	const char *str;
+	char *result;
+	int count;
+
+	buf = elfStringBuf_new();
+
 	va_start(vl, delimiter);
+	
+	count = 0;
+	while(true){
+		str = va_arg(vl, const char*);
+		if(str == NULL) break;
+
+		// Add delimiter only when needed
+		if(count != 0){
+			elfStringBuf_appendString(buf, delimiter);
+		}
+
+		count++;
+		elfStringBuf_appendString(buf, str);
+	}
+	
 	va_end(vl);
-	return NULL;
+
+	result = elfStringBuf_getString(buf, NULL);
+	elfStringBuf_destroy(&buf);
+
+	return result;
 }
 
 char *elfString_center(const char *str){

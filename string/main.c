@@ -81,20 +81,39 @@ void split_test(){
 	print_stringArray(strings);
 	free_stringArray(strings);
 
-	strings = elfString_split_bag(test_string, ". \n");
+	strings = elfString_split_bag(test_string, "abcdefghijklmnopqrstuvxwyz \n,.");
+	print_stringArray(strings);
+	free_stringArray(strings);
+	
+	strings = elfString_split_bag(test_string, "\n");
 	print_stringArray(strings);
 	free_stringArray(strings);
 
-	strings = elfString_split_bag(test_string, "abcdefghijklmnopqrstuvxwyz \n,.");
+	printf("\n=== SPLIT LINES ===\n\n");
+
+	strings = elfString_splitLines(test_string);
 	print_stringArray(strings);
 	free_stringArray(strings);
 
 }
 
+void join_test(){
+	char *str;
+
+	str = elfString_join("<-->", "Hello", "World", "This", "Is", "Variadic!", NULL);
+	printf("%s\n", str);
+	free(str);
+
+	str = elfString_join("<-->", "Hello", "", "", "", "Variadic!", NULL);
+	printf("%s\n", str);
+	free(str);
+}
+
 int main(int argc, char *argv[]){
 	//strip_test();
 	//format_test();
-	split_test();
+	//split_test();
+	join_test();
 
 	return 0;
 }

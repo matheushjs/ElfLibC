@@ -30,8 +30,8 @@ int latin1_hashing(unsigned char c){
 static inline
 int utf8_hashing(utfchar c){
 	unsigned int num = 0;
-	num &= c[1];
-	num &= ((int) c[0]) << 8;
+	num |= c[1];
+	num |= ((int) c[0]) << 8;
 	return num - 49792;
 }
 

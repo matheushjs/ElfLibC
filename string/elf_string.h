@@ -39,6 +39,10 @@ char *elfString_capitalize(const char *str);
 char *elfString_swapCase(const char *str);
 char *elfString_title(const char *str);
 
+char *elfString_toUtf8_fromLatin1(const char *str);
+char *elfString_toLatin1_fromUtf8(const char *str);
+
+
 /* DOCUMENTATION
 
 char *elfString_strip(const char *str);
@@ -149,6 +153,15 @@ char *elfString_swapCase(const char *str);
 char *elfString_title(const char *str);
 	Returns a string that is 'str' with all tokens capitalized.
 	Tokens are any substring that are composed of non-white/blankspace characters.
+
+
+char *elfString_toUtf8_fromLatin1(const char *str);
+	Given a string 'str' in encoding latin1, returns its utf8 equivalent.
+
+char *elfString_toLatin1_fromUtf8(const char *str);
+	Given a string 'str' in encoding UTF8, returns its latin1 equivalent.
+	If any utf8 character cannot be mapped to latin1, it's replaced by '*'.
+
 */
 
 #endif

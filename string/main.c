@@ -1,10 +1,37 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <elf_string.h>
 
 // Defined on the bottom
 const static char test_string[];
+
+char *read_stringFile(const char *filename){
+	FILE *fp;
+	char *result;
+
+	fp = fopen(filename, "r");
+	if(!fp){
+		result = malloc(1);
+		*result = '\0';
+		return result;
+	}
+
+	int tell;
+
+	fseek(fp, 0, SEEK_END);
+	tell = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+
+	result = malloc(sizeof(char) * (tell + 1));
+	fread(result, tell, 1, fp);
+	result[tell] = '\0';
+
+	fclose(fp);
+
+	return result;
+}
 
 void print_stringArray(char **strings){
 	while(*strings != NULL){
@@ -286,6 +313,32 @@ void case_test(){
 
 }
 
+void encoding_test(){
+	char *latin, *utf;
+	char *str;
+	int retval;
+
+	latin = read_stringFile("latin.txt");
+	utf = read_stringFile("utf.txt");
+	printf("%6s: %s\n", "UTF", utf);
+	printf("%6s: %s\n", "latin1", latin);
+
+	str = elfString_toUtf8_fromLatin1(latin);
+	printf("%6s: %s\n", "", str);
+	retval = strcmp(str, utf);
+	printf(retval == 0 ? "success\n" : "fail\n");
+	free(str);
+
+	str = elfString_toLatin1_fromUtf8(utf);
+	printf("%6s: %s\n", "", str);
+	retval = strcmp(str, latin);
+	printf(retval == 0 ? "success\n" : "fail\n");
+	free(str);
+
+	free(latin);
+	free(utf);
+}
+
 int main(int argc, char *argv[]){
 	//strip_test();
 	//format_test();
@@ -297,7 +350,8 @@ int main(int argc, char *argv[]){
 	//swith_test();
 	//slice_test();
 	//invert_test();
-	case_test();
+	//case_test();
+	encoding_test();
 
 	return 0;
 }

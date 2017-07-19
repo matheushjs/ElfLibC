@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include <elf_encodings.h>
 #include <elf_string_buf.h>
 #include <elf_string.h>
 
@@ -551,14 +552,55 @@ char *elfString_title(const char *str){
 
 
 /*
- * FUNCTIONS THAT REQUIRE UTF8 TREATMENT
- *
- * OR MAKE SPECIAL FUNCTIONS FOR UTF8 (I like this)
+ * ENCODING-RELATED FUNCTIONS
  */
 
-// latin1 -> utf8
-// utf8 -> latin1
-// upper_utf8()
-// lower_utf8()
-//
-// upper_latin1() will convert first to utf8.
+// Documented in header file.
+char *elfString_toUtf8_fromLatin1(const char *str){
+	ElfStringBuf *buf;
+	char *result;
+	unsigned char c0, c1;
+
+	buf = elfStringBuf_new();
+
+	while(*str != '\0'){
+		elfEncodings_toUtf8_latin1(*str, &c0, &c1);
+		elfStringBuf_appendChar(buf, c0);
+		if(c1 != 0){
+			elfStringBuf_appendChar(buf, c1);
+		}
+		str++;
+	}
+
+	result = elfStringBuf_getString(buf, NULL);
+	elfStringBuf_destroy(&buf);
+
+	return result;
+}
+
+// Documented in header file.
+char *elfString_toLatin1_fromUtf8(const char *str){
+	ElfStringBuf *buf;
+	char c, *result;
+	int len;
+
+	buf = elfStringBuf_new();
+
+	while(*str != '\0'){
+		c = elfEncodings_toLatin1_utf8((unsigned char *) str, &len);
+		if(c != 0)
+			elfStringBuf_appendChar(buf, c);
+		else
+			elfStringBuf_appendChar(buf, '*');
+		str += len;
+	}
+
+	result = elfStringBuf_getString(buf, NULL);
+	elfStringBuf_destroy(&buf);
+
+	return result;
+}
+
+
+//TODO: length for each encoding
+//TODO: lower(), upper(), capitalize(), title()

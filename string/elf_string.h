@@ -54,6 +54,9 @@ char *elfString_upper_utf8(const char *str);
 char *elfString_capitalize_latin1(const char *str);
 char *elfString_capitalize_utf8(const char *str);
 
+char *elfString_title_latin1(const char *str);
+char *elfString_title_utf8(const char *str);
+
 
 /* DOCUMENTATION
 
@@ -193,6 +196,14 @@ char *elfString_capitalize_latin1(const char *str);
 
 char *elfString_capitalize_utf8(const char *str);
 	Given a UTF8 string, capitalize its first letter and return in a new string.
+
+char *elfString_title_latin1(const char *str);
+	Given a latin1 string 'str', returns a string that is 'str' with all tokens capitalized.
+	Tokens are any substring that are composed of non-white/blankspace characters.
+
+char *elfString_title_utf8(const char *str);
+	Given a UTF8 string 'str', returns a string that is 'str' with all tokens capitalized.
+	Tokens are any substring that are composed of non-white/blankspace characters.
 
 */
 

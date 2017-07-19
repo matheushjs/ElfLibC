@@ -359,6 +359,14 @@ void encoding_test(){
 	printf("%6s: %s\n", "latin1", str);
 	free(str);
 
+	str = elfString_title_utf8(utf);
+	printf("%6s: %s\n", "UTF", str);
+	free(str);
+	
+	str = elfString_title_latin1(latin);
+	printf("%6s: %s\n", "latin1", str);
+	free(str);
+
 	printf(elfString_len_utf8(utf) == elfString_len_latin1(latin) ? "success\n" : "fail\n");
 	free(latin);
 	free(utf);

@@ -696,6 +696,67 @@ char *elfString_capitalize_utf8(const char *str){
 	return result;
 }
 
+// Documented in header file.
+char *elfString_title_latin1(const char *str){
+	ElfStringBuf *buf;
+	char *result;
 
-//TODO: title()
+	buf = elfStringBuf_new();
+
+	while(true){
+		// Skip whitespace
+		while(isspace(*str)){
+			elfStringBuf_appendChar(buf, *str);
+			str++;
+		}
+
+		// Check end of string
+		if(*str == '\0')
+			break;
+
+		// Capitalize character
+		elfStringBuf_appendChar(buf, elfEncodings_upper_latin1(*str));
+		str++;
+
+		// Skip non-whitespace
+		while(!isspace(*str) && *str != '\0'){
+			elfStringBuf_appendChar(buf, *str);
+			str++;
+		}
+	}
+
+	result = elfStringBuf_getString(buf, NULL);
+	elfStringBuf_destroy(&buf);
+
+	return result;
+}
+
+// Documented in header file.
+char *elfString_title_utf8(const char *str){
+	char *result, *aux;
+	int len;
+
+	result = aux = elfString_dup(str);
+
+	while(true){
+		// Skip whitespace
+		while(isspace(*aux))
+			aux++;
+
+		// Check end of string
+		if(*aux == '\0')
+			break;
+
+		// Capitalize character
+		len = elfEncodings_upper_utf8((unsigned char*) aux);
+		aux += len;
+
+		// Skip non-whitespace
+		while(!isspace(*aux) && *aux != '\0')
+			aux++;
+	}
+
+	return result;
+}
+
 //TODO: latin1 to ascii

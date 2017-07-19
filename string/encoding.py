@@ -107,8 +107,10 @@ class Latin1_2_Utf8:
         self.printHash()
 
 class FileCreator:
+    text = """sera íóúáé ã ser - eis a qüestão.\n"""
+    
     base = ''.join([ i.to_bytes(1, 'big').decode('latin1') for i in range(0, 256) ])
-    text = ''.join([ i for i in base if i.isprintable() ])
+    text += ''.join([ i for i in base if i.isprintable() ])
     
     def __init__(self):
         print(self.text)

@@ -15,6 +15,7 @@ static unsigned char upper_latinCaseHash[128];
 static utfchar       lower_utfCaseHash[320];
 static utfchar       upper_utfCaseHash[320];
 static unsigned char u2l_encodingHash[320];
+static unsigned char l2a_encodingHash[128];
 
 // Hashes any of the latin1 characters higher than 127 into a
 //   number from 0 to 127
@@ -142,6 +143,17 @@ unsigned char elfEncodings_toLatin1_utf8(const unsigned char *c, int *length){
 	return result;
 }
 
+// Documented in header file.
+unsigned char elfEncodings_toAscii_latin1(unsigned char c){
+	int hash;
+	if(c < 0x80){
+		return c;
+	} else {
+		hash = latin1_hashing(c);
+		return l2a_encodingHash[hash];
+	}
+}
+
 static unsigned char lower_latinCaseHash[128] = {
 128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,
 146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,
@@ -254,4 +266,13 @@ static unsigned char u2l_encodingHash[320] = {
 212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,
 230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,
 248,249,250,251,252,253,254,255
+};
+
+static unsigned char l2a_encodingHash[128] = {
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0, 0,0,0,'C',0,0,0,0,'R',0,0,0,'2','3','\'','u',0,'.',',', '1','o',0,0,0,0,
+0,'A','A','A','A','A','A',0,'C','E','E','E','E', 'I','I','I','I','D','N',
+'O','O','O','O','O','x','0','U','U','U','U','Y',0, 'B','a','a','a','a','a',
+'a',0,'c','e','e','e','e','i','i','i','i',0,'n', 'o','o','o','o','o',0,0,
+'u','u','u','u','y',0,'y'
 };

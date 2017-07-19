@@ -602,6 +602,28 @@ char *elfString_toLatin1_fromUtf8(const char *str){
 }
 
 // Documented in header file.
+char *elfString_toAscii_fromLatin1(const char *str){
+	char *result, *aux;
+	result = aux = elfString_dup(str);
+	while(*aux != '\0'){
+		*aux = elfEncodings_toAscii_latin1(*aux);
+		if(*aux == 0)
+			*aux = '*';
+		aux++;
+	}
+	return result;
+}
+
+// Documented in header file.
+char *elfString_toAscii_fromUtf8(const char *str){
+	char *result, *aux;
+	aux = elfString_toLatin1_fromUtf8(str);
+	result = elfString_toAscii_fromLatin1(aux);
+	free(aux);
+	return result;
+}
+
+// Documented in header file.
 int elfString_len_latin1(const char *str){
 	return strlen(str);
 }
@@ -758,5 +780,3 @@ char *elfString_title_utf8(const char *str){
 
 	return result;
 }
-
-//TODO: latin1 to ascii

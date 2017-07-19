@@ -121,9 +121,39 @@ class FileCreator:
         with open('utf.txt', 'w', encoding='utf8') as fp:
             fp.write(self.text)
 
+class Latin1_2_Ascii:
+    Hash = [ 0 for i in range(128) ]
+
+    @staticmethod
+    def hashing(char):
+        return char.encode('latin1')[0] - 128
+
+    def printHash(self):
+        print(",".join([ i for i in self.Hash ]))
+
+    def __init__(self):
+        j = 0
+        while j < len(g_chars):
+            i = g_chars[j]
+
+            print('{' + i + '}', end=' ')
+            idx = self.hashing(i)
+            char = input()
+            if char == '-1':
+                j -= 1
+                continue
+            elif len(char) == 1:
+                self.Hash[ idx ] = char
+            else:
+                self.Hash[ idx ] = '*'
+            j += 1
+
+        self.printHash()
+
 if __name__ == '__main__':
     # Latin1_case()
     # Utf8_case()
     # Utf8_2_Latin1()
     # Latin1_2_Utf8()
-    FileCreator()
+    # FileCreator()
+    Latin1_2_Ascii()

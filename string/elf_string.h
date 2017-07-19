@@ -42,6 +42,8 @@ char *elfString_title(const char *str);
 /* ENCODING-RELATED FUNCTIONS */
 char *elfString_toUtf8_fromLatin1(const char *str);
 char *elfString_toLatin1_fromUtf8(const char *str);
+char *elfString_toAscii_fromLatin1(const char *str);
+char *elfString_toAscii_fromUtf8(const char *str);
 
 int elfString_len_latin1(const char *str);
 int elfString_len_utf8(const char *str);
@@ -176,6 +178,16 @@ char *elfString_toUtf8_fromLatin1(const char *str);
 char *elfString_toLatin1_fromUtf8(const char *str);
 	Given a string 'str' in encoding UTF8, returns its latin1 equivalent.
 	If any utf8 character cannot be mapped to latin1, it's replaced by '*'.
+
+char *elfString_toAscii_fromLatin1(const char *str);
+	Given a string 'str' in latin1, returns its ascii equivalent.
+	Latin1 characters that aren't also ascii are converted to their most similar equivalents.
+	If there are no similar equivalent, it is set as '*'.
+
+char *elfString_toAscii_fromUtf8(const char *str);
+	Given a string 'str' in UTF8, returns its ascii equivalent.
+	Latin1 characters that aren't also ascii are converted to their most similar equivalents.
+	If there are no similar equivalent, it is set as '*'.
 
 int elfString_len_latin1(const char *str);
 	Returns the length of a latin1 string.

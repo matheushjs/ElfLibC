@@ -106,8 +106,22 @@ class Latin1_2_Utf8:
 
         self.printHash()
 
+class FileCreator:
+    base = ''.join([ i.to_bytes(1, 'big').decode('latin1') for i in range(0, 256) ])
+    text = ''.join([ i for i in base if i.isprintable() ])
+    
+    def __init__(self):
+        print(self.text)
+
+        with open('latin.txt', 'w', encoding='latin1') as fp:
+            fp.write(self.text)
+
+        with open('utf.txt', 'w', encoding='utf8') as fp:
+            fp.write(self.text)
+
 if __name__ == '__main__':
     # Latin1_case()
     # Utf8_case()
     # Utf8_2_Latin1()
-    Latin1_2_Utf8()
+    # Latin1_2_Utf8()
+    FileCreator()

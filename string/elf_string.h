@@ -48,6 +48,12 @@ int elfString_len_utf8(const char *str);
 
 char *elfString_lower_latin1(const char *str);
 char *elfString_upper_latin1(const char *str);
+char *elfString_lower_utf8(const char *str);
+char *elfString_upper_utf8(const char *str);
+
+char *elfString_capitalize_latin1(const char *str);
+char *elfString_capitalize_utf8(const char *str);
+
 
 /* DOCUMENTATION
 
@@ -177,6 +183,16 @@ int elfString_len_utf8(const char *str);
 char *elfString_lower_latin1(const char *str);
 char *elfString_upper_latin1(const char *str);
 	Given a latin1 string, returns its lowercase/uppercase equivalent, respectively.
+
+char *elfString_lower_utf8(const char *str);
+char *elfString_upper_utf8(const char *str);
+	Given a UTF8 string, returns its lowercase/uppercase equivalent, respectively.
+
+char *elfString_capitalize_latin1(const char *str);
+	Given a latin1 string, capitalize its first letter and return in a new string.
+
+char *elfString_capitalize_utf8(const char *str);
+	Given a UTF8 string, capitalize its first letter and return in a new string.
 
 */
 

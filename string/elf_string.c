@@ -652,6 +652,50 @@ char *elfString_upper_latin1(const char *str){
 	return result;
 }
 
+// Documented in header file.
+char *elfString_lower_utf8(const char *str){
+	char *result, *aux;
+	int len;
 
-//TODO: lower(), upper(), capitalize(), title()
+	result = aux = elfString_dup(str);
+	while(*aux != '\0'){
+		len = elfEncodings_lower_utf8((unsigned char *) aux);
+		aux += len;
+	}
+
+	return result;
+}
+
+// Documented in header file.
+char *elfString_upper_utf8(const char *str){
+	char *result, *aux;
+	int len;
+
+	result = aux = elfString_dup(str);
+	while(*aux != '\0'){
+		len = elfEncodings_upper_utf8((unsigned char *) aux);
+		aux += len;
+	}
+
+	return result;
+}
+
+// Documented in header file.
+char *elfString_capitalize_latin1(const char *str){
+	char *result;
+	result = elfString_dup(str);
+	result[0] = elfEncodings_upper_latin1(result[0]);
+	return result;
+}
+
+// Documented in header file.
+char *elfString_capitalize_utf8(const char *str){
+	char *result;
+	result = elfString_dup(str);
+	elfEncodings_upper_utf8((unsigned char*) result);
+	return result;
+}
+
+
+//TODO: title()
 //TODO: latin1 to ascii

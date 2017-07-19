@@ -555,3 +555,10 @@ char *elfString_title(const char *str){
  *
  * OR MAKE SPECIAL FUNCTIONS FOR UTF8 (I like this)
  */
+
+// latin1 -> utf8
+// utf8 -> latin1
+// upper_utf8()
+// lower_utf8()
+//
+// upper_latin1() will convert first to utf8.

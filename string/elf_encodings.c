@@ -37,8 +37,7 @@ int utf8_hashing(utfchar c){
 
 // Returns the length of the UTF8 character.
 // 'firstChar' should be the first byte of the UTF8 character.
-static inline
-int utf8_getLength(unsigned char firstChar){
+int elfEncodings_charLength_utf8(unsigned char firstChar){
     if(firstChar < 0x80 ) return 1;
     else if (!(firstChar & 0x20)) return 2;
     else if (!(firstChar & 0x10)) return 3;
@@ -49,7 +48,7 @@ int utf8_getLength(unsigned char firstChar){
 
 // Documented in header file.
 int elfEncodings_lower_utf8(unsigned char *c){
-	int hash, len = utf8_getLength(*c);
+	int hash, len = elfEncodings_charLength_utf8(*c);
 	utfchar u;
 
 	if(len == 1){
@@ -71,7 +70,7 @@ int elfEncodings_lower_utf8(unsigned char *c){
 
 // Documented in header file.
 int elfEncodings_upper_utf8(unsigned char *c){
-	int hash, len = utf8_getLength(*c);
+	int hash, len = elfEncodings_charLength_utf8(*c);
 	utfchar u;
 
 	if(len == 1){
@@ -125,7 +124,7 @@ unsigned char elfEncodings_toLatin1_utf8(const unsigned char *c, int *length){
 	unsigned char result;
 	utfchar u;
 
-	len = utf8_getLength(*c);
+	len = elfEncodings_charLength_utf8(*c);
 	if(len == 1){
 		result = *c;
 	} else if(len == 2){

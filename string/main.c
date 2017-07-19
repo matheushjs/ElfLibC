@@ -324,17 +324,26 @@ void encoding_test(){
 	printf("%6s: %s\n", "latin1", latin);
 
 	str = elfString_toUtf8_fromLatin1(latin);
-	printf("%6s: %s\n", "", str);
+	printf("%6s: %s\n", "UTF", str);
 	retval = strcmp(str, utf);
 	printf(retval == 0 ? "success\n" : "fail\n");
 	free(str);
 
 	str = elfString_toLatin1_fromUtf8(utf);
-	printf("%6s: %s\n", "", str);
+	printf("%6s: %s\n", "latin1", str);
 	retval = strcmp(str, latin);
 	printf(retval == 0 ? "success\n" : "fail\n");
 	free(str);
 
+	str = elfString_upper_latin1(latin);
+	printf("%6s: %s\n", "latin1", str);
+	free(str);
+	
+	str = elfString_lower_latin1(latin);
+	printf("%6s: %s\n", "latin1", str);
+	free(str);
+
+	printf(elfString_len_utf8(utf) == elfString_len_latin1(latin) ? "success\n" : "fail\n");
 	free(latin);
 	free(utf);
 }

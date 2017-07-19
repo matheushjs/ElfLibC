@@ -39,9 +39,15 @@ char *elfString_capitalize(const char *str);
 char *elfString_swapCase(const char *str);
 char *elfString_title(const char *str);
 
+/* ENCODING-RELATED FUNCTIONS */
 char *elfString_toUtf8_fromLatin1(const char *str);
 char *elfString_toLatin1_fromUtf8(const char *str);
 
+int elfString_len_latin1(const char *str);
+int elfString_len_utf8(const char *str);
+
+char *elfString_lower_latin1(const char *str);
+char *elfString_upper_latin1(const char *str);
 
 /* DOCUMENTATION
 
@@ -161,6 +167,16 @@ char *elfString_toUtf8_fromLatin1(const char *str);
 char *elfString_toLatin1_fromUtf8(const char *str);
 	Given a string 'str' in encoding UTF8, returns its latin1 equivalent.
 	If any utf8 character cannot be mapped to latin1, it's replaced by '*'.
+
+int elfString_len_latin1(const char *str);
+	Returns the length of a latin1 string.
+
+int elfString_len_utf8(const char *str);
+	Returns the length of a utf8 string.
+
+char *elfString_lower_latin1(const char *str);
+char *elfString_upper_latin1(const char *str);
+	Given a latin1 string, returns its lowercase/uppercase equivalent, respectively.
 
 */
 

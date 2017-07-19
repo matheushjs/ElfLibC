@@ -3,10 +3,15 @@
 
 int elfEncodings_lower_utf8(unsigned char *c);
 int elfEncodings_upper_utf8(unsigned char *c);
+
 unsigned char elfEncodings_lower_latin1(unsigned char c);
 unsigned char elfEncodings_upper_latin1(unsigned char c);
+
 int elfEncodings_toUtf8_latin1(unsigned char c, unsigned char *out1, unsigned char *out2);
 unsigned char elfEncodings_toLatin1_utf8(const unsigned char *c, int *length);
+
+int elfEncodings_charLength_utf8(unsigned char firstChar);
+
 
 /* DOCUMENTATION
 
@@ -37,6 +42,9 @@ unsigned char elfEncodings_toLatin1_utf8(const unsigned char *c, int *length);
 	  returns its latin1 representation.
 	If 'len' is not NULL, it receives the size of the utf8 character converted.
 	If the utf8 character does not map to any latin1, then 0 is returned.
+
+int elfEncodings_charLength_utf8(unsigned char firstChar);
+	Given a first byte of a utf8 character, returns the character's length.
 
 */
 

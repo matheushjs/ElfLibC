@@ -15,7 +15,9 @@ void test_lib(){
 	pbool(true, elfFile_exists("teste.txt"));
 	pbool(false, elfFile_exists("nopeeeee.txt"));
 	
-	FILE *fp = fopen("teste.txt", "r");
+	printf("%d\n", elfFile_size("teste.txt"));
+
+	FILE *fp = fopen("teste.txt", "r+");
 	printf("%c\n", elfFile_fpeek(fp));
 	pbool(false, elfFile_feof(fp));
 	fseek(fp, 0, SEEK_END);
@@ -23,12 +25,15 @@ void test_lib(){
 	printf("%c\n", elfFile_fpeek(fp));
 	fseek(fp, -1, SEEK_END);
 	printf("%c\n", elfFile_fpeek(fp));
+	elfFile_fappendContent(fp, test, sizeof(test) - 1);
+	printf("%d\n", elfFile_fsize(fp));
 	fclose(fp);
 	
 	elfFile_printByteInfo("teste.txt");
 	elfFile_printContent("teste.txt");
 	printf("\n");
 	elfFile_appendContent("teste.txt", test, sizeof(test) - 1);
+	printf("%d\n", elfFile_size("teste.txt"));
 
 	int size;
 	char *v = elfFile_getContent("teste.txt", &size);

@@ -28,6 +28,52 @@ bool elfFile_feof(FILE *fp){
 }
 
 // Documented in header file.
+void elfFile_fprintByteInfo(FILE *fp){
+	int tell = ftell(fp);
+	char c;
+	fseek(fp, 0, SEEK_SET);
+	while(!elfFile_feof(fp)){
+		c = fgetc(fp);
+		printf("%c - %3d\n", c, c);
+	}
+	fseek(fp, tell, SEEK_SET);
+}
+
+// Documented in header file.
+void elfFile_fprintContent(FILE *fp){
+	int tell = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+	while(!elfFile_feof(fp))
+		fputc(fgetc(fp), stdout);
+	fseek(fp, tell, SEEK_SET);
+}
+
+// Documented in header file.
+char *elfFile_fgetContent(FILE *fp, int *size_p){
+	int tell = ftell(fp);
+	int size = elfFile_fsize(fp);
+	char *result = malloc(sizeof(char) * size);
+	fread(result, size, sizeof(char), fp);
+	fseek(fp, tell, SEEK_SET);
+	if(size_p) *size_p = size;
+	return result;
+}
+
+// Documented in header file.
+void elfFile_fappendContent(FILE *fp, const char *contents, int size){
+	fseek(fp, 0, SEEK_END);
+	fwrite(contents, size, sizeof(char), fp);
+}
+
+// Documented in header file.
+int elfFile_size(const char *filename){
+	FILE *fp = fopen(filename, "r");
+	int size = elfFile_fsize(fp);
+	fclose(fp);
+	return size;
+}
+
+// Documented in header file.
 bool elfFile_exists(const char *filename){
 	FILE *fp = fopen(filename, "r");
 	if(!fp) return false;
@@ -38,32 +84,22 @@ bool elfFile_exists(const char *filename){
 // Documented in header file.
 void elfFile_printByteInfo(const char *filename){
 	FILE *fp = fopen(filename, "r");
-	char c;
-
 	if(!fp) return;
-
-	while(!elfFile_feof(fp)){
-		c = fgetc(fp);
-		printf("%c - %3d\n", c, c);
-	}
+	elfFile_fprintByteInfo(fp);
 	fclose(fp);
 }
 
 // Documented in header file.
 void elfFile_printContent(const char *filename){
 	FILE *fp = fopen(filename, "r");
-
 	if(!fp) return;
-
-	while(!elfFile_feof(fp))
-		fputc(fgetc(fp), stdout);
+	elfFile_fprintContent(fp);
 	fclose(fp);
 }
 
 // Documented in header file.
 char *elfFile_getContent(const char *filename, int *size_p){
 	FILE *fp = fopen(filename, "r");
-	int size;
 	char *result;
 
 	if(!fp){
@@ -72,13 +108,9 @@ char *elfFile_getContent(const char *filename, int *size_p){
 		if(size_p) *size_p = 0;
 		return result;
 	}
-
-	size = elfFile_fsize(fp);
-	result = malloc(sizeof(char) * size);
-	fread(result, size, sizeof(char), fp);
+	
+	result = elfFile_fgetContent(fp, size_p);
 	fclose(fp);
-
-	if(size_p) *size_p = size;
 	return result;
 }
 
@@ -92,6 +124,6 @@ void elfFile_setContent(const char *filename, const char *contents, int size){
 // Documented in header file.
 void elfFile_appendContent(const char *filename, const char *contents, int size){
 	FILE *fp = fopen(filename, "a");
-	fwrite(contents, sizeof(char), size, fp);
+	elfFile_fappendContent(fp, contents, size);
 	fclose(fp);
 }

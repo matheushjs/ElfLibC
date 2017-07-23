@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 // Documented in header file.
-int elfFile_size(FILE *fp){
+int elfFile_fsize(FILE *fp){
 	int tell, size;
 	
 	tell = ftell(fp);
@@ -15,15 +15,15 @@ int elfFile_size(FILE *fp){
 }
 
 // Documented in header file.
-char elfFile_peek(FILE *fp){
+char elfFile_fpeek(FILE *fp){
 	char c = fgetc(fp);
 	if(c != EOF) fseek(fp, -1, SEEK_CUR);
 	return c;
 }
 
 // Documented in header file.
-bool elfFile_eof(FILE *fp){
-	char c = elfFile_peek(fp);
+bool elfFile_feof(FILE *fp){
+	char c = elfFile_fpeek(fp);
 	return c == EOF ? true : false;
 }
 
@@ -42,7 +42,7 @@ void elfFile_printByteInfo(const char *filename){
 
 	if(!fp) return;
 
-	while(!elfFile_eof(fp)){
+	while(!elfFile_feof(fp)){
 		c = fgetc(fp);
 		printf("%c - %3d\n", c, c);
 	}
@@ -55,7 +55,7 @@ void elfFile_printContent(const char *filename){
 
 	if(!fp) return;
 
-	while(!elfFile_eof(fp))
+	while(!elfFile_feof(fp))
 		fputc(fgetc(fp), stdout);
 	fclose(fp);
 }
@@ -73,7 +73,7 @@ char *elfFile_getContent(const char *filename, int *size_p){
 		return result;
 	}
 
-	size = elfFile_size(fp);
+	size = elfFile_fsize(fp);
 	result = malloc(sizeof(char) * size);
 	fread(result, size, sizeof(char), fp);
 	fclose(fp);

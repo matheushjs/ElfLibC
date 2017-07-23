@@ -16,13 +16,13 @@ void test_lib(){
 	pbool(false, elfFile_exists("nopeeeee.txt"));
 	
 	FILE *fp = fopen("teste.txt", "r");
-	printf("%c\n", elfFile_peek(fp));
-	pbool(false, elfFile_eof(fp));
+	printf("%c\n", elfFile_fpeek(fp));
+	pbool(false, elfFile_feof(fp));
 	fseek(fp, 0, SEEK_END);
-	pbool(true, elfFile_eof(fp));
-	printf("%c\n", elfFile_peek(fp));
+	pbool(true, elfFile_feof(fp));
+	printf("%c\n", elfFile_fpeek(fp));
 	fseek(fp, -1, SEEK_END);
-	printf("%c\n", elfFile_peek(fp));
+	printf("%c\n", elfFile_fpeek(fp));
 	fclose(fp);
 	
 	elfFile_printByteInfo("teste.txt");

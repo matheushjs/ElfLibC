@@ -3,9 +3,9 @@
 
 #include <stdbool.h>
 
-int elfFile_size(FILE *fp);
-char elfFile_peek(FILE *fp);
-bool elfFile_eof(FILE *fp);
+int elfFile_fsize(FILE *fp);
+char elfFile_fpeek(FILE *fp);
+bool elfFile_feof(FILE *fp);
 
 bool elfFile_exists(const char *filename);
 void elfFile_printByteInfo(const char *filename);
@@ -14,21 +14,24 @@ char *elfFile_getContent(const char *filename, int *size_p);
 void elfFile_setContent(const char *filename, const char *contents, int size);
 void elfFile_appendContent(const char *filename, const char *contents, int size);
 
+
+
 /* DOCUMENTATION
 
 elf_file.[ch]
 	Library with routines to manipulate files.
 	All functions that receive a (FILE *) as argument are supposed to preserve the file's
-	  current position offset.
+	  current position offset. The exception are the functions where the user explicitly
+	  request that a read/write operation is executed, such as readLine().
 
 
-int elfFile_size(FILE *fp);
+int elfFile_fsize(FILE *fp);
 	Returns the size, in bytes, of the file.
 
-char elfFile_peek(FILE *fp);
+char elfFile_fpeek(FILE *fp);
 	Returns the next byte in 'fp', without advancing its current offset.
 
-bool elfFile_eof(FILE *fp);
+bool elfFile_feof(FILE *fp);
 	Returns 'true' if the file has no more bytes to be read.
 
 

@@ -103,10 +103,8 @@ char *elfFile_getContent(const char *filename, int *size_p){
 	char *result;
 
 	if(!fp){
-		result = malloc(1);
-		*result = '\0';
 		if(size_p) *size_p = 0;
-		return result;
+		return calloc(sizeof(char), 1);
 	}
 	
 	result = elfFile_fgetContent(fp, size_p);
@@ -128,8 +126,48 @@ void elfFile_appendContent(const char *filename, const char *contents, int size)
 	fclose(fp);
 }
 
+// Documented in header file.
+char *elfFile_freadLine(FILE *fp){
+	char *result;
+	int retval;
 
-//TODO: readLine
-//TODO: countLines
-//TODO: CSV Reading (another directory)
-//TODO: User input treatment (UI directory)
+	retval = fscanf(fp, "%m[^\n]", &result);
+	fscanf(fp, "%*c"); // Clear newline
+
+	if(retval != 1)
+		return calloc(sizeof(char), 1);
+	else
+		return result;
+}
+
+// Documented in header file.
+int elfFile_fcountLines(FILE *fp){
+	int count, tell = ftell(fp);
+	char c;
+
+	if(elfFile_fsize(fp) == 0)
+		return 0;
+
+	fseek(fp, 0, SEEK_SET);
+	count = 1;
+	while( (c = fgetc(fp)) != EOF )
+		if(c == '\n')
+			count++;
+
+	fseek(fp, tell, SEEK_SET);
+	return count;
+}
+
+// Documented in header file.
+int elfFile_countLines(const char *filename){
+	int count;
+	FILE *fp;
+
+	fp = fopen(filename, "r");
+	if(!fp) return 0;
+
+	count = elfFile_fcountLines(fp);
+	fclose(fp);
+
+	return count;
+}

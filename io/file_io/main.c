@@ -33,13 +33,26 @@ void test_lib(){
 	elfFile_printContent("teste.txt");
 	printf("\n");
 	elfFile_appendContent("teste.txt", test, sizeof(test) - 1);
-	printf("%d\n", elfFile_size("teste.txt"));
+	elfFile_appendContent("teste.txt", "\na\n\n", 4);
+	printf("Size: %d\n", elfFile_size("teste.txt"));
+	printf("Lines: %d\n", elfFile_countLines("teste.txt"));
 
 	int size;
 	char *v = elfFile_getContent("teste.txt", &size);
 	fwrite(v, size, sizeof(char), stdout);
 	free(v);
 	printf("\n");
+
+	char *line;
+	printf("Type a line:\n");
+	line = elfFile_freadLine(stdin);
+	printf("{%s}\n", line);
+	free(line);
+
+	printf("Type a line:\n");
+	line = elfFile_freadLine(stdin);
+	printf("{%s}\n", line);
+	free(line);
 }
 
 int main(int argc, char *argv[]){

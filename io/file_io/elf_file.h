@@ -6,6 +6,7 @@
 /* FILE POINTER ARGUMENT ONLY */
 char elfFile_fpeek(FILE *fp);
 bool elfFile_feof(FILE *fp);
+char *elfFile_freadLine(FILE *fp);
 
 /* FILE NAME ARGUMENT ONLY */
 bool elfFile_exists(const char *filename);
@@ -27,6 +28,9 @@ char *elfFile_getContent(const char *filename, int *size_p);
 void elfFile_fappendContent(FILE *fp, const char *contents, int size);
 void elfFile_appendContent(const char *filename, const char *contents, int size);
 
+int elfFile_fcountLines(FILE *fp);
+int elfFile_countLines(const char *filename);
+
 
 
 /* DOCUMENTATION
@@ -46,6 +50,8 @@ char elfFile_fpeek(FILE *fp);
 bool elfFile_feof(FILE *fp);
 	Returns 'true' if the file has no more bytes to be read.
 
+char *elfFile_freadLine(FILE *fp);
+	Returns the next line in file 'fp'.
 
 bool elfFile_exists(const char *filename);
 	Returns 'true' if file exists.
@@ -77,6 +83,10 @@ char *elfFile_getContent(const char *filename, int *size_p);
 void elfFile_fappendContent(FILE *fp, const char *contents, int size);
 void elfFile_appendContent(const char *filename, const char *contents, int size);
 	Appends 'size' bytes of 'contents' into the file with name 'filename'. Creates the file if needed.
+
+int elfFile_fcountLines(FILE *fp);
+int elfFile_countLines(const char *filename);
+	Returns the number of lines in the file.
 
 */
 

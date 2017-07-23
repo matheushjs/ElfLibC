@@ -127,3 +127,9 @@ void elfFile_appendContent(const char *filename, const char *contents, int size)
 	elfFile_fappendContent(fp, contents, size);
 	fclose(fp);
 }
+
+
+//TODO: readLine
+//TODO: countLines
+//TODO: CSV Reading (another directory)
+//TODO: User input treatment (UI directory)

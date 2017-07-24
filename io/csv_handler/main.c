@@ -23,6 +23,20 @@ void print_csv(const char *filename, char sep){
 	elfCsvR_destroy(&reader);
 }
 
+void copy_csv(const char *in, const char *out, char sep){
+	ElfCsvR *reader;
+	ElfCsvW *writer;
+	
+	reader = elfCsvR_new_withSep(in, sep);
+	writer = elfCsvW_new_withArgs(out, sep, false);
+	
+	while(elfCsvR_hasNext(reader))
+		elfCsvW_writeLine(writer, elfCsvR_nextLine_managed(reader));
+
+	elfCsvR_destroy(&reader);
+	elfCsvW_destroy(&writer);
+}
+
 int main(int argc, char *argv[]){
 	printf("=================================\n");
 	print_csv("test1.csv", ',');
@@ -31,11 +45,24 @@ int main(int argc, char *argv[]){
 	printf("=================================\n");
 	print_csv("test3.csv", ',');
 	printf("=================================\n");
-	print_csv("test4.csv", ',');
+	print_csv("test4.csv", '+');
 	printf("=================================\n");
-	print_csv("test5.csv", ',');
+
+	copy_csv("test1.csv", "out1.csv", ',');
+	copy_csv("test2.csv", "out2.csv", ',');
+	copy_csv("test3.csv", "out3.csv", ',');
+	copy_csv("test4.csv", "out4.csv", '+');
+
+	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
+
 	printf("=================================\n");
-	print_csv("test6.csv", '+');
+	print_csv("out1.csv", ',');
+	printf("=================================\n");
+	print_csv("out2.csv", ',');
+	printf("=================================\n");
+	print_csv("out3.csv", ',');
+	printf("=================================\n");
+	print_csv("out4.csv", '+');
 	printf("=================================\n");
 
 	return 0;

@@ -19,7 +19,12 @@ const char **elfCsvR_nextLine_managed(ElfCsvR *elf);
 
 
 /* CSV WRITER */
+typedef struct _ElfCsvW ElfCsvW;
 
+ElfCsvW *elfCsvW_new_withArgs(const char *filename, char sep, bool truncate);
+ElfCsvW *elfCsvW_new(const char *filename);
+void elfCsvW_destroy(ElfCsvW **elf_p);
+void elfCsvW_writeLine(ElfCsvW *elf, const char **strings);
 
 
 
@@ -67,6 +72,27 @@ const char **elfCsvR_nextLine_managed(ElfCsvR *elf);
 	  _managed() function.
 
 
+typedef ElfCsvW;
+	Structure representing a CSV Writer.
+
+ElfCsvW *elfCsvW_new_withArgs(const char *filename, char sep, bool truncate);
+	Returns a new CSV Writer, based on file with name 'filename', and considering 'sep' as the
+	  internal separator between fields.
+	If 'truncate' is true, the file will be truncated if it already exists.
+	If 'truncate' is false, we will append to the file.
+
+ElfCsvW *elfCsvW_new(const char *filename);
+	Same as above, but with default arguments:
+		sep = ','
+		truncate = true
+
+void elfCsvW_destroy(ElfCsvW **elf_p);
+	Frees all memory allocated for the given CSV Writer.
+
+void elfCsvW_writeLine(ElfCsvW *elf, const char **strings);
+	Writes a new line to the CSV file.
+	'strings' is expected to be a NULL-terminated array of strings.
+	If there are no strings in the string array, nothing is written to the CSV file.
 */
 
 #endif

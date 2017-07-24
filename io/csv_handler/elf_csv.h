@@ -25,6 +25,7 @@ ElfCsvW *elfCsvW_new_withArgs(const char *filename, char sep, bool truncate);
 ElfCsvW *elfCsvW_new(const char *filename);
 void elfCsvW_destroy(ElfCsvW **elf_p);
 void elfCsvW_writeLine(ElfCsvW *elf, const char **strings);
+void elfCsvW_writeLine_size(ElfCsvW *elf, const char **strings, int size);
 
 
 
@@ -93,6 +94,10 @@ void elfCsvW_writeLine(ElfCsvW *elf, const char **strings);
 	Writes a new line to the CSV file.
 	'strings' is expected to be a NULL-terminated array of strings.
 	If there are no strings in the string array, nothing is written to the CSV file.
+
+void elfCsvW_writeLine_size(ElfCsvW *elf, const char **strings, int size);
+	Same as above, but 'strings' is now expected to have at least 'size' strings.
+
 */
 
 #endif

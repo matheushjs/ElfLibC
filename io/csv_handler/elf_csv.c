@@ -350,3 +350,31 @@ void elfCsvW_writeLine(ElfCsvW *elf, const char **strings){
 	// Jump a line
 	fputc('\n', elf->fp);
 }
+
+// Documented in header file.
+void elfCsvW_writeLine_size(ElfCsvW *elf, const char **strings, int size){
+	bool lock_comma;
+	char *string;
+
+	// If there are no values, no line is written.
+	// Because an empty line is a line with a single empty value.
+	if(size == 0)
+		return;
+
+	lock_comma = true;
+	while(size != 0){
+		string = normalize_value(*strings, elf->sep);
+		
+		if(!lock_comma)
+			fputc(elf->sep, elf->fp);
+		fputs(string, elf->fp);
+
+		free(string);
+		lock_comma = false;
+		strings++;
+		size--;
+	}
+
+	// Jump a line
+	fputc('\n', elf->fp);
+}

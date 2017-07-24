@@ -23,6 +23,7 @@ static char **read_record(FILE *fp, char sep);
 typedef struct _ElfCsvR {
 	FILE *fp;
 	char sep;
+	char **last_read;
 } ElfCsvR;
 
 // Documented in header file.
@@ -40,6 +41,7 @@ ElfCsvR *elfCsvR_new_withSep(const char *filename, char sep){
 	// The function 'hasNext()' must return false though.
 	elf->fp = fopen(filename, "r");
 	elf->sep = sep;
+	elf->last_read = NULL;
 
 	return elf;
 }
@@ -50,11 +52,26 @@ ElfCsvR *elfCsvR_new(const char *filename){
 }
 
 // Documented in header file.
+void elfCsv_freeStrings(char **strings){
+	char **aux = strings;
+	while(*aux){
+		free(*aux);
+		aux++;
+	}
+	free(strings);
+}
+
+// Documented in header file.
 void elfCsvR_destroy(ElfCsvR **elf_p){
 	ElfCsvR *elf = *elf_p;
 	if(elf){
-		if(elf->fp)
+		if(elf->fp){
 			fclose(elf->fp);
+		}
+		if(elf->last_read){
+			elfCsv_freeStrings(elf->last_read);
+			elf->last_read = NULL; // why not?
+		}
 		free(elf);
 		*elf_p = NULL;
 	}
@@ -187,6 +204,15 @@ char **elfCsvR_nextLine(ElfCsvR *elf){
 	if(elfCsvR_hasNext(elf))
 		return read_record(elf->fp, elf->sep);
 	else return NULL;
+}
+
+// Documented in header file.
+const char **elfCsvR_nextLine_managed(ElfCsvR *elf){
+	if(elf->last_read){
+		elfCsv_freeStrings(elf->last_read);
+	}
+	elf->last_read = elfCsvR_nextLine(elf);
+	return (const char **) elf->last_read;
 }
 
 

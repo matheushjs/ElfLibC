@@ -3,7 +3,7 @@
 
 #include <elf_csv.h>
 
-void print_strings(char **strings){
+void print_strings(const char **strings){
 	while(*strings){
 		printf("{%s} ", *strings);
 		strings++;
@@ -11,24 +11,14 @@ void print_strings(char **strings){
 	printf("\n");
 }
 
-void free_strings(char **strings){
-	char **aux = strings;
-	while(*aux){
-		free(*aux);
-		aux++;
-	}
-	free(strings);
-}
-
 void print_csv(const char *filename, char sep){
 	ElfCsvR *reader;
-	char **strings;
+	const char **strings;
 
 	reader = elfCsvR_new_withSep(filename, sep);
 	while(elfCsvR_hasNext(reader)){
-		strings = elfCsvR_nextLine(reader);
+		strings = elfCsvR_nextLine_managed(reader);
 		print_strings(strings);
-		free_strings(strings);
 	}
 	elfCsvR_destroy(&reader);
 }

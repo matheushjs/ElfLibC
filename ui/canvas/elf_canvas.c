@@ -4,6 +4,8 @@
 #include <stdio.h>
 
 #define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
+#define ELF_MAX(X,Y) ((X)>(Y)?X:Y)
+#define ELF_MIN(X,Y) ((X)<(Y)?X:Y)
 
 typedef struct _ElfCanvas {
 	char **matrix;
@@ -111,10 +113,12 @@ void elfCanvas_drawText_v(ElfCanvas *elf, int w, int h, const char *str){
 
 // Documented in header file.
 void elfCanvas_fillRow_span(ElfCanvas *elf, int w1, int w2, int h, char c){
-	if(w1 < 0 || w1 >= elf->w
-	|| w2 < 0 || w2 >= elf->w
+	if(w1 < 0 || w2 < 0
 	|| w1 > w2
 	|| h < 0 || h >= elf->h) ELF_DIE("Invalid arguments");
+
+	w1 = ELF_MIN(w1, elf->w);
+	w2 = ELF_MIN(w2, elf->w-1);
 
 	while(w1 <= w2)
 		elf->matrix[h][w1++] = c;
@@ -127,10 +131,12 @@ void elfCanvas_fillRow(ElfCanvas *elf, int h, char c){
 
 // Documented in header file.
 void elfCanvas_fillCol_span(ElfCanvas *elf, int h1, int h2, int w, char c){
-	if(h1 < 0 || h1 >= elf->h
-	|| h2 < 0 || h2 >= elf->h
+	if(h1 < 0 || h2 < 0
 	|| h1 > h2
 	|| w < 0 || w >= elf->w) ELF_DIE("Invalid arguments");
+
+	h1 = ELF_MIN(h1, elf->h);
+	h2 = ELF_MIN(h2, elf->h-1);
 
 	while(h1 <= h2)
 		elf->matrix[h1++][w] = c;

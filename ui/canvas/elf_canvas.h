@@ -58,12 +58,14 @@ void elfCanvas_drawText_v(ElfCanvas *elf, int w, int h, const char *str);
 
 void elfCanvas_fillRow_span(ElfCanvas *elf, int w1, int w2, int h, char c);
 	Fills the row 'h' with character 'c', beginning from column w1 to w2.
+	If given interval is out of bounds, only the possible space is filled.
 
 void elfCanvas_fillRow(ElfCanvas *elf, int h, char c);
 	Fills the whole line 'h' with character 'c'.
 
 void elfCanvas_fillCol_span(ElfCanvas *elf, int h1, int h2, int w, char c);
 	Fills the column 'w' with character 'c', starting from row h1 to h2.
+	If given interval is out of bounds, only the possible space is filled.
 
 void elfCanvas_fillCol(ElfCanvas *elf, int w, char c);
 	Fills the whole column 'w' with character 'c'.

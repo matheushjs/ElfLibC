@@ -15,9 +15,9 @@ void test1(){
 	elfCanvas_drawText_v(elf, 9, 9, "Matheussssssssss");
 	elfCanvas_print(elf);
 
-	elfCanvas_fillRow_span(elf, 0, 9, 0, 'a');
+	elfCanvas_fillRow_span(elf, 0, 20, 0, 'a');
 	elfCanvas_fillRow(elf, 9, 'b');
-	elfCanvas_fillCol_span(elf, 0, 9, 0, 'c');
+	elfCanvas_fillCol_span(elf, 0, 20, 0, 'c');
 	elfCanvas_fillCol(elf, 9, 'd');
 
 	elfCanvas_fprint(elf, stdout);

@@ -7,11 +7,6 @@ typedef struct _ElfCanvas {
 
 	int w;  // Width
 	int h;  // Height
-
-	int wCapacity; // Size alloc'ed for each row, in number of characters.
-
-	bool fixHeight; // Canvas has fixed height value.
-	bool fixWidth;  // Canvas has fixed width value.
 } ElfCanvas;
 
 /* TODO:
@@ -34,7 +29,7 @@ static inline char *new_row(int size);
 // Returns a new char vector filled with blank spaces.
 static inline
 char *new_row(int size){
-	static int val = 32 + (32<<8) + (32<<16) + (32<<24); //32 is whitespace ascii
+	static int val = 0x20202020; // White spaces
 	char *result = malloc(size * sizeof(char));
 	memset(result, val, size * sizeof(char));
 	return result;
@@ -46,15 +41,8 @@ ElfCanvas *elfCanvas_new_wh(int width, int height){
 
 	elf = malloc(sizeof(ElfCanvas));
 	
-	elf->fixWidth  = width  >= 0 ? true : false;
-	elf->fixHeight = height >= 0 ? true : false;
-
 	elf->w = width  >= 0 ? width  : 0;
 	elf->h = height >= 0 ? height : 0;
-
-	int capacity = 8;
-	while(capacity < elf->w) capacity <<= 1;
-	elf->wCapacity = capacity;
 
 	if(elf->h > 0)
 		elf->matrix = malloc(sizeof(char *) * elf->h);
@@ -63,24 +51,9 @@ ElfCanvas *elfCanvas_new_wh(int width, int height){
 
 	int i;
 	for(i = 0; i < elf->h; i++)
-		elf->matrix[i] = new_row(elf->wCapacity);
+		elf->matrix[i] = new_row(elf->w);
 
 	return elf;
-}
-
-// Documented in header file.
-ElfCanvas *elfCanvas_new_w(int width){
-	return elfCanvas_new_wh(width, -1);
-}
-
-// Documented in header file.
-ElfCanvas *elfCanvas_new_h(int height){
-	return elfCanvas_new_wh(-1, height);
-}
-
-// Documented in header file.
-ElfCanvas *elfCanvas_new(){
-	return elfCanvas_new_wh(-1, -1);
 }
 
 // Documented in header file.

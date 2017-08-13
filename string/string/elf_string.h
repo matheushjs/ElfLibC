@@ -62,6 +62,12 @@ char *elfString_title_utf8(const char *str);
 
 /* DOCUMENTATION
 
+The conceptual object "string" is considered, in this library, to be an immutable object, hence
+  no functions modify the strings (char*) passed as arguments.
+Libraries that are allowed to modify the given strings should be called buffers (string_buf,
+  utf_string_buf and such).
+
+
 char *elfString_strip(const char *str);
 	Removes trailing and leading blank/space characters from 'str'.
 	Returns a newly allocated string.

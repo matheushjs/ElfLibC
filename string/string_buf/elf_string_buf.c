@@ -1,4 +1,7 @@
 #include <stdlib.h>
+#include <string.h>
+
+#define INITIAL_CAPACITY 8
 
 // Structure for building a string by appending characters or other strings.
 typedef struct _ElfStringBuf {
@@ -7,14 +10,18 @@ typedef struct _ElfStringBuf {
 	int capacity;
 } ElfStringBuf;
 
+/* Static functions declarations */
+static inline void change_size(ElfStringBuf *elf, int size);
+/* */
+
 // Documented in header file.
 ElfStringBuf *elfStringBuf_new(){
 	ElfStringBuf *elf;
 
 	elf = malloc(sizeof(ElfStringBuf));
-	elf->str = malloc(sizeof(char) * 8);
+	elf->str = malloc(sizeof(char) * INITIAL_CAPACITY);
 	elf->size = 0;
-	elf->capacity = 8;
+	elf->capacity = INITIAL_CAPACITY;
 
 	return elf;
 }
@@ -30,21 +37,50 @@ void elfStringBuf_destroy(ElfStringBuf **elf_p){
 	}
 }
 
-// Documented in header file.
-void elfStringBuf_appendChar(ElfStringBuf *elf, char c){
-	elf->str[elf->size] = c;
-	elf->size += 1;
-	if(elf->size == elf->capacity){
+// Changes 'buf' so that it can hold 'size' characters.
+// First checks the capacity, then grows/shrinks if needed.
+static inline
+void change_size(ElfStringBuf *elf, int size){
+	if(size < INITIAL_CAPACITY){
+		elf->size = size;
+		return;
+	}
+
+	if(elf->capacity < size){
+		// Grow
+		while(elf->capacity < size)
+			elf->capacity <<= 1;
+		elf->str = realloc(elf->str, sizeof(char) * elf->capacity);
+
+	} else if( size < (0.33 * elf->capacity) ){
+		// Shrink
+		while(elf->capacity > size)
+			elf->capacity >>= 1;
 		elf->capacity <<= 1;
+		
+		// Don't shrink too much
+		if(elf->capacity < INITIAL_CAPACITY)
+			elf->capacity = INITIAL_CAPACITY;
+
 		elf->str = realloc(elf->str, sizeof(char) * elf->capacity);
 	}
+	
+	elf->size = size;
+}
+
+// Documented in header file.
+void elfStringBuf_appendChar(ElfStringBuf *elf, char c){
+	change_size(elf, elf->size + 1);
+	elf->str[elf->size-1] = c;
 }
 
 // Documented in header file.
 void elfStringBuf_appendString(ElfStringBuf *elf, const char *str){
-	while( *str != '\0' ){
-		elfStringBuf_appendChar(elf, *str);
-		str++;
+	int i, len = strlen(str);
+	change_size(elf, elf->size + len);
+
+	for(i = 1; i <= len; i++){
+		elf->str[elf->size - i] = str[len - i];
 	}
 }
 

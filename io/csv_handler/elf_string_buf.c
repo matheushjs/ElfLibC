@@ -49,7 +49,7 @@ void elfStringBuf_appendString(ElfStringBuf *elf, const char *str){
 }
 
 // Documented in header file.
-char *elfStringBuf_getString(ElfStringBuf *elf, int *size){
+char *elfStringBuf_makeString(ElfStringBuf *elf, int *size){
 	char *result;
 	
 	result = elf->str;

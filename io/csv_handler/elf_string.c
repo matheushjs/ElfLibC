@@ -142,10 +142,10 @@ char **elfString_split(const char *str, const char *delimiter){
 		result = realloc(result, sizeof(char *) * resSize);
 
 		// Grab string on Buffer
-		result[resSize - 1] = elfStringBuf_getString(newStr, &curSize);
+		result[resSize - 1] = elfStringBuf_makeString(newStr, &curSize);
 
 		// If string is empty, we reached the end of 'str'.
-		// Notice that if it's empty, _getString() returns an empty string which should be freed.
+		// Notice that if it's empty, _makeString() returns an empty string which should be freed.
 		if(curSize == 0){
 			free(result[resSize - 1]);
 			result[resSize - 1] = NULL; // NULL-termination
@@ -204,10 +204,10 @@ char **elfString_split_bag(const char *str, const char *delimiterBag){
 		result = realloc(result, sizeof(char *) * resSize);
 
 		// Grab string on Buffer
-		result[resSize - 1] = elfStringBuf_getString(newStr, &curSize);
+		result[resSize - 1] = elfStringBuf_makeString(newStr, &curSize);
 
 		// If string is empty, we reached the end of 'str'.
-		// Notice that if it's empty, _getString() returns an empty string which should be freed.
+		// Notice that if it's empty, _makeString() returns an empty string which should be freed.
 		if(curSize == 0){
 			free(result[resSize - 1]);
 			result[resSize - 1] = NULL; // NULL-termination
@@ -253,7 +253,7 @@ char *elfString_join(const char *delimiter, ...){
 	
 	va_end(vl);
 
-	result = elfStringBuf_getString(buf, NULL);
+	result = elfStringBuf_makeString(buf, NULL);
 	elfStringBuf_destroy(&buf);
 
 	return result;
@@ -288,7 +288,7 @@ char *elfString_center_fill(const char *str, int width, char fill){
 	for(; right > 0; right--)
 		elfStringBuf_appendChar(buf, fill);
 
-	result = elfStringBuf_getString(buf, NULL);
+	result = elfStringBuf_makeString(buf, NULL);
 	elfStringBuf_destroy(&buf);
 
 	return result;
@@ -362,7 +362,7 @@ char *elfString_replace(const char *str, const char *old, const char *neww){
 		}
 	}
 	
-	result = elfStringBuf_getString(buf, NULL);
+	result = elfStringBuf_makeString(buf, NULL);
 	elfStringBuf_destroy(&buf);
 
 	return result;
@@ -427,7 +427,7 @@ char *elfString_slice(const char *str, int left, int right){
 	buf = elfStringBuf_new();
 	for(i = beg; i < end; i++)
 		elfStringBuf_appendChar(buf, str[i]);
-	result = elfStringBuf_getString(buf, NULL);
+	result = elfStringBuf_makeString(buf, NULL);
 	elfStringBuf_destroy(&buf);
 
 	return result;
@@ -443,7 +443,7 @@ char *elfString_invert(const char *str){
 	for(i = len - 1; i >= 0; i--)
 		elfStringBuf_appendChar(buf, str[i]);
 	
-	char *result = elfStringBuf_getString(buf, NULL);
+	char *result = elfStringBuf_makeString(buf, NULL);
 	elfStringBuf_destroy(&buf);
 	return result;
 }
@@ -459,7 +459,7 @@ char *elfString_lower(const char *str){
 		str++;
 	}
 
-	result = elfStringBuf_getString(buf, NULL);
+	result = elfStringBuf_makeString(buf, NULL);
 	elfStringBuf_destroy(&buf);
 
 	return result;
@@ -476,7 +476,7 @@ char *elfString_upper(const char *str){
 		str++;
 	}
 
-	result = elfStringBuf_getString(buf, NULL);
+	result = elfStringBuf_makeString(buf, NULL);
 	elfStringBuf_destroy(&buf);
 
 	return result;
@@ -509,7 +509,7 @@ char *elfString_swapCase(const char *str){
 		str++;
 	}
 
-	result = elfStringBuf_getString(buf, NULL);
+	result = elfStringBuf_makeString(buf, NULL);
 	elfStringBuf_destroy(&buf);
 
 	return result;
@@ -544,7 +544,7 @@ char *elfString_title(const char *str){
 		}
 	}
 
-	result = elfStringBuf_getString(buf, NULL);
+	result = elfStringBuf_makeString(buf, NULL);
 	elfStringBuf_destroy(&buf);
 
 	return result;
@@ -572,7 +572,7 @@ char *elfString_toUtf8_fromLatin1(const char *str){
 		str++;
 	}
 
-	result = elfStringBuf_getString(buf, NULL);
+	result = elfStringBuf_makeString(buf, NULL);
 	elfStringBuf_destroy(&buf);
 
 	return result;
@@ -595,7 +595,7 @@ char *elfString_toLatin1_fromUtf8(const char *str){
 		str += len;
 	}
 
-	result = elfStringBuf_getString(buf, NULL);
+	result = elfStringBuf_makeString(buf, NULL);
 	elfStringBuf_destroy(&buf);
 
 	return result;
@@ -653,7 +653,7 @@ char *elfString_lower_latin1(const char *str){
 		str++;
 	}
 
-	result = elfStringBuf_getString(buf, NULL);
+	result = elfStringBuf_makeString(buf, NULL);
 	elfStringBuf_destroy(&buf);
 	return result;
 }
@@ -669,7 +669,7 @@ char *elfString_upper_latin1(const char *str){
 		str++;
 	}
 
-	result = elfStringBuf_getString(buf, NULL);
+	result = elfStringBuf_makeString(buf, NULL);
 	elfStringBuf_destroy(&buf);
 	return result;
 }
@@ -747,7 +747,7 @@ char *elfString_title_latin1(const char *str){
 		}
 	}
 
-	result = elfStringBuf_getString(buf, NULL);
+	result = elfStringBuf_makeString(buf, NULL);
 	elfStringBuf_destroy(&buf);
 
 	return result;

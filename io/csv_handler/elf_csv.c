@@ -155,7 +155,7 @@ char *read_field(FILE *fp, char sep){
 		elfStringBuf_appendChar(buf, c);
 	}
 
-	result = elfStringBuf_getString(buf, NULL);
+	result = elfStringBuf_makeString(buf, NULL);
 	elfStringBuf_destroy(&buf);
 
 	return result;

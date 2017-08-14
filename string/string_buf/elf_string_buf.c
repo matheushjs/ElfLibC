@@ -103,3 +103,29 @@ char *elfStringBuf_makeString(ElfStringBuf *elf, int *size){
 }
 
 
+
+
+/*
+ * TODO
+ */
+
+int elfStringBuf_getSize(ElfStringBuf *elf){
+
+}
+
+const
+char *elfStringBuf_getString(ElfStringBuf *elf){
+	// Place the ending '\0' and return the string
+}
+
+void elfStringBuf_insertChar(ElfStringBuf *elf, int pos, char c){
+	// Inserts char 'c' so that it's at position 'pos'
+}
+
+void elfStringBuf_insertBytes(ElfStringBuf *elf, int pos, void *bytes, int size){
+	// Inserts 'size' bytes from memory position 'bytes'
+}
+
+void elfStringBuf_removeBytes(ElfStringBuf *elf, int pos, int size){
+	// Removes the given range
+}

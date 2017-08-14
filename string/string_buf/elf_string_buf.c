@@ -6,7 +6,7 @@
 // Structure for building a string by appending characters or other strings.
 typedef struct _ElfStringBuf {
 	char *str;
-	int size;
+	int size;  // Number of ascii characters in the string. (excluding the \0)
 	int capacity;
 } ElfStringBuf;
 
@@ -39,12 +39,17 @@ void elfStringBuf_destroy(ElfStringBuf **elf_p){
 
 // Changes 'buf' so that it can hold 'size' characters.
 // First checks the capacity, then grows/shrinks if needed.
+// This should be the only function reallocating ElfStringBuf's array.
+// One byte for appending a '\0' is always available.
 static inline
 void change_size(ElfStringBuf *elf, int size){
-	if(size < INITIAL_CAPACITY){
-		elf->size = size;
+	elf->size = size;
+	
+	if(size < INITIAL_CAPACITY)
 		return;
-	}
+
+	// For making an extra byte available.
+	size += 1;
 
 	if(elf->capacity < size){
 		// Grow
@@ -64,8 +69,6 @@ void change_size(ElfStringBuf *elf, int size){
 
 		elf->str = realloc(elf->str, sizeof(char) * elf->capacity);
 	}
-	
-	elf->size = size;
 }
 
 // Documented in header file.
@@ -88,14 +91,18 @@ void elfStringBuf_appendString(ElfStringBuf *elf, const char *str){
 char *elfStringBuf_makeString(ElfStringBuf *elf, int *size){
 	char *result;
 	
+	// There is always space available for the '\0'.
 	result = elf->str;
 	result[elf->size] = '\0';
+
+	// Shrink to fit.
 	result = realloc(result, sizeof(char) * (elf->size + 1));
 
 	if(size)
 		*size = elf->size;
 
-	elf->str = malloc(sizeof(char) * 8);
+	// Reset the structure.
+	elf->str = malloc(sizeof(char) * INITIAL_CAPACITY);
 	elf->size = 0;
 	elf->capacity = 8;
 
@@ -110,7 +117,7 @@ char *elfStringBuf_makeString(ElfStringBuf *elf, int *size){
  */
 
 int elfStringBuf_getSize(ElfStringBuf *elf){
-
+	return elf->size;
 }
 
 const

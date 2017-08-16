@@ -27,3 +27,47 @@ void elfUtfBuf_destroy(ElfUtfBuf **elf_p){
 		*elf_p = NULL;
 	}
 }
+
+//TODO
+
+void elfUtfBuf_appendChar(ElfUtfBuf *elf, const char *c){
+
+}
+
+void elfUtfBuf_appendString(ElfUtfBuf *elf, const char *str){
+
+}
+
+char *elfUtfBuf_makeString(ElfUtfBuf *elf, int *len){
+
+}
+
+int *elfUtfBuf_getLength(const ElfUtfBuf *elf){
+
+}
+
+const
+char *elfUtfBuf_getString(ElfStringBuf *elf){
+
+}
+
+void elfUtfBuf_insertChar(ElfStringBuf *elf, int pos, const char *c){
+
+}
+
+void elfUtfBuf_insertString(ElfStringBuf *elf, int pos, const char *string, int len){
+
+}
+
+void elfUtfBuf_removeString(ElfStringBuf *elf, int pos, int nChars){
+
+}
+
+const
+char *elfUtfBuf_getChar(const ElfStringBuf *elf, int pos){
+
+}
+
+void elfUtfBuf_setChar(ElfStringBuf *elf, int pos, const char *c){
+
+}

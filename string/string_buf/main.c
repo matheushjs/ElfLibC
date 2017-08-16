@@ -49,10 +49,16 @@ void test2(){
 	printf("Current string: %s\n", elfStringBuf_getString(buf));
 
 	// Removes all characters
-	elfStringBuf_removeBytes(buf, 0, 1000);
-	printf("Length: %d (0)\n", elfStringBuf_getLength(buf));
+	int len = elfStringBuf_getLength(buf);
+	elfStringBuf_removeBytes(buf, len-1, 1000);
 	printf("Current string: {%s}\n", elfStringBuf_getString(buf));
-
+	elfStringBuf_removeBytes(buf, len-2, 1000);
+	printf("Current string: {%s}\n", elfStringBuf_getString(buf));
+	elfStringBuf_removeBytes(buf, len-5, 1000);
+	printf("Current string: {%s}\n", elfStringBuf_getString(buf));
+	elfStringBuf_removeBytes(buf, 0, 1000);
+	printf("Current string: {%s}\n", elfStringBuf_getString(buf));
+	printf("Length: %d (0)\n", elfStringBuf_getLength(buf));
 
 	elfStringBuf_destroy(&buf);
 }

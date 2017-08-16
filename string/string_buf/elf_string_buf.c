@@ -152,5 +152,8 @@ void elfStringBuf_removeBytes(ElfStringBuf *elf, int pos, int len){
 	int beg, end;
 	for(beg = pos, end = pos + len; end < elf->len; beg++, end++)
 		elf->str[beg] = elf->str[end];
-	change_length(elf, ELF_MAX(0, elf->len - len));
+
+	//At this point, 'beg' has the position (plus 1) of last character that must remain.
+	//That should be the number of characters in the string after removal
+	change_length(elf, beg);
 }

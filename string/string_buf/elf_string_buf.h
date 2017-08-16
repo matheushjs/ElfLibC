@@ -16,6 +16,10 @@ void elfStringBuf_insertChar(ElfStringBuf *elf, int pos, char c);
 void elfStringBuf_insertBytes(ElfStringBuf *elf, int pos, const void *bytes, int len);
 void elfStringBuf_removeBytes(ElfStringBuf *elf, int pos, int len);
 
+char elfStringBuf_getChar(const ElfStringBuf *elf, int pos);
+void elfStringBuf_setChar(ElfStringBuf *elf, int pos, char c);
+
+
 /* DOCUMENTATION
 
 typedef struct _ElfStringBuf ElfStringBuf;
@@ -55,10 +59,19 @@ void elfStringBuf_insertChar(ElfStringBuf *elf, int pos, char c);
 void elfStringBuf_insertBytes(ElfStringBuf *elf, int pos, const void *bytes, int len);
 	Inserts 'len' bytes from the memory location 'bytes' into the buffer, so that it begins
 	  at position 'pos'.
+	'pos' may be the last position, but may not be beyond that.
 
 void elfStringBuf_removeBytes(ElfStringBuf *elf, int pos, int len);
 	Removes 'len' bytes from the string buffer, starting at position 'pos'.
 	The characters to the right of the removed position are "shifted-left".
+
+
+char elfStringBuf_getChar(const ElfStringBuf *elf, int pos);
+	Returns character at position 'pos'.
+
+void elfStringBuf_setChar(ElfStringBuf *elf, int pos, char c);
+	Sets character at position 'pos' to value 'c'.
+	'pos' must be a position within the string.
 
 */
 

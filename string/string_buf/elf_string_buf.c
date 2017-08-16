@@ -157,3 +157,15 @@ void elfStringBuf_removeBytes(ElfStringBuf *elf, int pos, int len){
 	//That should be the number of characters in the string after removal
 	change_length(elf, beg);
 }
+
+// Documented in header file.
+char elfStringBuf_getChar(const ElfStringBuf *elf, int pos){
+	if(pos < 0 || pos >= elf->len) ELF_DIE("Invallid position");
+	return elf->str[pos];
+}
+
+// Documented in header file.
+void elfStringBuf_setChar(ElfStringBuf *elf, int pos, char c){
+	if(pos < 0 || pos >= elf->len) ELF_DIE("Invallid position");
+	elf->str[pos] = c;
+}

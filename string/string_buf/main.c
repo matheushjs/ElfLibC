@@ -23,8 +23,13 @@ void test1(){
 
 	// Adds 2 characters 
 	elfStringBuf_insertChar(buf, 0, '1');
+	elfStringBuf_setChar(buf, 0, '2');
 	elfStringBuf_insertChar(buf, elfStringBuf_getLength(buf), '9');
+	elfStringBuf_setChar(buf, elfStringBuf_getLength(buf)-1, '8');
 	printf("Length: %d (43)\n", elfStringBuf_getLength(buf));
+
+	printf("Char at 0: %c\n", elfStringBuf_getChar(buf, 0));
+	printf("Char at end: %c\n", elfStringBuf_getChar(buf, elfStringBuf_getLength(buf)-1));
 
 	str = elfStringBuf_makeString(buf, NULL);
 	printf("%s\n", str);

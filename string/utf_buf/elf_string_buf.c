@@ -140,7 +140,7 @@ void elfStringBuf_insertBytes(ElfStringBuf *elf, int pos, const void *bytes, int
 	if(len == 0) return;
 
 	change_length(elf, elf->len + len);
-	memmove(&elf->str[pos+len], &elf->str[pos], sizeof(char) * (elf->len - pos));
+	memmove(&elf->str[pos+len], &elf->str[pos], sizeof(char) * (elf->len - pos - len));
 	memcpy(&elf->str[pos], bytes, sizeof(char) * len);
 }
 

@@ -1,5 +1,9 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
+#define ELF_MAX(X,Y) ((X)>(Y)?X:Y)
 
 #define INITIAL_CAPACITY 8
 
@@ -109,30 +113,44 @@ char *elfStringBuf_makeString(ElfStringBuf *elf, int *len){
 	return result;
 }
 
-
-
-
-/*
- * TODO
- */
-
-int elfStringBuf_getLength(ElfStringBuf *elf){
+// Documented in header file.
+int elfStringBuf_getLength(const ElfStringBuf *elf){
 	return elf->len;
 }
 
+// Documented in header file.
 const
 char *elfStringBuf_getString(ElfStringBuf *elf){
-	// Place the ending '\0' and return the string
+	elf->str[elf->len] = '\0';
+	return (const char *) elf->str;
 }
 
+// Documented in header file.
 void elfStringBuf_insertChar(ElfStringBuf *elf, int pos, char c){
-	// Inserts char 'c' so that it's at position 'pos'
+	if(pos < 0 || pos > elf->len) ELF_DIE("Invallid position");
+	
+	change_length(elf, elf->len + 1);
+	memmove(&elf->str[pos+1], &elf->str[pos], sizeof(char) * (elf->len - pos));
+	elf->str[pos] = c;
 }
 
-void elfStringBuf_insertBytes(ElfStringBuf *elf, int pos, void *bytes, int len){
-	// Inserts 'len' bytes from memory position 'bytes'
+// Documented in header file.
+void elfStringBuf_insertBytes(ElfStringBuf *elf, int pos, const void *bytes, int len){
+	if(pos < 0 || pos > elf->len) ELF_DIE("Invallid position");
+	if(len == 0) return;
+
+	change_length(elf, elf->len + len);
+	memmove(&elf->str[pos+len], &elf->str[pos], sizeof(char) * (elf->len - pos));
+	memcpy(&elf->str[pos], bytes, sizeof(char) * len);
 }
 
+// Documented in header file.
 void elfStringBuf_removeBytes(ElfStringBuf *elf, int pos, int len){
-	// Removes the given range
+	if(pos < 0 || pos > elf->len) ELF_DIE("Invallid position");
+	if(len == 0) return;
+
+	int beg, end;
+	for(beg = pos, end = pos + len; end < elf->len; beg++, end++)
+		elf->str[beg] = elf->str[end];
+	change_length(elf, ELF_MAX(0, elf->len - len));
 }

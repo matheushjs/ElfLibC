@@ -31,7 +31,17 @@ void elfUtfBuf_destroy(ElfUtfBuf **elf_p){
 //TODO
 
 void elfUtfBuf_appendChar(ElfUtfBuf *elf, const char *c){
+	int charLen, bufLen;
 
+	// Get length of the given char
+	charLen = elfEncodings_charLength_utf8(*c);
+
+	// Get length of current string
+	bufLen = elfStringBuf_getLength(elf->buf);
+
+	// Insert character to the end of the buffer
+	elfStringBuf_insertBytes(elf->buf, bufLen, c, charLen);
+	elf->len += 1;
 }
 
 void elfUtfBuf_appendString(ElfUtfBuf *elf, const char *str){

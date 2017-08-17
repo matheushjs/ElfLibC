@@ -40,7 +40,7 @@ void elfStringBuf_appendString(ElfStringBuf *elf, const char *str);
 
 char *elfStringBuf_makeString(ElfStringBuf *elf, int *len);
 	Returns the string within the given ElfStringBuf, and resets its state to having a string of len 0.
-	If 'len' is not NULL, it receives the lenth of the returned string, disregarding the '\0'.
+	If 'len' is not NULL, it receives the length of the returned string, disregarding the '\0'.
 
 
 int elfStringBuf_getLength(const ElfStringBuf *elf);

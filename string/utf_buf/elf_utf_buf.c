@@ -28,8 +28,7 @@ void elfUtfBuf_destroy(ElfUtfBuf **elf_p){
 	}
 }
 
-//TODO
-
+// Documented in header file.
 void elfUtfBuf_appendChar(ElfUtfBuf *elf, const char *c){
 	int charLen, bufLen;
 
@@ -44,6 +43,26 @@ void elfUtfBuf_appendChar(ElfUtfBuf *elf, const char *c){
 	elf->len += 1;
 }
 
+// Documented in header file.
+const
+char *elfUtfBuf_getString(ElfUtfBuf *elf){
+	return elfStringBuf_getString(elf->buf);
+}
+
+// Documented in header file.
+int elfUtfBuf_getLength(const ElfUtfBuf *elf){
+	return elf->len;
+}
+
+// Documented in header file.
+int elfUtfBuf_getSize(const ElfUtfBuf *elf){
+	return elfStringBuf_getLength(elf->buf);
+}
+
+
+
+//TODO
+
 void elfUtfBuf_appendString(ElfUtfBuf *elf, const char *str){
 
 }
@@ -52,32 +71,23 @@ char *elfUtfBuf_makeString(ElfUtfBuf *elf, int *len){
 
 }
 
-int *elfUtfBuf_getLength(const ElfUtfBuf *elf){
+void elfUtfBuf_insertChar(ElfUtfBuf *elf, int pos, const char *c){
+
+}
+
+void elfUtfBuf_insertString(ElfUtfBuf *elf, int pos, const char *string, int len){
+
+}
+
+void elfUtfBuf_removeString(ElfUtfBuf *elf, int pos, int nChars){
 
 }
 
 const
-char *elfUtfBuf_getString(ElfStringBuf *elf){
+char *elfUtfBuf_getChar(const ElfUtfBuf *elf, int pos){
 
 }
 
-void elfUtfBuf_insertChar(ElfStringBuf *elf, int pos, const char *c){
-
-}
-
-void elfUtfBuf_insertString(ElfStringBuf *elf, int pos, const char *string, int len){
-
-}
-
-void elfUtfBuf_removeString(ElfStringBuf *elf, int pos, int nChars){
-
-}
-
-const
-char *elfUtfBuf_getChar(const ElfStringBuf *elf, int pos){
-
-}
-
-void elfUtfBuf_setChar(ElfStringBuf *elf, int pos, const char *c){
+void elfUtfBuf_setChar(ElfUtfBuf *elf, int pos, const char *c){
 
 }

@@ -5,6 +5,7 @@
 #define EPRINT(X) printf("\n -=-=- " X " -=-=- \n")
 
 void test1(){
+	int i;
 	ElfUtfBuf *buf = elfUtfBuf_new();
 
 	// Adds 3 characters.
@@ -50,6 +51,21 @@ void test1(){
 	printf("Len: %d\n", elfUtfBuf_getLength(buf));
 	printf("Bytes: %d\n", elfUtfBuf_getSize(buf));
 	printf("0> %s\n1> まみむめも はひふへほ たちつてと\n", elfUtfBuf_getString(buf));
+
+	EPRINT("getChar");
+	for(i = elfUtfBuf_getLength(buf) - 1; i >= 0; i--){
+		printf("%s\n", elfUtfBuf_getChar(buf, i));
+	}
+
+	EPRINT("removeString");
+	elfUtfBuf_removeString(buf, 0, 0);
+	elfUtfBuf_removeString(buf, 17, 1);
+	elfUtfBuf_removeString(buf, 16, 1);
+	elfUtfBuf_removeString(buf, 11, 100);
+	elfUtfBuf_removeString(buf, 0, 6);
+	printf("Len: %d\n", elfUtfBuf_getLength(buf));
+	printf("Bytes: %d\n", elfUtfBuf_getSize(buf));
+	printf("0> %s\n1> はひふへほ\n", elfUtfBuf_getString(buf));
 
 	made = elfUtfBuf_makeString(buf, &len);
 	EPRINT("makeString");

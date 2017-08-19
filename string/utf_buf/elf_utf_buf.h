@@ -17,7 +17,9 @@ char *elfUtfBuf_makeString(ElfUtfBuf *elf, int *len);
 
 void elfUtfBuf_insertChar(ElfUtfBuf *elf, int pos, const char *c);
 void elfUtfBuf_insertString(ElfUtfBuf *elf, int pos, const char *string);
+void elfUtfBuf_removeString(ElfUtfBuf *elf, int pos, int nChars);
 
+const char *elfUtfBuf_getChar(const ElfUtfBuf *elf, int pos);
 
 /* DOCUMENTATION
 
@@ -64,6 +66,15 @@ void elfUtfBuf_insertChar(ElfUtfBuf *elf, int pos, const char *c);
 void elfUtfBuf_insertString(ElfUtfBuf *elf, int pos, const char *string);
 	Inserts string 'string' in the buffer so that it occupies the position 'pos'.
 	'pos' may be the last position, but may not be beyond that.
+
+void elfUtfBuf_removeString(ElfUtfBuf *elf, int pos, int nChars);
+	Removes 'len' UTF8 characters from the utf buffer, starting the removal at the 'pos'-th character.
+	The characters to the right of the removed position are "shifted-left".
+	Any position outside of the buffer's bounds is accepted too. Simply nothing is done.
+
+const char *elfUtfBuf_getChar(const ElfUtfBuf *elf, int pos);
+	Returns the 'pos'-th character.
+	Any position outside of the buffer's bounds is considered an error.
 */
 
 #endif

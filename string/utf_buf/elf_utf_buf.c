@@ -150,18 +150,52 @@ void elfUtfBuf_insertString(ElfUtfBuf *elf, int pos, const char *string){
 	elfStringBuf_insertBytes(elf->buf, idx, string, size);
 }
 
-
-
-//TODO
-
+// Documented in header file.
 void elfUtfBuf_removeString(ElfUtfBuf *elf, int pos, int nChars){
+	if(pos < 0 || pos >= elf->len) return;
+	if(nChars == 0) return;
 
+	const char *buf;
+	int idx, len, charCount;
+
+	// Find position of 'pos'-th character
+	buf = elfStringBuf_getString(elf->buf);
+	idx = utf_char_index(buf, pos);
+
+	// Count length of bytes of nChars characters from that character
+	len = 0;
+	charCount = 0;
+	buf = &buf[idx];
+	while(*buf != '\0' && charCount < nChars){
+		int charSize = elfEncodings_charLength_utf8(*buf);
+		len += charSize;
+		buf += charSize;
+		charCount += 1;
+	}
+
+	// Remove these bytes through the string buffer.
+	elfStringBuf_removeBytes(elf->buf, idx, len);
+
+	// Change utf buffer length
+	elf->len -= charCount;
 }
 
+// Documented in header file.
 const
 char *elfUtfBuf_getChar(const ElfUtfBuf *elf, int pos){
+	if(pos < 0 || pos >= elf->len) ELF_DIE("Invallid position");
+	
+	const char *buf;
+	int idx;
 
+	// Find position of pos-th character
+	buf = elfStringBuf_getString(elf->buf);
+	idx = utf_char_index(buf, pos);
+	
+	return &buf[idx];
 }
+
+//TODO
 
 void elfUtfBuf_setChar(ElfUtfBuf *elf, int pos, const char *c){
 

@@ -15,6 +15,8 @@ int elfUtfBuf_getSize(const ElfUtfBuf *elf);
 const char *elfUtfBuf_getString(ElfUtfBuf *elf);
 char *elfUtfBuf_makeString(ElfUtfBuf *elf, int *len);
 
+void elfUtfBuf_insertChar(ElfUtfBuf *elf, int pos, const char *c);
+
 
 /* DOCUMENTATION
 
@@ -53,6 +55,10 @@ char *elfUtfBuf_makeString(ElfUtfBuf *elf, int *len);
 	Returns the string within the given ElfUtfBuf, and resets its state to having a string of len 0.
 	If 'len' is not NULL, it receives the length of the returned string, which is the number of
 	  utf characters, disregarding the trailing '\0'.
+
+void elfUtfBuf_insertChar(ElfUtfBuf *elf, int pos, const char *c);
+	Inserts character 'c' in the buffer so that it occupies the position 'pos'.
+	'pos' may be the last position, but may not be beyond that.
 
 */
 

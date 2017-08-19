@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <elf_utf_buf.h>
 
 #define EPRINT(X) printf("\n -=-=- " X " -=-=- \n")
@@ -31,6 +32,17 @@ void test1(){
 	printf("Len: %d\n", elfUtfBuf_getLength(buf));
 	printf("Bytes: %d\n", elfUtfBuf_getSize(buf));
 	printf("%s\n", elfUtfBuf_getString(buf));
+	free(made);
+
+	EPRINT("insertChar");
+	elfUtfBuf_insertChar(buf, 0, "へ");
+	elfUtfBuf_insertChar(buf, 0, "ふ");
+	elfUtfBuf_insertChar(buf, 0, "は");
+	elfUtfBuf_insertChar(buf, 1, "ひ");
+	elfUtfBuf_insertChar(buf, 4, "ほ");
+	printf("Len: %d\n", elfUtfBuf_getLength(buf));
+	printf("Bytes: %d\n", elfUtfBuf_getSize(buf));
+	printf("%s (はひふへほ)\n", elfUtfBuf_getString(buf));
 
 	elfUtfBuf_destroy(&buf);
 }

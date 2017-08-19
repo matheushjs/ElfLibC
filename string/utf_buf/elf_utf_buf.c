@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <elf_utf_buf.h>
@@ -11,6 +12,27 @@ typedef struct _ElfUtfBuf {
 	ElfStringBuf *buf;
 	int len;   // Length in number of UTF characters.
 } ElfUtfBuf;
+
+/* Static functions declarations */
+static inline int utf_char_index(const char *str, int pos);
+/* */
+
+// Given a UTF8 string, finds the index at which the pos-th character begins.
+// If 'pos' exceeds the string size, the position of '\0' is returned.
+static inline
+int utf_char_index(const char *str, int pos){
+	int index, len;
+
+	index = 0;
+	while(*str != '\0' && pos > 0){
+		len = elfEncodings_charLength_utf8(*str);
+		pos -= 1;
+		str += len;
+		index += len;
+	}
+
+	return index;
+}
 
 // Documented in header file.
 ElfUtfBuf *elfUtfBuf_new(){
@@ -86,13 +108,18 @@ int elfUtfBuf_getSize(const ElfUtfBuf *elf){
 	return elfStringBuf_getLength(elf->buf);
 }
 
+// Documented in header file.
+void elfUtfBuf_insertChar(ElfUtfBuf *elf, int pos, const char *c){
+	if(pos < 0 || pos > elf->len) ELF_DIE("Invallid position");
+	
+	int idx = utf_char_index(elfStringBuf_getString(elf->buf), pos);
+	int len = elfEncodings_charLength_utf8(*c);
+	elfStringBuf_insertBytes(elf->buf, idx, c, len);
+	elf->len += 1;
+}
 
 
 //TODO
-
-void elfUtfBuf_insertChar(ElfUtfBuf *elf, int pos, const char *c){
-
-}
 
 void elfUtfBuf_insertString(ElfUtfBuf *elf, int pos, const char *string, int len){
 

@@ -195,8 +195,29 @@ char *elfUtfBuf_getChar(const ElfUtfBuf *elf, int pos){
 	return &buf[idx];
 }
 
-//TODO
-
+// Documented in header file.
 void elfUtfBuf_setChar(ElfUtfBuf *elf, int pos, const char *c){
+	if(pos < 0 || pos >= elf->len) ELF_DIE("Invallid position");
 
+	const char *buf;
+	int i, idx, rem_size, add_size;
+
+	// Find position of pos-th character
+	buf = elfStringBuf_getString(elf->buf);
+	idx = utf_char_index(buf, pos);
+
+	// Check size of each characters
+	rem_size = elfEncodings_charLength_utf8(buf[idx]);
+	add_size = elfEncodings_charLength_utf8(*c);
+
+	// If size of new character is equal, substitute byte-by-byte
+	if(rem_size == add_size){
+		for(i = 0; i < rem_size; i++)
+			elfStringBuf_setChar(elf->buf, idx+i, c[i]);
+
+	// Else, remove bytes and then insert bytes
+	} else {
+		elfStringBuf_removeBytes(elf->buf, idx, rem_size);
+		elfStringBuf_insertBytes(elf->buf, idx, c, add_size);
+	}
 }

@@ -67,6 +67,18 @@ void test1(){
 	printf("Bytes: %d\n", elfUtfBuf_getSize(buf));
 	printf("0> %s\n1> はひふへほ\n", elfUtfBuf_getString(buf));
 
+	EPRINT("setChar");
+	for(i = elfUtfBuf_getLength(buf) - 1; i >= 0; i--)
+		elfUtfBuf_setChar(buf, i, "ん");
+	printf("Len: %d\n", elfUtfBuf_getLength(buf));
+	printf("Bytes: %d\n", elfUtfBuf_getSize(buf));
+	printf("0> %s\n", elfUtfBuf_getString(buf));
+	for(i = elfUtfBuf_getLength(buf) - 1; i >= 0; i--)
+		elfUtfBuf_setChar(buf, i, "é");
+	printf("Len: %d\n", elfUtfBuf_getLength(buf));
+	printf("Bytes: %d\n", elfUtfBuf_getSize(buf));
+	printf("0> %s\n", elfUtfBuf_getString(buf));
+
 	made = elfUtfBuf_makeString(buf, &len);
 	EPRINT("makeString");
 	printf("Len: %d\n", len);

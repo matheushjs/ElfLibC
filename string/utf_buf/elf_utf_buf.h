@@ -20,6 +20,7 @@ void elfUtfBuf_insertString(ElfUtfBuf *elf, int pos, const char *string);
 void elfUtfBuf_removeString(ElfUtfBuf *elf, int pos, int nChars);
 
 const char *elfUtfBuf_getChar(const ElfUtfBuf *elf, int pos);
+void elfUtfBuf_setChar(ElfUtfBuf *elf, int pos, const char *c);
 
 /* DOCUMENTATION
 
@@ -75,6 +76,13 @@ void elfUtfBuf_removeString(ElfUtfBuf *elf, int pos, int nChars);
 const char *elfUtfBuf_getChar(const ElfUtfBuf *elf, int pos);
 	Returns the 'pos'-th character.
 	Any position outside of the buffer's bounds is considered an error.
+
+void elfUtfBuf_setChar(ElfUtfBuf *elf, int pos, const char *c);
+	Sets the pos-th UTF8 character as being the UTF8 character 'c'.
+	If size of character 'c' is the same as character being modified, the functions just modifies the
+	  original character byte-by-byte.
+	If sizes are different, bytes are removed and then inserted, which can be a time-consuming  operation.
+	'pos' must be a position within the string.
 */
 
 #endif

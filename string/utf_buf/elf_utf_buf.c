@@ -4,6 +4,8 @@
 #include <elf_string_buf.h>
 #include <elf_encodings.h>
 
+#define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
+
 // Structure for building a string by appending characters or other strings.
 typedef struct _ElfUtfBuf {
 	ElfStringBuf *buf;
@@ -32,6 +34,10 @@ void elfUtfBuf_destroy(ElfUtfBuf **elf_p){
 void elfUtfBuf_appendChar(ElfUtfBuf *elf, const char *c){
 	int charLen, bufLen;
 
+	// In 'c' points to the end of a string.
+	if(*c == '\0')
+		return;
+
 	// Get length of the given char
 	charLen = elfEncodings_charLength_utf8(*c);
 
@@ -44,9 +50,30 @@ void elfUtfBuf_appendChar(ElfUtfBuf *elf, const char *c){
 }
 
 // Documented in header file.
+void elfUtfBuf_appendString(ElfUtfBuf *elf, const char *str){
+	int len;
+
+	while(*str != '\0'){
+		len = elfEncodings_charLength_utf8(*str);
+		elfUtfBuf_appendChar(elf, str);
+
+		// Advance whole character
+		str += len;
+	}
+}
+
+// Documented in header file.
 const
 char *elfUtfBuf_getString(ElfUtfBuf *elf){
 	return elfStringBuf_getString(elf->buf);
+}
+
+// Documented in header file.
+char *elfUtfBuf_makeString(ElfUtfBuf *elf, int *len){
+	char *result = elfStringBuf_makeString(elf->buf, NULL);
+	if(len) *len = elf->len;
+	elf->len = 0;
+	return result;
 }
 
 // Documented in header file.
@@ -62,14 +89,6 @@ int elfUtfBuf_getSize(const ElfUtfBuf *elf){
 
 
 //TODO
-
-void elfUtfBuf_appendString(ElfUtfBuf *elf, const char *str){
-
-}
-
-char *elfUtfBuf_makeString(ElfUtfBuf *elf, int *len){
-
-}
 
 void elfUtfBuf_insertChar(ElfUtfBuf *elf, int pos, const char *c){
 

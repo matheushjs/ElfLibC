@@ -16,6 +16,7 @@ const char *elfUtfBuf_getString(ElfUtfBuf *elf);
 char *elfUtfBuf_makeString(ElfUtfBuf *elf, int *len);
 
 void elfUtfBuf_insertChar(ElfUtfBuf *elf, int pos, const char *c);
+void elfUtfBuf_insertString(ElfUtfBuf *elf, int pos, const char *string);
 
 
 /* DOCUMENTATION
@@ -60,6 +61,9 @@ void elfUtfBuf_insertChar(ElfUtfBuf *elf, int pos, const char *c);
 	Inserts character 'c' in the buffer so that it occupies the position 'pos'.
 	'pos' may be the last position, but may not be beyond that.
 
+void elfUtfBuf_insertString(ElfUtfBuf *elf, int pos, const char *string);
+	Inserts string 'string' in the buffer so that it occupies the position 'pos'.
+	'pos' may be the last position, but may not be beyond that.
 */
 
 #endif

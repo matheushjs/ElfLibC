@@ -23,7 +23,6 @@ void test1(){
 	printf("Bytes: %d\n", elfUtfBuf_getSize(buf));
 	printf("%s\n", elfUtfBuf_getString(buf));
 
-
 	int len;
 	char *made = elfUtfBuf_makeString(buf, &len);
 	EPRINT("makeString");
@@ -43,6 +42,23 @@ void test1(){
 	printf("Len: %d\n", elfUtfBuf_getLength(buf));
 	printf("Bytes: %d\n", elfUtfBuf_getSize(buf));
 	printf("%s (はひふへほ)\n", elfUtfBuf_getString(buf));
+
+	EPRINT("insertString");
+	elfUtfBuf_insertString(buf, 5, " たちつてと");
+	elfUtfBuf_insertString(buf, 0, "まみむめも ");
+	elfUtfBuf_insertString(buf, 0, "");
+	printf("Len: %d\n", elfUtfBuf_getLength(buf));
+	printf("Bytes: %d\n", elfUtfBuf_getSize(buf));
+	printf("0> %s\n1> まみむめも はひふへほ たちつてと\n", elfUtfBuf_getString(buf));
+
+	made = elfUtfBuf_makeString(buf, &len);
+	EPRINT("makeString");
+	printf("Len: %d\n", len);
+	printf("%s\n", made);
+	printf("Len: %d\n", elfUtfBuf_getLength(buf));
+	printf("Bytes: %d\n", elfUtfBuf_getSize(buf));
+	printf("%s\n", elfUtfBuf_getString(buf));
+	free(made);
 
 	elfUtfBuf_destroy(&buf);
 }

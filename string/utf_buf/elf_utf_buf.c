@@ -111,19 +111,48 @@ int elfUtfBuf_getSize(const ElfUtfBuf *elf){
 // Documented in header file.
 void elfUtfBuf_insertChar(ElfUtfBuf *elf, int pos, const char *c){
 	if(pos < 0 || pos > elf->len) ELF_DIE("Invallid position");
-	
+
+	// In case given char is empty.
+	if(*c == '\0')
+		return;
+
 	int idx = utf_char_index(elfStringBuf_getString(elf->buf), pos);
 	int len = elfEncodings_charLength_utf8(*c);
 	elfStringBuf_insertBytes(elf->buf, idx, c, len);
 	elf->len += 1;
 }
 
+// Documented in header file.
+void elfUtfBuf_insertString(ElfUtfBuf *elf, int pos, const char *string){
+	if(pos < 0 || pos > elf->len) ELF_DIE("Invallid position");
+
+	int charCount, size, charSize, idx;
+	const char *aux;
+
+	// Calculate number of bytes on the string to add
+	size = 0;
+	charCount = 0;
+	aux = string;
+	while(*aux != '\0'){
+		charSize = elfEncodings_charLength_utf8(*aux);
+		aux += charSize;
+		size += charSize;
+		charCount += 1;
+	}
+
+	// Increment our length
+	elf->len += charCount;
+
+	// Find index in our buffer, where we should insert the given string
+	idx = utf_char_index(elfStringBuf_getString(elf->buf), pos);
+
+	// Insert
+	elfStringBuf_insertBytes(elf->buf, idx, string, size);
+}
+
+
 
 //TODO
-
-void elfUtfBuf_insertString(ElfUtfBuf *elf, int pos, const char *string, int len){
-
-}
 
 void elfUtfBuf_removeString(ElfUtfBuf *elf, int pos, int nChars){
 

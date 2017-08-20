@@ -3,28 +3,29 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include <elf_utf_buf.h>
+
 #define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
 #define ELF_MAX(X,Y) ((X)>(Y)?X:Y)
 #define ELF_MIN(X,Y) ((X)<(Y)?X:Y)
 
 typedef struct _ElfCanvas {
-	char **matrix;
+	ElfUtfBuf **canvas;
 	int w;  // Width
 	int h;  // Height
 } ElfCanvas;
 
 /* Static function declarations */
-static inline char *new_row(int size);
+static inline ElfUtfBuf *new_buffer(int size);
 /* */
 
-// Returns a new char vector filled with blank spaces.
+// Returns a new Utf buffer filled with 'size' blank spaces.
 static inline
-char *new_row(int size){
-	char *result = malloc(size * sizeof(char));
-	int i;
-	for(i = 0; i < size; i++)
-		result[i] = ' ';
-	return result;
+ElfUtfBuf *new_buffer(int size){
+	ElfUtfBuf *buf = elfUtfBuf_new();
+	for(; size > 0; size--)
+		elfUtfBuf_appendChar(buf, " ");
+	return buf;
 }
 
 // Documented in header file.
@@ -35,11 +36,11 @@ ElfCanvas *elfCanvas_new(int width, int height){
 	
 	elf->w = width  > 0 ? width  : 1;
 	elf->h = height > 0 ? height : 1;
-	elf->matrix = malloc(sizeof(char *) * elf->h);
+	elf->canvas = malloc(sizeof(ElfUtfBuf *) * elf->h);
 
 	int i;
 	for(i = 0; i < elf->h; i++)
-		elf->matrix[i] = new_row(elf->w);
+		elf->canvas[i] = new_buffer(elf->w);
 
 	return elf;
 }
@@ -50,8 +51,8 @@ void elfCanvas_destroy(ElfCanvas **elf_p){
 	if(elf){
 		int i;
 		for(i = 0; i < elf->h; i++)
-			free(elf->matrix[i]);
-		free(elf->matrix);
+			elfUtfBuf_destroy(&elf->canvas[i]);
+		free(elf->canvas);
 		free(elf);
 		*elf_p = NULL;
 	}
@@ -70,8 +71,11 @@ int elfCanvas_getHeight(const ElfCanvas *elf){
 // Documented in header file.
 void elfCanvas_fprint(const ElfCanvas *elf, FILE *fp){
 	int i;
+	const char *str;
+
 	for(i = 0; i < elf->h; i++){
-		fwrite(elf->matrix[i], sizeof(char), elf->w, fp);
+		str = elfUtfBuf_getString(elf->canvas[i]);
+		fprintf(fp, "%s", str);
 		fputc('\n', fp);
 	}
 }
@@ -84,7 +88,7 @@ void elfCanvas_print(const ElfCanvas *elf){
 // Documented in header file.
 void elfCanvas_drawChar(const ElfCanvas *elf, int w, int h, char c){
 	if(w < 0 || w >= elf->w || h < 0 || h >= elf->h) ELF_DIE("Invalid arguments");
-	elf->matrix[h][w] = c;
+	elfUtfBuf_setChar(elf->canvas[h], w, &c);
 }
 
 // Documented in header file.
@@ -95,7 +99,7 @@ void elfCanvas_drawText(ElfCanvas *elf, int w, int h, const char *str){
 	
 	size = strlen(str);
 	for(i = 0; i < size && (w+i) < elf->w; i++){
-		elf->matrix[h][w+i] = str[i];
+		elfUtfBuf_setChar(elf->canvas[h], w+i, &str[i]);
 	}
 }
 
@@ -107,7 +111,7 @@ void elfCanvas_drawText_v(ElfCanvas *elf, int w, int h, const char *str){
 	
 	size = strlen(str);
 	for(i = 0; i < size && (h+i) < elf->h; i++){
-		elf->matrix[h+i][w] = str[i];
+		elfUtfBuf_setChar(elf->canvas[h+i], w, &str[i]);
 	}
 }
 
@@ -120,8 +124,10 @@ void elfCanvas_fillRow_span(ElfCanvas *elf, int w1, int w2, int h, char c){
 	w1 = ELF_MIN(w1, elf->w);
 	w2 = ELF_MIN(w2, elf->w-1);
 
-	while(w1 <= w2)
-		elf->matrix[h][w1++] = c;
+	while(w1 <= w2){
+		elfUtfBuf_setChar(elf->canvas[h], w1, &c);
+		w1++;
+	}
 }
 
 // Documented in header file.
@@ -138,8 +144,10 @@ void elfCanvas_fillCol_span(ElfCanvas *elf, int h1, int h2, int w, char c){
 	h1 = ELF_MIN(h1, elf->h);
 	h2 = ELF_MIN(h2, elf->h-1);
 
-	while(h1 <= h2)
-		elf->matrix[h1++][w] = c;
+	while(h1 <= h2){
+		elfUtfBuf_setChar(elf->canvas[h1], w, &c);
+		h1++;
+	}
 }
 
 // Documented in header file.

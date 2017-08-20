@@ -30,6 +30,10 @@ typedef ElfCanvas;
 	Structure that holds a matrix of characters which can be printed to a file at any point.
 	All the characters are expected to be in encoding UTF8, hence why all character arguments
 	  are actually received as (char*).
+	All characters are expected to have the same width when displayed in whatever displaying
+	  device the canvas will be printed on. This means that accented characters probably mix
+	  well with ascii characters, but japanese characters wouldn't because they are normally
+	  wider.
 
 ElfCanvas *elfCanvas_new(int width, int height);
 	Returns a new ElfCanvas that holds 'height' lines of text and 'width' UTF characters

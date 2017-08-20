@@ -10,15 +10,15 @@ void test1(){
 	elfCanvas_drawChar(elf, 0, 9, "*");
 	elfCanvas_print(elf);
 	
-	elfCanvas_drawText(elf, 0, 0, "Matheusssssssssss");
-	elfCanvas_drawText_v(elf, 0, 0, "Matheussssssssss");
-	elfCanvas_drawText_v(elf, 9, 9, "Matheussssssssss");
+	elfCanvas_drawText(elf, 0, 0, "Mathéússsssssssss");
+	elfCanvas_drawText_v(elf, 0, 0, "Mathéússssssssss");
+	elfCanvas_drawText_v(elf, 9, 9, "Mathéússssssssss");
 	elfCanvas_print(elf);
 
-	elfCanvas_fillRow_span(elf, 0, 20, 0, "a");
-	elfCanvas_fillRow(elf, 9, "b");
-	elfCanvas_fillCol_span(elf, 0, 20, 0, "c");
-	elfCanvas_fillCol(elf, 9, "d");
+	elfCanvas_fillRow_span(elf, 0, 20, 0, "á");
+	elfCanvas_fillRow(elf, 9, "í");
+	elfCanvas_fillCol_span(elf, 0, 20, 0, "ú");
+	elfCanvas_fillCol(elf, 9, "é");
 
 	elfCanvas_fprint(elf, stdout);
 	elfCanvas_destroy(&elf);

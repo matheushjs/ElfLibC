@@ -154,6 +154,17 @@ unsigned char elfEncodings_toAscii_latin1(unsigned char c){
 	}
 }
 
+// Documented in header file.
+unsigned char *elfEncodings_advanceChar_utf8(unsigned char *str){
+	return str + elfEncodings_charLength_utf8(*str);
+}
+
+// Documented in header file.
+const
+unsigned char *elfEncodings_advanceChar_utf8_c(const unsigned char *str){
+	return str + elfEncodings_charLength_utf8(*str);
+}
+
 static unsigned char lower_latinCaseHash[128] = {
 128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,
 146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,

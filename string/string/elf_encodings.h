@@ -13,8 +13,13 @@ unsigned char elfEncodings_toAscii_latin1(unsigned char c);
 
 int elfEncodings_charLength_utf8(unsigned char firstChar);
 
+unsigned char *elfEncodings_advanceChar_utf8(unsigned char *str);
+const unsigned char *elfEncodings_advanceChar_utf8_c(const unsigned char *str);
 
 /* DOCUMENTATION
+
+Library for manipulating individual UTF or latin1 characters.
+For manipulating multiple characters, refer to elfString library or anything alike.
 
 int elfEncodings_lower_utf8(unsigned char *c);
 	Converts an utf8 character to lowercase.
@@ -52,6 +57,9 @@ unsigned char elfEncodings_toAscii_latin1(unsigned char c);
 int elfEncodings_charLength_utf8(unsigned char firstChar);
 	Given a first byte of a utf8 character, returns the character's length.
 
+unsigned char *elfEncodings_advanceChar_utf8(unsigned char *str);
+const unsigned char *elfEncodings_advanceChar_utf8_c(const unsigned char *str);
+	Returns a pointer to the next character of the UTF8 string.
 */
 
 #endif

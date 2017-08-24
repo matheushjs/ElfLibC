@@ -559,7 +559,7 @@ char *elfString_title(const char *str){
 char *elfString_toUtf8_fromLatin1(const char *str){
 	ElfStringBuf *buf;
 	char *result;
-	unsigned char c0, c1;
+	char c0, c1;
 
 	buf = elfStringBuf_new();
 
@@ -587,7 +587,7 @@ char *elfString_toLatin1_fromUtf8(const char *str){
 	buf = elfStringBuf_new();
 
 	while(*str != '\0'){
-		c = elfEncodings_toLatin1_utf8((unsigned char *) str, &len);
+		c = elfEncodings_toLatin1_utf8(str, &len);
 		if(c != 0)
 			elfStringBuf_appendChar(buf, c);
 		else
@@ -681,7 +681,7 @@ char *elfString_lower_utf8(const char *str){
 
 	result = aux = elfString_dup(str);
 	while(*aux != '\0'){
-		len = elfEncodings_lower_utf8((unsigned char *) aux);
+		len = elfEncodings_lower_utf8(aux);
 		aux += len;
 	}
 
@@ -695,7 +695,7 @@ char *elfString_upper_utf8(const char *str){
 
 	result = aux = elfString_dup(str);
 	while(*aux != '\0'){
-		len = elfEncodings_upper_utf8((unsigned char *) aux);
+		len = elfEncodings_upper_utf8(aux);
 		aux += len;
 	}
 
@@ -714,7 +714,7 @@ char *elfString_capitalize_latin1(const char *str){
 char *elfString_capitalize_utf8(const char *str){
 	char *result;
 	result = elfString_dup(str);
-	elfEncodings_upper_utf8((unsigned char*) result);
+	elfEncodings_upper_utf8(result);
 	return result;
 }
 
@@ -770,7 +770,7 @@ char *elfString_title_utf8(const char *str){
 			break;
 
 		// Capitalize character
-		len = elfEncodings_upper_utf8((unsigned char*) aux);
+		len = elfEncodings_upper_utf8(aux);
 		aux += len;
 
 		// Skip non-whitespace

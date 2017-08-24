@@ -1,3 +1,6 @@
+Remove unsigned qualifiers from all string libraries.
+At least the encodings one, but elfString probably has them too.
+
 avl tree
 other trees
 hash table (HashSet, HashDict)

@@ -48,7 +48,7 @@ int elfEncodings_charLength_utf8(unsigned char firstChar){
 }
 
 // Documented in header file.
-int elfEncodings_lower_utf8(unsigned char *c){
+int elfEncodings_lower_utf8(char *c){
 	int hash, len = elfEncodings_charLength_utf8(*c);
 	utfchar u;
 
@@ -70,7 +70,7 @@ int elfEncodings_lower_utf8(unsigned char *c){
 }
 
 // Documented in header file.
-int elfEncodings_upper_utf8(unsigned char *c){
+int elfEncodings_upper_utf8(char *c){
 	int hash, len = elfEncodings_charLength_utf8(*c);
 	utfchar u;
 
@@ -92,13 +92,13 @@ int elfEncodings_upper_utf8(unsigned char *c){
 }
 
 // Documented in header file.
-unsigned char elfEncodings_lower_latin1(unsigned char c){
+char elfEncodings_lower_latin1(unsigned char c){
 	if(c < 0x80) return tolower(c);
 	else return lower_latinCaseHash[latin1_hashing(c)];
 }
 
 // Documented in header file.
-unsigned char elfEncodings_upper_latin1(unsigned char c){
+char elfEncodings_upper_latin1(unsigned char c){
 	if(c < 0x80) return toupper(c);
 	else return upper_latinCaseHash[latin1_hashing(c)];
 }
@@ -108,7 +108,7 @@ unsigned char elfEncodings_upper_latin1(unsigned char c){
 //Answer from user 'Lord Raiden'
 //
 // Documented in header file.
-int elfEncodings_toUtf8_latin1(unsigned char c, unsigned char *out1, unsigned char *out2){
+int elfEncodings_toUtf8_latin1(unsigned char c, char *out1, char *out2){
 	if(c < 0x80){
 		*out1 = c, *out2 = 0;
 		return 1;
@@ -120,9 +120,9 @@ int elfEncodings_toUtf8_latin1(unsigned char c, unsigned char *out1, unsigned ch
 }
 
 // Documented in header file.
-unsigned char elfEncodings_toLatin1_utf8(const unsigned char *c, int *length){
+char elfEncodings_toLatin1_utf8(const char *c, int *length){
 	int hash, len;
-	unsigned char result;
+	char result;
 	utfchar u;
 
 	len = elfEncodings_charLength_utf8(*c);
@@ -144,7 +144,7 @@ unsigned char elfEncodings_toLatin1_utf8(const unsigned char *c, int *length){
 }
 
 // Documented in header file.
-unsigned char elfEncodings_toAscii_latin1(unsigned char c){
+char elfEncodings_toAscii_latin1(unsigned char c){
 	int hash;
 	if(c < 0x80){
 		return c;
@@ -155,13 +155,13 @@ unsigned char elfEncodings_toAscii_latin1(unsigned char c){
 }
 
 // Documented in header file.
-unsigned char *elfEncodings_advanceChar_utf8(unsigned char *str){
+char *elfEncodings_advanceChar_utf8(char *str){
 	return str + elfEncodings_charLength_utf8(*str);
 }
 
 // Documented in header file.
 const
-unsigned char *elfEncodings_advanceChar_utf8_c(const unsigned char *str){
+char *elfEncodings_advanceChar_utf8_c(const char *str){
 	return str + elfEncodings_charLength_utf8(*str);
 }
 

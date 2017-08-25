@@ -102,7 +102,9 @@ char *elfString_format(const char *format, ...){
 char **elfString_split(const char *str, const char *delimiter){
 	char **result, c;
 	const char *iter;
-	int delSize, resSize, curSize;
+	int delSize, // size of the delimiter
+	    resSize, // size of array 'result'
+	    curSize; // curSize, size of token being processed
 	ElfStringBuf *newStr;
 
 	iter = str;
@@ -779,4 +781,49 @@ char *elfString_title_utf8(const char *str){
 	}
 
 	return result;
+}
+
+
+/*
+ * TODO
+ */
+
+char **elfString_split_utf8(const char *str, const char *delimiter){
+	char **result, c;
+	const char *iter;
+	int delLen,  // number of characters in the delimiter
+	    delSize, // Number of bytes used in the delimiter
+	    resSize, // size of array 'result'
+	    curSize; // curSize, size of token being processed
+	ElfStringBuf *newStr;
+
+	iter = str;
+	delLen  = elfString_len_utf8(delimiter);
+	delSize = strlen(delimiter);
+
+	// Protection against delimiter = "". Which would cause an eternal loop.
+	if(delLen == 0){
+		result = malloc(sizeof(char *) * 2);
+		result[0] = elfString_dup(str);
+		result[1] = NULL;
+		return result;
+	}
+
+	// Initialize for usage with realloc
+	resSize = 0;
+	result = NULL;
+
+	// Initialize stringBuf
+	newStr = elfStringBuf_new();
+
+	while(true){
+		// XXX
+	}
+
+	elfStringBuf_destroy(&newStr);
+	return result;
+}
+
+char **elfString_split_bag_utf8(const char *str, const char *delimiterBag){
+	return NULL;
 }

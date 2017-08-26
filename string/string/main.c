@@ -412,6 +412,14 @@ void utfsplit_test(){
 	result = elfString_split_utf8(u2, "　");
 	print_stringArray(result);
 	free_stringArray(result);
+
+	result = elfString_split_utf8(u2, "");
+	print_stringArray(result);
+	free_stringArray(result);
+
+	result = elfString_split_utf8(u2, "アンダーテール");
+	print_stringArray(result);
+	free_stringArray(result);
 }
 
 int main(int argc, char *argv[]){

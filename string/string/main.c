@@ -380,6 +380,40 @@ void encoding_test(){
 	free(utf);
 }
 
+void comp_test(){
+	char *u1, *u2;
+
+	u1 = "おはよう！";
+	u2 = "おはよう！";
+	printf("{%s} == {%s} returns %d\n", u1, u2, elfString_strncmp_utf8(u1, u2, 4));
+	printf("{%s} == {%s} returns %d\n", u1, u2, elfString_strcmp_utf8(u1, u2));
+
+	u1 = "";
+	u2 = "";
+	printf("{%s} == {%s} returns %d\n", u1, u2, elfString_strncmp_utf8(u1, u2, 4));
+	printf("{%s} == {%s} returns %d\n", u1, u2, elfString_strcmp_utf8(u1, u2));
+
+	u1 = "目の前には、好きな物があった";
+	u2 = "めのまえには、すきなものがあった";
+	printf("{%s} == {%s} returns %d\n", u1, u2, elfString_strncmp_utf8(u1, u2, 4));
+	printf("{%s} == {%s} returns %d\n", u1, u2, elfString_strcmp_utf8(u1, u2));
+}
+
+void utfsplit_test(){
+	char u1[] = "",
+		 u2[] = "皆さん、　おはよう！　今回　も　アンダーテール、　遊んでいきましょう";
+
+	char **result;
+
+	result = elfString_split_utf8(u1, "　");
+	print_stringArray(result);
+	free_stringArray(result);
+
+	result = elfString_split_utf8(u2, "　");
+	print_stringArray(result);
+	free_stringArray(result);
+}
+
 int main(int argc, char *argv[]){
 	//strip_test();
 	//format_test();
@@ -392,7 +426,9 @@ int main(int argc, char *argv[]){
 	//slice_test();
 	//invert_test();
 	//case_test();
-	encoding_test();
+	//encoding_test();
+	comp_test();
+	//utfsplit_test();
 
 	return 0;
 }

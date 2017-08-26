@@ -783,47 +783,61 @@ char *elfString_title_utf8(const char *str){
 	return result;
 }
 
+// Documented in header file.
+int elfString_strncmp_utf8(const char *a, const char *b, int size){
+	int count, cmp;
+
+	count = 0; // Number of characters that were compared and were equal
+	while(true){
+		if(count == size)
+			return 0;
+		if( *a == '\0' || *b == '\0')
+			return 0;
+		if(*a == '\0')
+			return -1;
+		if(*b == '\0')
+			return 1;
+
+		cmp = elfEncodings_charCmp_utf8(a, b);
+		if(cmp != 0)
+			return cmp;
+
+		count++;
+		a++;
+		b++;
+	}
+
+	return 0;
+}
+
+// Documented in header file.
+int elfString_strcmp_utf8(const char *a, const char *b){
+	return elfString_strncmp_utf8(a, b, -1);
+}
+
+// Documented in header file.
+char **elfString_split_utf8(const char *str, const char *delimiter){
+	// XXX: RE-DO
+	return NULL;
+}
 
 /*
  * TODO
  */
 
-char **elfString_split_utf8(const char *str, const char *delimiter){
-	char **result, c;
-	const char *iter;
-	int delLen,  // number of characters in the delimiter
-	    delSize, // Number of bytes used in the delimiter
-	    resSize, // size of array 'result'
-	    curSize; // curSize, size of token being processed
-	ElfStringBuf *newStr;
+static
+bool char_equals_any_utf(const char *c, const char *accept){
 
-	iter = str;
-	delLen  = elfString_len_utf8(delimiter);
-	delSize = strlen(delimiter);
-
-	// Protection against delimiter = "". Which would cause an eternal loop.
-	if(delLen == 0){
-		result = malloc(sizeof(char *) * 2);
-		result[0] = elfString_dup(str);
-		result[1] = NULL;
-		return result;
-	}
-
-	// Initialize for usage with realloc
-	resSize = 0;
-	result = NULL;
-
-	// Initialize stringBuf
-	newStr = elfStringBuf_new();
-
-	while(true){
-		// XXX
-	}
-
-	elfStringBuf_destroy(&newStr);
-	return result;
 }
 
 char **elfString_split_bag_utf8(const char *str, const char *delimiterBag){
+	// I've had a genious idea!!!!!
+	// Pick 1 delimiter from the delimiter bag
+	// then run over 'str' switching any delimiter into the delimiter bag to the selected delimiter
+	// then run _split_utf8 on it
+	
+	// Oh shit it wont work
+
+
 	return NULL;
 }

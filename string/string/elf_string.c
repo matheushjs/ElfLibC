@@ -791,7 +791,7 @@ int elfString_strncmp_utf8(const char *a, const char *b, int size){
 	while(true){
 		if(count == size)
 			return 0;
-		if( *a == '\0' || *b == '\0')
+		if( *a == '\0' && *b == '\0')
 			return 0;
 		if(*a == '\0')
 			return -1;
@@ -817,7 +817,7 @@ int elfString_strcmp_utf8(const char *a, const char *b){
 
 // Documented in header file.
 char **elfString_split_utf8(const char *str, const char *delimiter){
-	// XXX: RE-DO
+	//TODO: RE_DO
 	return NULL;
 }
 

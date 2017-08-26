@@ -427,8 +427,8 @@ int main(int argc, char *argv[]){
 	//invert_test();
 	//case_test();
 	//encoding_test();
-	comp_test();
-	//utfsplit_test();
+	//comp_test();
+	utfsplit_test();
 
 	return 0;
 }

@@ -16,6 +16,8 @@ int elfEncodings_charLength_utf8(unsigned char firstChar);
 char *elfEncodings_advanceChar_utf8(char *str);
 const char *elfEncodings_advanceChar_utf8_c(const char *str);
 
+int elfEncodings_charCmp_utf8(const char *a, const char *b);
+
 /* DOCUMENTATION
 
 Library for manipulating individual UTF or latin1 characters.
@@ -65,6 +67,10 @@ int elfEncodings_charLength_utf8(unsigned char firstChar);
 char *elfEncodings_advanceChar_utf8(char *str);
 const char *elfEncodings_advanceChar_utf8_c(const char *str);
 	Returns a pointer to the next character of the UTF8 string.
+
+int elfEncodings_charCmp_utf8(const char *a, const char *b);
+	Compares characters 'a' and 'b', returning -1, 0, 1 in a similar way to strcmp().
+
 */
 
 #endif

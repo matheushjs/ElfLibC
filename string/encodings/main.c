@@ -46,6 +46,29 @@ void test(){
 		u4 = (char*) elfEncodings_advanceChar_utf8(u4);
 		printf("Advance: %s\n", u4);
 	}
+
+
+	char *u5, *u6;
+
+	u5 = "は";
+	u6 = "は";
+	printf("%s == %s returns %d\n", u5, u6, elfEncodings_charCmp_utf8(u5, u6));
+
+	u5 = "a";
+	u6 = "a";
+	printf("%s == %s returns %d\n", u5, u6, elfEncodings_charCmp_utf8(u5, u6));
+
+	u5 = "a";
+	u6 = "á";
+	printf("%s == %s returns %d\n", u5, u6, elfEncodings_charCmp_utf8(u5, u6));
+
+	u5 = "は";
+	u6 = "目";
+	printf("%s == %s returns %d\n", u5, u6, elfEncodings_charCmp_utf8(u5, u6));
+
+	u5 = "目";
+	u6 = "は";
+	printf("%s == %s returns %d\n", u5, u6, elfEncodings_charCmp_utf8(u5, u6));
 }
 
 /* XXX: Might be a good idea to run the tests on ElfString too, whenever the tests here

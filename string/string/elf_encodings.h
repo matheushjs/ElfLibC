@@ -18,6 +18,9 @@ const char *elfEncodings_advanceChar_utf8_c(const char *str);
 
 int elfEncodings_charCmp_utf8(const char *a, const char *b);
 
+void elfEncodings_fputc_utf8(const char *c, FILE *fp);
+void elfEncodings_putc_utf8(const char *c);
+
 /* DOCUMENTATION
 
 Library for manipulating individual UTF or latin1 characters.
@@ -71,6 +74,11 @@ const char *elfEncodings_advanceChar_utf8_c(const char *str);
 int elfEncodings_charCmp_utf8(const char *a, const char *b);
 	Compares characters 'a' and 'b', returning -1, 0, 1 in a similar way to strcmp().
 
+void elfEncodings_fputc_utf8(const char *c, FILE *fp);
+	Writes a single UTF character 'c' to the file 'fp'.
+
+void elfEncodings_putc_utf8(const char *c);
+	Same as _fputc_utf8 but 'fp' is set as stdout.
 */
 
 #endif

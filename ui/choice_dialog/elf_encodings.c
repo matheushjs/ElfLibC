@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdio.h>
 
 /* In this file we'll be trying to handle some conversion between ascii, latin1 and UTF8.
  * Particularly, the conversion of the latin1 characters between 128-255.
@@ -178,6 +179,16 @@ int elfEncodings_charCmp_utf8(const char *a, const char *b){
 		return 1;
 	else
 		return strncmp(a, b, asize);
+}
+
+// Documented in header file.
+void elfEncodings_fputc_utf8(const char *c, FILE *fp){
+	fwrite(c, sizeof(char), elfEncodings_charLength_utf8(*c), fp);
+}
+
+// Documented in header file.
+void elfEncodings_putc_utf8(const char *c){
+	elfEncodings_fputc_utf8(c, stdout);
 }
 
 static unsigned char lower_latinCaseHash[128] = {

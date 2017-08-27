@@ -17,11 +17,10 @@ typedef struct _ElfChoiceDialog {
 	
 	char *choiceZero;   // User can specify the choice 0 (usually "leave" or "cancel")
 
-	ElfCanvas *canvas;
-	int width; // width, in characters, of the canvas. Should be optional (but with a nice default value).
-	bool canvasInvallid;  // Checks if canvas exist and if it's valid.
+	char *interface; // Stores the last built interface, in case user requests it multiple times.
+	int width;       // width, in characters, of the interface. Should be optional (but with a nice default value).
+	bool interfaceInval;  // Checks if canvas exist and if it's valid.
 	                      // It becomes invallid if user changed the dialog since last printing.
-	char *builtInterface; // Stores the last build interface, in case user requests it multiple times.
 } ElfChoiceDialog;
 
 // Documented in header file.
@@ -37,12 +36,9 @@ ElfChoiceDialog *elfChoiceDialog_new(){
 
 	elf->choiceZero = NULL;
 
-	// Canvas is only created upon a call to any function that returns
-	//   the string that represents the interface or that prints it.
-	elf->canvas = NULL;
+	elf->interface = NULL;
 	elf->width = DEFAULT_WIDTH;
-
-	elf->canvasInvallid = true;
+	elf->interfaceInval = true;
 
 	return elf;
 }
@@ -58,10 +54,8 @@ void elfChoiceDialog_destroy(ElfChoiceDialog **elf_p){
 		for(i = 0; i < elf->choiceCount; i++)
 			free(elf->choices[i]);
 		free(elf->choices);
-
 		free(elf->choiceZero);
-
-		elfCanvas_destroy(&elf->canvas);
+		free(elf->interface);
 
 		free(elf);
 		*elf_p = NULL;

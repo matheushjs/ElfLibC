@@ -807,8 +807,8 @@ int elfString_strncmp_utf8(const char *a, const char *b, int size){
 			return cmp;
 
 		count++;
-		a++;
-		b++;
+		a = elfEncodings_advanceChar_utf8_c(a);
+		b = elfEncodings_advanceChar_utf8_c(b);
 	}
 
 	return 0;

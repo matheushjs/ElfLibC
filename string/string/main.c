@@ -435,6 +435,11 @@ void utfsplit_test(){
 	print_stringArray(result);
 	free_stringArray(result);
 
+	printf("=> ");
+	result = elfString_split_utf8(u2, "、　");
+	print_stringArray(result);
+	free_stringArray(result);
+
 	printf("\n\nsplit_bag\n\n");
 
 	printf("=> ");

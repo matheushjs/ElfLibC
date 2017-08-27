@@ -11,6 +11,8 @@
 
 /* Static functions defined later */
 static bool char_equals_any(char c, const char *accept);
+static bool char_equals_any_utf8(const char *c, const char *accept);
+/* */
 
 
 // Documented in header file.
@@ -102,7 +104,9 @@ char *elfString_format(const char *format, ...){
 char **elfString_split(const char *str, const char *delimiter){
 	char **result, c;
 	const char *iter;
-	int delSize, resSize, curSize;
+	int delSize, // size of the delimiter
+	    resSize, // size of array 'result'
+	    curSize; // curSize, size of token being processed
 	ElfStringBuf *newStr;
 
 	iter = str;
@@ -159,6 +163,7 @@ char **elfString_split(const char *str, const char *delimiter){
 }
 
 // Verifies if 'c' is any character within 'accept'.
+// If 'accept' is empty, 'false' is returned.
 static
 bool char_equals_any(char c, const char *accept){
 	while(*accept != '\0'){
@@ -178,6 +183,7 @@ char **elfString_split_bag(const char *str, const char *delimiterBag){
 
 	iter = str;
 	
+	// Set up for using realloc
 	resSize = 0;
 	result = NULL;
 
@@ -185,7 +191,7 @@ char **elfString_split_bag(const char *str, const char *delimiterBag){
 	newStr = elfStringBuf_new();
 
 	while(true){
-		//Skip delimiter
+		//Skip delimiters
 		while( char_equals_any(*iter, delimiterBag) ){
 			iter += 1;
 		}
@@ -777,6 +783,176 @@ char *elfString_title_utf8(const char *str){
 		while(!isspace(*aux) && *aux != '\0')
 			aux++;
 	}
+
+	return result;
+}
+
+// Documented in header file.
+int elfString_strncmp_utf8(const char *a, const char *b, int size){
+	int count, cmp;
+
+	count = 0; // Number of characters that were compared and were equal
+	while(true){
+		if(count == size)
+			return 0;
+		if( *a == '\0' && *b == '\0')
+			return 0;
+		if(*a == '\0')
+			return -1;
+		if(*b == '\0')
+			return 1;
+
+		cmp = elfEncodings_charCmp_utf8(a, b);
+		if(cmp != 0)
+			return cmp;
+
+		count++;
+		a = elfEncodings_advanceChar_utf8_c(a);
+		b = elfEncodings_advanceChar_utf8_c(b);
+	}
+
+	return 0;
+}
+
+// Documented in header file.
+int elfString_strcmp_utf8(const char *a, const char *b){
+	return elfString_strncmp_utf8(a, b, -1);
+}
+
+// Documented in header file.
+char **elfString_split_utf8(const char *str, const char *delimiter){
+	char **result;
+	const char *iter;
+	int delLen,  // number of characters in the delimiter
+	    delSize, // Number of bytes occupied by the delimiter
+	    resSize, // size of array 'result'
+	    curSize; // curSize, size of token being processed
+	ElfStringBuf *newStr;
+
+	iter = str;
+	delLen  = elfString_len_utf8(delimiter);
+	delSize = strlen(delimiter);
+
+	// Protection against delimiter = "". Which would cause an eternal loop.
+	if(delLen == 0){
+		result = malloc(sizeof(char *) * 2);
+		result[0] = elfString_dup(str);
+		result[1] = NULL;
+		return result;
+	}
+
+	// Initialize for usage with realloc
+	resSize = 0;
+	result = NULL;
+
+	// Initialize stringBuf
+	newStr = elfStringBuf_new();
+
+	while(true){
+		// Skip delimiter
+		while( elfString_strncmp_utf8(iter, delimiter, delLen) == 0){
+			iter += delSize;
+		}
+
+		// Read token
+		while( elfString_strncmp_utf8(iter, delimiter, delLen) != 0){
+			if(*iter == '\0') break;
+			
+			// Add character to string buffer
+			int i, charSize = elfEncodings_charLength_utf8(*iter);
+			for(i = 0; i < charSize; i++)
+				elfStringBuf_appendChar(newStr, iter[i]);
+
+			iter += charSize;
+		}
+
+		// Allocate one more string
+		resSize += 1;
+		result = realloc(result, sizeof(char *) * resSize);
+
+		// Grab string on buffer
+		result[resSize - 1] = elfStringBuf_makeString(newStr, &curSize);
+
+		// If string is empty, we reached the end of 'str
+		// Notice that if it's empty, _makeString() returns an empty string that should be freed
+		if(curSize == 0){
+			free(result[resSize - 1]);
+			result[resSize - 1] = NULL; // We return a NULL-terminated array of strings
+			break;
+		}
+	}
+
+	elfStringBuf_destroy(&newStr);
+	return result;
+}
+
+// Verifies if 'c' is any UTF character within 'accept'.
+// If 'accept' is empty, 'false' is returned.
+// If 'c' is empty, 'false' is returned.
+static
+bool char_equals_any_utf8(const char *c, const char *accept){
+	while(*accept != '\0'){
+		if(elfEncodings_charCmp_utf8(c, accept) == 0)
+			return true;
+		accept = elfEncodings_advanceChar_utf8_c(accept);
+	}
+	return false;
+}
+
+// Documented in header file.
+char **elfString_split_bag_utf8(const char *str, const char *delimiterBag){
+	char **result;
+	const char *iter;
+	int resSize,
+	    curSize;
+	ElfStringBuf *newStr;
+
+	iter = str;
+
+	// Set up for using realloc
+	resSize = 0;
+	result = NULL;
+
+	// Initialize stringBuf
+	newStr = elfStringBuf_new();
+
+	while(true){
+
+		// Skip delimiters
+		while( char_equals_any_utf8(iter, delimiterBag) ){
+			iter = elfEncodings_advanceChar_utf8_c(iter);
+		}
+
+		// Read token
+		while( !char_equals_any_utf8(iter, delimiterBag) ){
+			if(*iter == '\0') break;
+
+			// Add character to the string
+			int i, charSize = elfEncodings_charLength_utf8(*iter);
+			for(i = 0; i < charSize; i++)
+				elfStringBuf_appendChar(newStr, iter[i]);
+
+			// Advance iterator
+			iter += charSize;
+		}
+
+		// Allocate one more string
+		resSize += 1;
+		result = realloc(result, sizeof(char *) * resSize);
+
+		// Grab string on Buffer
+		result[resSize - 1] = elfStringBuf_makeString(newStr, &curSize);
+
+		// If string is empty, we reached the end of 'str'.
+		// Notice that if it's empty, _makeString() returns an empty string which should be freed.
+		if(curSize == 0){
+			free(result[resSize - 1]);
+			result[resSize - 1] = NULL; // NULL-termination
+			break;
+		}
+	}
+	
+	elfStringBuf_destroy(&newStr);
 
 	return result;
 }

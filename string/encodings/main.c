@@ -69,6 +69,13 @@ void test(){
 	u5 = "目";
 	u6 = "は";
 	printf("%s == %s returns %d\n", u5, u6, elfEncodings_charCmp_utf8(u5, u6));
+
+	elfEncodings_putc_utf8("目の前に");
+	elfEncodings_putc_utf8("\n");
+	elfEncodings_putc_utf8("a");
+	elfEncodings_putc_utf8("\n");
+	elfEncodings_putc_utf8("");
+	elfEncodings_putc_utf8("\n");
 }
 
 /* XXX: Might be a good idea to run the tests on ElfString too, whenever the tests here

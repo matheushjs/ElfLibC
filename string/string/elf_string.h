@@ -63,6 +63,7 @@ int elfString_strncmp_utf8(const char *a, const char *b, int size);
 int elfString_strcmp_utf8(const char *a, const char *b);
 
 char **elfString_split_utf8(const char *str, const char *delimiter);
+char **elfString_split_bag_utf8(const char *str, const char *delimiterBag);
 
 /* DOCUMENTATION
 
@@ -235,6 +236,11 @@ int elfString_strcmp_utf8(const char *a, const char *b);
 char **elfString_split_utf8(const char *str, const char *delimiter);
 	Splits the given string 'str' into tokens that are delimited by the whole string given
 	  in the parameter 'delimiter'. Either 'str' or 'delimiter' can be encoded as UTF8.
+	Returns a NULL-terminated array of strings.
+
+char **elfString_split_bag_utf8(const char *str, const char *delimiterBag);
+	Same as _split_utf8(), but what is considered as delimiter is each individual character within the
+	  parameter 'delimiterBag'.
 	Returns a NULL-terminated array of strings.
 */
 

@@ -410,19 +410,45 @@ void utfsplit_test(){
 
 	char **result;
 
+	printf("=> ");
 	result = elfString_split_utf8(u1, "　");
 	print_stringArray(result);
 	free_stringArray(result);
 
+	printf("=> ");
 	result = elfString_split_utf8(u2, "　");
 	print_stringArray(result);
 	free_stringArray(result);
 
+	printf("=> ");
 	result = elfString_split_utf8(u2, "");
 	print_stringArray(result);
 	free_stringArray(result);
 
+	printf("=> ");
 	result = elfString_split_utf8(u2, "アンダーテール");
+	print_stringArray(result);
+	free_stringArray(result);
+
+	printf("=> ");
+	result = elfString_split_utf8(u2, "　ん");
+	print_stringArray(result);
+	free_stringArray(result);
+
+	printf("\n\nsplit_bag\n\n");
+
+	printf("=> ");
+	result = elfString_split_bag_utf8(u2, "");
+	print_stringArray(result);
+	free_stringArray(result);
+
+	printf("=> ");
+	result = elfString_split_bag_utf8(u1, "　、！");
+	print_stringArray(result);
+	free_stringArray(result);
+
+	printf("=> ");
+	result = elfString_split_bag_utf8(u2, "　、！");
 	print_stringArray(result);
 	free_stringArray(result);
 }
@@ -440,8 +466,8 @@ int main(int argc, char *argv[]){
 	//invert_test();
 	//case_test();
 	//encoding_test();
-	comp_test();
-	//utfsplit_test();
+	//comp_test();
+	utfsplit_test();
 
 	return 0;
 }

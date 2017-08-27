@@ -397,6 +397,11 @@ void comp_test(){
 	u2 = "めのまえには、すきなものがあった";
 	printf("{%s} == {%s} returns %d\n", u1, u2, elfString_strncmp_utf8(u1, u2, 4));
 	printf("{%s} == {%s} returns %d\n", u1, u2, elfString_strcmp_utf8(u1, u2));
+
+	u1 = "　アンダーテール";
+	u2 = "　ん";
+	printf("{%s} == {%s} returns %d\n", u1, u2, elfString_strncmp_utf8(u1, u2, 4));
+	printf("{%s} == {%s} returns %d\n", u1, u2, elfString_strcmp_utf8(u1, u2));
 }
 
 void utfsplit_test(){
@@ -435,8 +440,8 @@ int main(int argc, char *argv[]){
 	//invert_test();
 	//case_test();
 	//encoding_test();
-	//comp_test();
-	utfsplit_test();
+	comp_test();
+	//utfsplit_test();
 
 	return 0;
 }

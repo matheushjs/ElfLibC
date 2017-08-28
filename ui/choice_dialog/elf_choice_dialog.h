@@ -6,6 +6,13 @@ typedef struct _ElfChoiceDialog ElfChoiceDialog;
 ElfChoiceDialog *elfChoiceDialog_new();
 void elfChoiceDialog_destroy(ElfChoiceDialog **elf_p);
 
+void elfChoiceDialog_setHeader(ElfChoiceDialog *elf, const char *text);
+void elfChoiceDialog_setText(ElfChoiceDialog *elf, const char *text);
+
+int elfChoiceDialog_addChoice(ElfChoiceDialog *elf, const char *text);
+
+void elfChoiceDialog_printInternal(const ElfChoiceDialog *elf);
+
 /* DOCUMENTATION
 
 	This library provides the structure ElfChoiceDialog, that you can use to build a simple interface with
@@ -27,7 +34,7 @@ void elfChoiceDialog_destroy(ElfChoiceDialog **elf_p);
    |  [5] -                  |
    |  [6] -                  |
    |  [7] -                  |
-   | [11] -                  |  - 11 is just for illustration
+   | [11] -                  |  - 11 is just for illustration of multi-digit
    |-------------------------|
    |  [0] - Exit             |
    '-------------------------'
@@ -40,6 +47,22 @@ ElfChoiceDialog *elfChoiceDialog_new();
 
 void elfChoiceDialog_destroy(ElfChoiceDialog **elf_p);
 	Frees all memory allocated for the given ElfChoiceDialog.
+
+void elfChoiceDialog_setHeader(ElfChoiceDialog *elf, const char *text);
+	Sets the header text of the interface.
+	'text' may be NULL to unset.
+
+void elfChoiceDialog_setText(ElfChoiceDialog *elf, const char *text);
+	Sets the text of the interface.
+	'text' may be NULL to unset.
+
+int elfChoiceDialog_addChoice(ElfChoiceDialog *elf, const char *text);
+	Adds choice 'text' to the interface.
+	Returns the number of the choice added.
+
+void elfChoiceDialog_printInternal(const ElfChoiceDialog *elf);
+	Prints the internal state of the ElfChoiceDialog to stdout.
+	For debugging only.
 
 */
 

@@ -62,28 +62,59 @@ void elfChoiceDialog_destroy(ElfChoiceDialog **elf_p){
 	}
 }
 
+// Documented in header file.
+void elfChoiceDialog_setHeader(ElfChoiceDialog *elf, const char *text){
+	if(elf->header) free(elf->header);
+	elf->header = elfString_dup(text);
+}
+
+// Documented in header file.
+void elfChoiceDialog_setText(ElfChoiceDialog *elf, const char *text){
+	if(elf->text) free(elf->text);
+	elf->text = elfString_dup(text);
+}
+
+// Documented in header file.
+int elfChoiceDialog_addChoice(ElfChoiceDialog *elf, const char *text){
+	// Can't be null
+	if(!text) return -1;
+
+	// Expand choice array
+	elf->choiceCount += 1;
+	elf->choices = (char **) realloc(elf->choices, sizeof(char *) * elf->choiceCount);
+	elf->choices[elf->choiceCount - 1] = elfString_dup(text);
+
+	return elf->choiceCount;
+}
+
+// Documented in header file.
+void elfChoiceDialog_printInternal(const ElfChoiceDialog *elf){
+	if(elf->header)
+		printf("Header: %s\n", elf->header);
+	if(elf->text)
+		printf("Text: %s\n", elf->text);
+
+	int i, n;
+	for(i = 0, n = elf->choiceCount; i < n; i++){
+		printf("Choice %d: %s\n", i+1, elf->choices[i]);
+	}
+	
+	if(elf->choiceZero)
+		printf("Choice 0: %s\n", elf->choiceZero);
+
+	printf("Width: %d\n", elf->width);
+}
+
 /*
  * TODO
  */
-
-void elfChoiceDialog_setHeader(ElfChoiceDialog *elf, const char *text){
-
-}
-
-void elfChoiceDialog_setText(ElfChoiceDialog *elf, const char *text){
-
-}
-
-int elfChoiceDialog_addChoice(ElfChoiceDialog *elf, const char *text){
-
-}
 
 void elfChoiceDialog_removeChoice(ElfChoiceDialog *elf, int choiceNum){
 
 }
 
 void elfChoiceDialog_changeChoice(ElfChoiceDialog *elf, int choiceNum, const char *text){
-
+	// Can't be null
 }
 
 void elfChoiceDialog_setChoiceZero(ElfChoiceDialog *elf, const char *text){
@@ -107,6 +138,6 @@ void elfChoiceDialog_print(ElfChoiceDialog *elf){
 	elfChoiceDialog_fprint(elf, stdin);
 }
 
-int elfChoiceDialog_prompt(ElfChoiceDialog *elf){
+int elfChoiceDialog_prompt(ElfChoiceDialog *elf, const char *promptStr){
 	// Print interface to stdin and return the number typed.
 }

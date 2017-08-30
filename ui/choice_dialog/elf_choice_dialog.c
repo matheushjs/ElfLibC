@@ -123,6 +123,10 @@ void elfChoiceDialog_removeChoice(ElfChoiceDialog *elf, int choiceNum){
 	// Shrink array
 	elf->choiceCount -= 1;
 	elf->choices = (char **) realloc(elf->choices, sizeof(char *) * elf->choiceCount);
+	
+	// failsafe because of realloc() documentation.
+	if(elf->choiceCount == 0)
+		elf->choices = NULL;
 }
 
 /*

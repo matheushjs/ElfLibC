@@ -90,6 +90,42 @@ int elfChoiceDialog_addChoice(ElfChoiceDialog *elf, const char *text){
 }
 
 // Documented in header file.
+void elfChoiceDialog_removeChoice(ElfChoiceDialog *elf, int choiceNum){
+	int i, n;
+
+	if(choiceNum <= 0 || choiceNum > elf->choiceCount)
+		ELF_DIE("Invallid choice number.");
+
+
+	// We want to erase choice (choiceNum - 1), since choices here start with index 1.
+	free(elf->choices[choiceNum - 1]);
+	for(i = choiceNum - 1, n = elf->choiceCount - 1; i < n; i++){
+		// Shift choices to the left
+		elf->choices[i] = elf->choices[i+1];
+	}
+
+	// Shrink array
+	elf->choiceCount -= 1;
+	elf->choices = (char **) realloc(elf->choices, sizeof(char *) * elf->choiceCount);
+	
+	// failsafe because of realloc() documentation.
+	if(elf->choiceCount == 0)
+		elf->choices = NULL;
+}
+
+// Documented in header file.
+void elfChoiceDialog_changeChoice(ElfChoiceDialog *elf, int choiceNum, const char *text){
+	if(choiceNum <= 0 || choiceNum > elf->choiceCount)
+		ELF_DIE("Invallid choice number.");
+
+	if(text == NULL)
+		ELF_DIE("Received NULL pointer.");
+
+	free(elf->choices[choiceNum - 1]);
+	elf->choices[choiceNum - 1] = elfString_dup(text);
+}
+
+// Documented in header file.
 void elfChoiceDialog_printInternal(const ElfChoiceDialog *elf){
 	if(elf->header)
 		printf("Header: %s\n", elf->header);
@@ -107,35 +143,9 @@ void elfChoiceDialog_printInternal(const ElfChoiceDialog *elf){
 	printf("Width: %d\n", elf->width);
 }
 
-// Documented in header file.
-void elfChoiceDialog_removeChoice(ElfChoiceDialog *elf, int choiceNum){
-	int i, n;
-
-	if(choiceNum <= 0 || choiceNum > elf->choiceCount)
-		ELF_DIE("Invallid choice number.");
-
-	// We want to erase choice (choiceNum - 1), since choices here start with index 1.
-	for(i = choiceNum - 1, n = elf->choiceCount; i < n; i++){
-		// Shift choices to the left
-		elf->choices[i] = elf->choices[i+1];
-	}
-
-	// Shrink array
-	elf->choiceCount -= 1;
-	elf->choices = (char **) realloc(elf->choices, sizeof(char *) * elf->choiceCount);
-	
-	// failsafe because of realloc() documentation.
-	if(elf->choiceCount == 0)
-		elf->choices = NULL;
-}
-
 /*
  * TODO
  */
-
-void elfChoiceDialog_changeChoice(ElfChoiceDialog *elf, int choiceNum, const char *text){
-	// If NULL, remove
-}
 
 void elfChoiceDialog_setChoiceZero(ElfChoiceDialog *elf, const char *text){
 	// Can accept null

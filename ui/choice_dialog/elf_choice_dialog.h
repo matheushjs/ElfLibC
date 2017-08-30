@@ -11,6 +11,7 @@ void elfChoiceDialog_setText(ElfChoiceDialog *elf, const char *text);
 
 int elfChoiceDialog_addChoice(ElfChoiceDialog *elf, const char *text);
 void elfChoiceDialog_removeChoice(ElfChoiceDialog *elf, int choiceNum);
+void elfChoiceDialog_changeChoice(ElfChoiceDialog *elf, int choiceNum, const char *text);
 
 void elfChoiceDialog_printInternal(const ElfChoiceDialog *elf);
 
@@ -63,8 +64,12 @@ int elfChoiceDialog_addChoice(ElfChoiceDialog *elf, const char *text);
 
 void elfChoiceDialog_removeChoice(ElfChoiceDialog *elf, int choiceNum);
 	Removes choice with index 'choiceNum' from the Choice Dialog.
-	'choiceNum' must be a number higher than 1.
+	'choiceNum' must be a number higher than or equal to 1.
 	Complexity for removing a choice is O(n) on the number of choices.
+
+void elfChoiceDialog_changeChoice(ElfChoiceDialog *elf, int choiceNum, const char *text);
+	Changes choice of index 'choiceNum' to be 'text'.
+	'choicenum' must be a number higher than or equal to 1.
 
 void elfChoiceDialog_printInternal(const ElfChoiceDialog *elf);
 	Prints the internal state of the ElfChoiceDialog to stdout.

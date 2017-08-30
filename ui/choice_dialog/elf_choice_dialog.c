@@ -6,6 +6,8 @@
 #include <elf_canvas.h>
 #include <elf_string.h> // Manipulation of non-utf8 strings
 
+#define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
+
 #define DEFAULT_WIDTH 70
 
 typedef struct _ElfChoiceDialog {
@@ -105,16 +107,30 @@ void elfChoiceDialog_printInternal(const ElfChoiceDialog *elf){
 	printf("Width: %d\n", elf->width);
 }
 
+// Documented in header file.
+void elfChoiceDialog_removeChoice(ElfChoiceDialog *elf, int choiceNum){
+	int i, n;
+
+	if(choiceNum <= 0 || choiceNum > elf->choiceCount)
+		ELF_DIE("Invallid choice number.");
+
+	// We want to erase choice (choiceNum - 1), since choices here start with index 1.
+	for(i = choiceNum - 1, n = elf->choiceCount; i < n; i++){
+		// Shift choices to the left
+		elf->choices[i] = elf->choices[i+1];
+	}
+
+	// Shrink array
+	elf->choiceCount -= 1;
+	elf->choices = (char **) realloc(elf->choices, sizeof(char *) * elf->choiceCount);
+}
+
 /*
  * TODO
  */
 
-void elfChoiceDialog_removeChoice(ElfChoiceDialog *elf, int choiceNum){
-
-}
-
 void elfChoiceDialog_changeChoice(ElfChoiceDialog *elf, int choiceNum, const char *text){
-	// Can't be null
+	// If NULL, remove
 }
 
 void elfChoiceDialog_setChoiceZero(ElfChoiceDialog *elf, const char *text){

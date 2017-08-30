@@ -23,6 +23,10 @@ void test1(){
 	elfChoiceDialog_addChoice(elf, "Choice 3");
 	elfChoiceDialog_printInternal(elf);
 
+	elfChoiceDialog_removeChoice(elf, 3);
+	elfChoiceDialog_removeChoice(elf, 1);
+	elfChoiceDialog_printInternal(elf);
+
 	elfChoiceDialog_destroy(&elf);
 }
 

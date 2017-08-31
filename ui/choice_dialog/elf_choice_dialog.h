@@ -12,6 +12,9 @@ void elfChoiceDialog_setText(ElfChoiceDialog *elf, const char *text);
 int elfChoiceDialog_addChoice(ElfChoiceDialog *elf, const char *text);
 void elfChoiceDialog_removeChoice(ElfChoiceDialog *elf, int choiceNum);
 void elfChoiceDialog_changeChoice(ElfChoiceDialog *elf, int choiceNum, const char *text);
+void elfChoiceDialog_setChoiceZero(ElfChoiceDialog *elf, const char *text);
+
+void elfChoiceDialog_setWidth(ElfChoiceDialog *elf, int width);
 
 void elfChoiceDialog_printInternal(const ElfChoiceDialog *elf);
 
@@ -40,6 +43,9 @@ void elfChoiceDialog_printInternal(const ElfChoiceDialog *elf);
    |-------------------------|
    |  [0] - Exit             |
    '-------------------------'
+
+   |-------- width ----------|
+
 
 typedef ElfChoiceDialog;
 	Structure that holds the user interface.
@@ -75,6 +81,14 @@ void elfChoiceDialog_printInternal(const ElfChoiceDialog *elf);
 	Prints the internal state of the ElfChoiceDialog to stdout.
 	For debugging only.
 
+void elfChoiceDialog_setChoiceZero(ElfChoiceDialog *elf, const char *text);
+	Sets the choice number 0 of the given ChoiceDialog.
+	'text' can be NULL to unset.
+
+void elfChoiceDialog_setWidth(ElfChoiceDialog *elf, int width);
+	Sets the width of the ChoiceDialog.
+	The width is the number of characters between the Dialog's side frames, as illustrated
+	  on the top of this documentation.
 */
 
 #endif

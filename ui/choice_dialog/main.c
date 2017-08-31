@@ -32,6 +32,17 @@ void test1(){
 	elfChoiceDialog_removeChoice(elf, 1);
 	elfChoiceDialog_printInternal(elf);
 
+	elfChoiceDialog_setChoiceZero(elf, "");
+	elfChoiceDialog_setChoiceZero(elf, "ZEROOOOO");
+	elfChoiceDialog_setChoiceZero(elf, "");
+	elfChoiceDialog_setChoiceZero(elf, "ZEROOOOO!!!!!");
+	elfChoiceDialog_printInternal(elf);
+
+	elfChoiceDialog_setWidth(elf, 700);
+	elfChoiceDialog_setWidth(elf, 100);
+	elfChoiceDialog_setWidth(elf, 100);
+	elfChoiceDialog_printInternal(elf);
+
 	elfChoiceDialog_destroy(&elf);
 }
 

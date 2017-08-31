@@ -143,17 +143,22 @@ void elfChoiceDialog_printInternal(const ElfChoiceDialog *elf){
 	printf("Width: %d\n", elf->width);
 }
 
+// Documented in header file.
+void elfChoiceDialog_setChoiceZero(ElfChoiceDialog *elf, const char *text){
+	free(elf->choiceZero);
+	elf->choiceZero = elfString_dup(text);
+}
+
+// Documented in header file.
+void elfChoiceDialog_setWidth(ElfChoiceDialog *elf, int width){
+	if(width <= 0)
+		ELF_DIE("Invallid choice number.");
+	elf->width = width;
+}
+
 /*
  * TODO
  */
-
-void elfChoiceDialog_setChoiceZero(ElfChoiceDialog *elf, const char *text){
-	// Can accept null
-}
-
-void elfChoiceDialog_setWidth(ElfChoiceDialog *elf, int width){
-
-}
 
 const
 char *elfChoiceDialog_getInterface(ElfChoiceDialog *elf){

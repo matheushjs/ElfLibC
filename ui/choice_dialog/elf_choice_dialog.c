@@ -21,8 +21,8 @@ typedef struct _ElfChoiceDialog {
 
 	char *interface; // Stores the last built interface, in case user requests it multiple times.
 	int width;       // width, in characters, of the interface. Should be optional (but with a nice default value).
-	bool interfaceInval;  // Checks if canvas exist and if it's valid.
-	                      // It becomes invallid if user changed the dialog since last printing.
+	bool isValid;    // Checks if canvas exist and if it's valid.
+	                   // It becomes invallid if user changed the dialog since last printing.
 } ElfChoiceDialog;
 
 // Documented in header file.
@@ -40,7 +40,7 @@ ElfChoiceDialog *elfChoiceDialog_new(){
 
 	elf->interface = NULL;
 	elf->width = DEFAULT_WIDTH;
-	elf->interfaceInval = true;
+	elf->isValid = false;
 
 	return elf;
 }
@@ -68,12 +68,14 @@ void elfChoiceDialog_destroy(ElfChoiceDialog **elf_p){
 void elfChoiceDialog_setHeader(ElfChoiceDialog *elf, const char *text){
 	if(elf->header) free(elf->header);
 	elf->header = elfString_dup(text);
+	elf->isValid = false;
 }
 
 // Documented in header file.
 void elfChoiceDialog_setText(ElfChoiceDialog *elf, const char *text){
 	if(elf->text) free(elf->text);
 	elf->text = elfString_dup(text);
+	elf->isValid = false;
 }
 
 // Documented in header file.
@@ -86,6 +88,7 @@ int elfChoiceDialog_addChoice(ElfChoiceDialog *elf, const char *text){
 	elf->choices = (char **) realloc(elf->choices, sizeof(char *) * elf->choiceCount);
 	elf->choices[elf->choiceCount - 1] = elfString_dup(text);
 
+	elf->isValid = false;
 	return elf->choiceCount;
 }
 
@@ -111,6 +114,7 @@ void elfChoiceDialog_removeChoice(ElfChoiceDialog *elf, int choiceNum){
 	// failsafe because of realloc() documentation.
 	if(elf->choiceCount == 0)
 		elf->choices = NULL;
+	elf->isValid = false;
 }
 
 // Documented in header file.
@@ -123,6 +127,7 @@ void elfChoiceDialog_changeChoice(ElfChoiceDialog *elf, int choiceNum, const cha
 
 	free(elf->choices[choiceNum - 1]);
 	elf->choices[choiceNum - 1] = elfString_dup(text);
+	elf->isValid = false;
 }
 
 // Documented in header file.
@@ -147,6 +152,7 @@ void elfChoiceDialog_printInternal(const ElfChoiceDialog *elf){
 void elfChoiceDialog_setChoiceZero(ElfChoiceDialog *elf, const char *text){
 	free(elf->choiceZero);
 	elf->choiceZero = elfString_dup(text);
+	elf->isValid = false;
 }
 
 // Documented in header file.
@@ -154,6 +160,7 @@ void elfChoiceDialog_setWidth(ElfChoiceDialog *elf, int width){
 	if(width <= 0)
 		ELF_DIE("Invallid choice number.");
 	elf->width = width;
+	elf->isValid = false;
 }
 
 /*

@@ -9,6 +9,8 @@
 #define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
 
 #define DEFAULT_WIDTH 70
+#define DEFAULT_SPACING 5
+#define DEFAULT_PADDING 2
 
 typedef struct _ElfChoiceDialog {
 	char *header;    // Header string. Should be optional
@@ -20,9 +22,12 @@ typedef struct _ElfChoiceDialog {
 	char *choiceZero;   // User can specify the choice 0 (usually "leave" or "cancel")
 
 	char *interface; // Stores the last built interface, in case user requests it multiple times.
-	int width;       // width, in characters, of the interface. Should be optional (but with a nice default value).
 	bool isValid;    // Checks if canvas exist and if it's valid.
 	                   // It becomes invallid if user changed the dialog since last printing.
+	
+	int width;       // width, in characters, of the interface. Optional with default.
+	int spacing;     // Distance to terminal's left side. Optional with default.
+	int sidePadding; // Distance between the content and the side borders. Optional with default.
 } ElfChoiceDialog;
 
 // Documented in header file.
@@ -39,8 +44,11 @@ ElfChoiceDialog *elfChoiceDialog_new(){
 	elf->choiceZero = NULL;
 
 	elf->interface = NULL;
-	elf->width = DEFAULT_WIDTH;
 	elf->isValid = false;
+	
+	elf->width = DEFAULT_WIDTH;
+	elf->spacing = DEFAULT_SPACING;
+	elf->sidePadding = DEFAULT_PADDING;
 
 	return elf;
 }
@@ -145,7 +153,9 @@ void elfChoiceDialog_printInternal(const ElfChoiceDialog *elf){
 	if(elf->choiceZero)
 		printf("Choice 0: %s\n", elf->choiceZero);
 
-	printf("Width: %d\n", elf->width);
+	printf("Width  : %d\n", elf->width);
+	printf("Spacing: %d\n", elf->spacing);
+	printf("Padding: %d\n", elf->sidePadding);
 }
 
 // Documented in header file.

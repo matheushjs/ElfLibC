@@ -27,24 +27,23 @@ void elfChoiceDialog_printInternal(const ElfChoiceDialog *elf);
 	The library tries to provide reasonable default values, which can be changed by the user, if desired.
 	The interface should look like this:
 
-   .-------------------------.
-   |      Header             |
-   |-------------------------|
-   |    Text:                |
-   |                         |
-   |  [1] -                  |
-   |  [2] -                  |
-   |  [3] -                  |
-   |  [4] -                  |
-   |  [5] -                  |
-   |  [6] -                  |
-   |  [7] -                  |
-   | [11] -                  |  - 11 is just for illustration of multi-digit
-   |-------------------------|
-   |  [0] - Exit             |
-   '-------------------------'
-
-   |-------- width ----------|
+            .------------------------------------------------------.
+            |               Header                                 |
+            |------------------------------------------------------|
+            |             Text:                                    |
+            |                                                      |
+            |           [1] -                                      |
+            |           [2] -                                      |
+            |           [3] -                                      |
+            |           [4] -                                      |
+            |           [5] -                                      |
+            |           [6] -                                      |
+            |           [7] -                                      |
+            |          [11] -                                      |  - 11 is just for illustration of multi-digit
+            |------------------------------------------------------|
+            |           [0] - Exit                                 |
+            '------------------------------------------------------'
+|-spacing--| |padding||------------- width --------------||padding|
 
 
 typedef ElfChoiceDialog;

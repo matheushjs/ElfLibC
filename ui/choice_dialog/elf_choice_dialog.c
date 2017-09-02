@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include <elf_canvas.h>
+#include <elf_string_buf.h>
 #include <elf_string.h> // Manipulation of non-utf8 strings
 
 #define ELF_DIE(X) fprintf(stdout, "%s:%s:%d - %s", __FILE__, __func__, __LINE__, X), exit(EXIT_FAILURE)
@@ -177,13 +178,139 @@ void elfChoiceDialog_setWidth(ElfChoiceDialog *elf, int width){
  * TODO
  */
 
+static
+char **fit_string_to_width(char *string, int width){
+	// Must return a NULL-terminated array of strings, each containing
+	//   a fragment of 'string' that doesn't exceed length 'width'.
+	
+	/* How it will work
+	 *
+	 * 1) We will have a 'while' loop that builds just single line
+	 * 2) Everything will work based on the concept of token
+	 * 
+	 * Steps:
+	 *
+	 * 1) Create new line
+	 * 2) Get next token
+	 * 3) If token fits in the line, add it
+	 * 4) If doesn't fit in the line:
+	 *  	4.1) If token is bigger than width, add as much of it in the current line
+	 *  	     and edit the current token to have only the characters that still
+	 *  	     need to be added
+	 *  	4.2) If the token is smaller than 'width', finish current line and pass
+	 *  	     current token fully to next iteration. Go to step 1.
+	 */
+
+	ElfStringBuf *line;
+	char **tokens, *token, **iter;
+	char **lines;
+	int lineCount, lineLen, tokenLen;
+	
+	// Array of tokens removed from 'string'
+	tokens = elfString_split_bag_utf8(string, " ");
+	
+	// Line being constructed
+	line = elfStringBuf_new();
+	lineLen = 0;   // Characters in line being built
+
+	// Prepare for using realloc.
+	lines = NULL;
+	lineCount = 0; // Number of lines
+
+	iter = tokens;
+	while(*iter != NULL){
+/*
+		lineLen = 0;
+
+		// Add first token to the current line
+		tokenLen = elfString_len_utf8(*iter);
+		if(tokenLen <= width){
+			elfStringBuf_appendString(line, *iter);
+			lineLen += tokenLen;
+			iter += 1;
+		}
+		
+		// Add as many tokens as possible to the current line
+		// Note that if first token isn't inserted, this one isn't either
+		while(*iter != NULL){
+			tokenLen = elfString_len_utf8(*iter);
+			if(tokenLen + 1 <= width){ // +1 because of whitespace
+				// if token + whitespace fits in the line, add them.
+				elfStringBuf_appendChar(line, ' ');
+				elfStringBuf_appendString(line, *iter);
+				lineLen += tokenLen + 1;
+				iter += 1;
+			} else break;
+		}
+
+		// Analyze last not-inserted token
+		if(*iter == NULL){
+			break;
+		} else {
+			tokenLen = elfString_len_utf8(*iter);
+			
+			if(tokenLen > width){
+				// If token doesn't fit in a single line
+				int usedChars = 0;
+				
+				// Check if current line can hold whitespace + at least 1 character
+				if(width - lineLen >= 2){
+					elfStringBuf_appendChar(line, ' ');
+					lineLen += 1;
+
+					while(lineLen != width){
+						elfStringBuf_appendChar(line, (*iter)[usedChars]);
+						lineLen += 1;
+						usedChars += 1;
+					}
+				}
+
+				// Add current line to lines
+				lineCount += 1;
+				lines = realloc(lines, sizeof(char *) * lineCount);
+				lines[lineCount - 1] = elfStringBuf_makeString(line, NULL); // This resets the StringBuf
+				lineLen = 0;
+
+				// Fill following lines
+				while( usedChars != tokenLen){
+
+					// Check if needs new line
+					if(lineLen == width){
+						lineCount += 1;
+						lines = realloc(lines, sizeof(char *) * lineCount);
+						lines[lineCount - 1] = elfStringBuf_makeString(line, NULL); // This resets the StringBuf
+						lineLen = 0;
+					}
+
+					elfStringBuf_appendChar(line, (*iter)[usedChars]);
+					usedChars += 1;
+					lineLen += 1;
+				}
+
+			} else {
+				// If token does fit in a single line, create another line
+				lineCount += 1;
+				lines = realloc(lines, sizeof(char *) * lineCount);
+				lines[lineCount - 1] = elfStringBuf_makeString(line, NULL); // This resets the StringBuf
+				lineLen = 0;
+
+			}
+		}
+*/
+
+	}
+
+	elfStringBuf_destroy(&line);
+	return NULL;
+}
+
 const
 char *elfChoiceDialog_getInterface(ElfChoiceDialog *elf){
-
+	return NULL;
 }
 
 void elfChoiceDialog_fprint(ElfChoiceDialog *elf, FILE *fp){
-
+	fprintf(fp, "%s", elfChoiceDialog_getInterface(elf));
 }
 
 void elfChoiceDialog_print(ElfChoiceDialog *elf){
@@ -192,4 +319,5 @@ void elfChoiceDialog_print(ElfChoiceDialog *elf){
 
 int elfChoiceDialog_prompt(ElfChoiceDialog *elf, const char *promptStr){
 	// Print interface to stdin and return the number typed.
+	return 0;
 }

@@ -28,9 +28,21 @@ char **test_split(const char *string, int width);
 
 	This library provides the structure ElfChoiceDialog, that you can use to build a simple interface with
 	  a certain amount of numbered choices, and the user has to choose one.
+
 	When the object is created, the interface is blank, with just a frame; the user of the structure can
 	  sequentially add choices, header, explanation text and so on.
+
 	The library tries to provide reasonable default values, which can be changed by the user, if desired.
+
+	The library works with UTF8 characters, but the user is expected to use only characters of same width.
+	Japanese characters, for example, may be wider in the terminal than regular latin1 characters, and using
+	  both of them in the same Dialog will mess up the interface.
+	Also, graphical characters such as newline or tabs are also forbidden. The Dialog will split big strings
+	  into multiple lines whenever needed, so don't use these graphical characters.
+
+	The dialog was designed to hold at most 99 choices. Trying to exceed this number will make the library
+	  terminate your program with an error.
+
 	The interface should look like this:
 
             .------------------------------------------------------.
@@ -71,6 +83,7 @@ void elfChoiceDialog_setText(ElfChoiceDialog *elf, const char *text);
 
 int elfChoiceDialog_addChoice(ElfChoiceDialog *elf, const char *text);
 	Adds choice 'text' to the interface.
+	Will exit the program if more than 99 choices are added.
 	Returns the number of the choice added.
 
 void elfChoiceDialog_removeChoice(ElfChoiceDialog *elf, int choiceNum);

@@ -31,6 +31,15 @@ typedef struct _ElfChoiceDialog {
 	int sidePadding; // Distance between the content and the side borders. Optional with default.
 } ElfChoiceDialog;
 
+/* File-local declarations along this source file*/
+typedef struct _TokenInfo TokenInfo;
+static void token_init(TokenInfo *tok, char **tokens);
+static void token_next(TokenInfo *tok);
+static bool token_empty(TokenInfo *tok);
+static char **fit_string_to_width(const char *string, int width, int *size_out);
+static void free_strings(char **strings);
+/* END */
+
 // Documented in header file.
 ElfChoiceDialog *elfChoiceDialog_new(){
 	ElfChoiceDialog *elf;
@@ -91,6 +100,8 @@ void elfChoiceDialog_setText(ElfChoiceDialog *elf, const char *text){
 int elfChoiceDialog_addChoice(ElfChoiceDialog *elf, const char *text){
 	// Can't be null
 	if(!text) return -1;
+	if(elf->choiceCount == 99)
+		ELF_DIE("Cannot have more than 99 choices.");
 
 	// Expand choice array
 	elf->choiceCount += 1;
@@ -107,7 +118,6 @@ void elfChoiceDialog_removeChoice(ElfChoiceDialog *elf, int choiceNum){
 
 	if(choiceNum <= 0 || choiceNum > elf->choiceCount)
 		ELF_DIE("Invallid choice number.");
-
 
 	// We want to erase choice (choiceNum - 1), since choices here start with index 1.
 	free(elf->choices[choiceNum - 1]);
@@ -169,7 +179,7 @@ void elfChoiceDialog_setChoiceZero(ElfChoiceDialog *elf, const char *text){
 // Documented in header file.
 void elfChoiceDialog_setWidth(ElfChoiceDialog *elf, int width){
 	if(width <= 9)
-		ELF_DIE("Invallid width. Must higher than 9.");
+		ELF_DIE("Invallid width. Must be higher than 9.");
 	elf->width = width;
 	elf->isValid = false;
 }
@@ -217,6 +227,10 @@ bool token_empty(TokenInfo *tok){
 	return (bool) (tok->len == -1);
 }
 
+// Splits 'string' nicely into multiple lines, in order to fit within width of 'width'.
+// UTF8 characters are taking into consideration.
+// If 'size_out' is not NULL, stores in it the number of lines retuned.
+// Returns a NULL-terminated array of strings containing the lines that 'string' was split into.
 static
 char **fit_string_to_width(const char *string, int width, int *size_out){
 	// Must return a NULL-terminated array of strings, each containing
@@ -389,7 +403,6 @@ char *elfChoiceDialog_getInterface(ElfChoiceDialog *elf){
 	// Draw edge points
 	elfCanvas_drawChar(canvas, elf->spacing , 0, ".");
 	elfCanvas_drawChar(canvas, canvasWidth-1, 0, ".");
-	
 	elfCanvas_drawChar(canvas, elf->spacing , canvasHeight-1, "'");
 	elfCanvas_drawChar(canvas, canvasWidth-1, canvasHeight-1, "'");
 
@@ -397,6 +410,8 @@ char *elfChoiceDialog_getInterface(ElfChoiceDialog *elf){
 	// TODO: Remove
 	elfCanvas_print(canvas);
 
+	// TODO: String returned must end with a newline
+	// TODO: String must be stored within the ElfChoiceDialog structure
 
 	elfCanvas_destroy(&canvas);
 	

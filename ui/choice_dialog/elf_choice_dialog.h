@@ -18,6 +18,10 @@ void elfChoiceDialog_setWidth(ElfChoiceDialog *elf, int width);
 
 void elfChoiceDialog_printInternal(const ElfChoiceDialog *elf);
 
+// TODO: Remove this
+char **test_split(const char *string, int width);
+
+
 /* DOCUMENTATION
 
 	This library provides the structure ElfChoiceDialog, that you can use to build a simple interface with

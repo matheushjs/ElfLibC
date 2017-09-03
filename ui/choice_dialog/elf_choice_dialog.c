@@ -178,130 +178,140 @@ void elfChoiceDialog_setWidth(ElfChoiceDialog *elf, int width){
  * TODO
  */
 
+// Structure for handling an array of strings, where each string is a single token (a word).
+typedef struct _TokenInfo {
+	char *iter;
+	int len;
+
+	char **tokens;
+	int curToken;
+} TokenInfo;
+
+// Initializes the structure for handling the array 'tokens'.
 static
-char **fit_string_to_width(char *string, int width){
+void token_init(TokenInfo *tok, char **tokens){
+	tok->tokens = tokens;
+	tok->curToken = 0;
+
+	tok->iter = tok->tokens[tok->curToken];
+	if(tok->iter != NULL)
+		tok->len = elfString_len_utf8(tok->iter);
+	else
+		tok->len = -1;
+}
+
+// Advances to the next token in the array
+static
+void token_next(TokenInfo *tok){
+	tok->curToken += 1;
+	tok->iter = tok->tokens[tok->curToken];
+	if(tok->iter != NULL)
+		tok->len = elfString_len_utf8(tok->iter);
+	else
+		tok->len = -1;
+}
+
+// Returns 'true' if there are no more tokens
+static
+bool token_empty(TokenInfo *tok){
+	return (bool) (tok->len == -1);
+}
+
+static
+char **fit_string_to_width(const char *string, int width){
 	// Must return a NULL-terminated array of strings, each containing
 	//   a fragment of 'string' that doesn't exceed length 'width'.
 	
-	/* How it will work
-	 *
-	 * 1) We will have a 'while' loop that builds just single line
-	 * 2) Everything will work based on the concept of token
-	 * 
-	 * Steps:
-	 *
-	 * 1) Create new line
-	 * 2) Get next token
-	 * 3) If token fits in the line, add it
-	 * 4) If doesn't fit in the line:
-	 *  	4.1) If token is bigger than width, add as much of it in the current line
-	 *  	     and edit the current token to have only the characters that still
-	 *  	     need to be added
-	 *  	4.2) If the token is smaller than 'width', finish current line and pass
-	 *  	     current token fully to next iteration. Go to step 1.
-	 */
-
-	ElfStringBuf *line;
-	char **tokens, *token, **iter;
+	TokenInfo token;
 	char **lines;
-	int lineCount, lineLen, tokenLen;
-	
-	// Array of tokens removed from 'string'
-	tokens = elfString_split_bag_utf8(string, " ");
-	
-	// Line being constructed
-	line = elfStringBuf_new();
-	lineLen = 0;   // Characters in line being built
+	int lineLen, lineCount;
+	ElfStringBuf *line;
+
+	// Get tokens and initialize TokenInfo
+	token_init(&token, elfString_split_bag_utf8(string, " "));
 
 	// Prepare for using realloc.
 	lines = NULL;
 	lineCount = 0; // Number of lines
+	
+	// Line being constructed
+	line = elfStringBuf_new();
 
-	iter = tokens;
-	while(*iter != NULL){
-/*
-		lineLen = 0;
+	while(!token_empty(&token)){
+
+		// Will break the loop once the NULL token is reached
+		lineLen = 0;   // Characters in line being built
 
 		// Add first token to the current line
-		tokenLen = elfString_len_utf8(*iter);
-		if(tokenLen <= width){
-			elfStringBuf_appendString(line, *iter);
-			lineLen += tokenLen;
-			iter += 1;
+		if(token.len <= width){
+			elfStringBuf_appendString(line, token.iter);
+			lineLen += token.len;
+			
+			// Get next token
+			token_next(&token);
 		}
-		
-		// Add as many tokens as possible to the current line
-		// Note that if first token isn't inserted, this one isn't either
-		while(*iter != NULL){
-			tokenLen = elfString_len_utf8(*iter);
-			if(tokenLen + 1 <= width){ // +1 because of whitespace
-				// if token + whitespace fits in the line, add them.
+
+		// Add as many tokens as possible to current line
+		while(!token_empty(&token)){
+			if(lineLen + token.len + 1 <= width){ // +1 because of whitespace
 				elfStringBuf_appendChar(line, ' ');
-				elfStringBuf_appendString(line, *iter);
-				lineLen += tokenLen + 1;
-				iter += 1;
+				elfStringBuf_appendString(line, token.iter);
+				lineLen += token.len + 1;
+				token_next(&token);
 			} else break;
 		}
 
-		// Analyze last not-inserted token
-		if(*iter == NULL){
-			break;
-		} else {
-			tokenLen = elfString_len_utf8(*iter);
-			
-			if(tokenLen > width){
-				// If token doesn't fit in a single line
-				int usedChars = 0;
-				
-				// Check if current line can hold whitespace + at least 1 character
-				if(width - lineLen >= 2){
-					elfStringBuf_appendChar(line, ' ');
-					lineLen += 1;
+		// Analyze last inserted token
+		if(token_empty(&token)){
+			// Do nothing
+		} else if(width - lineLen <= 1){
+			// Do nothing, because only a whitespace fits in current line
+		} else if(token.len > width) {
+			// If token not inserted does not fit in a single line
+			// We add as many characters as possible to current line
 
-					while(lineLen != width){
-						elfStringBuf_appendChar(line, (*iter)[usedChars]);
-						lineLen += 1;
-						usedChars += 1;
-					}
-				}
-
-				// Add current line to lines
-				lineCount += 1;
-				lines = realloc(lines, sizeof(char *) * lineCount);
-				lines[lineCount - 1] = elfStringBuf_makeString(line, NULL); // This resets the StringBuf
-				lineLen = 0;
-
-				// Fill following lines
-				while( usedChars != tokenLen){
-
-					// Check if needs new line
-					if(lineLen == width){
-						lineCount += 1;
-						lines = realloc(lines, sizeof(char *) * lineCount);
-						lines[lineCount - 1] = elfStringBuf_makeString(line, NULL); // This resets the StringBuf
-						lineLen = 0;
-					}
-
-					elfStringBuf_appendChar(line, (*iter)[usedChars]);
-					usedChars += 1;
-					lineLen += 1;
-				}
-
-			} else {
-				// If token does fit in a single line, create another line
-				lineCount += 1;
-				lines = realloc(lines, sizeof(char *) * lineCount);
-				lines[lineCount - 1] = elfStringBuf_makeString(line, NULL); // This resets the StringBuf
-				lineLen = 0;
-
+			// Add whitespace only if line is not empty
+			if(lineLen != 0){
+				elfStringBuf_appendChar(line, ' ');
+				lineLen += 1;
 			}
-		}
-*/
 
+			// Add characters
+			while(lineLen != width){
+				elfStringBuf_appendChar(line, *token.iter);
+				lineLen += 1;
+				token.iter++;
+				token.len--;
+			}
+			// Leave the shortened token for the next while-iteration
+		} else {
+			// If token does fit in a line, we just leave it for the next while iteration
+		}
+
+		// Conclude creation of current line
+		lineCount += 1;
+		lines = realloc(lines, sizeof(char *) * lineCount);
+		lines[lineCount - 1] = elfStringBuf_makeString(line, NULL); // This resets the buffer
+		
 	}
 
+	// Free tokens
+	int i;
+	for(i = 0; token.tokens[i] != NULL; i++)
+		free(token.tokens[i]);
+	free(token.tokens);
+
+	// Add terminating NULL line
+	lines = realloc(lines, sizeof(char *) * (lineCount + 1));
+	lines[lineCount] = NULL;
+
 	elfStringBuf_destroy(&line);
-	return NULL;
+	return lines;
+}
+
+// TODO: Remove this
+char **test_split(const char *string, int width){
+	return fit_string_to_width(string, width);
 }
 
 const

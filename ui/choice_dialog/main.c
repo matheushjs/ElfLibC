@@ -1,6 +1,25 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <elf_choice_dialog.h>
+
+// Prints a NULL_terminated array of strings
+static
+void print_strings(const char **strings){
+	int i;
+	for(i = 0; strings[i] != NULL; i++)
+		printf("{%s}\n", strings[i]);
+	printf("\n");
+}
+
+// Frees a NULL_terminated array of strings
+static
+void free_strings(char **strings){
+	int i;
+	for(i = 0; strings[i] != NULL; i++)
+		free(strings[i]);
+	free(strings);
+}
 
 void test1(){
 	ElfChoiceDialog *elf = elfChoiceDialog_new();
@@ -46,8 +65,66 @@ void test1(){
 	elfChoiceDialog_destroy(&elf);
 }
 
+void test2(){
+	char *s;
+	char **res;
+	int w;
+
+	printf("\n\n===== String Splitting =====\n");
+
+	s = "string for testing the string splitting algorithm";
+	w = 70;
+	printf("Testing on string: {%s}\n", s);
+	res = test_split(s, w);
+	print_strings((const char **) res);
+	free_strings(res);
+
+	s = "string for testing the string splitting algorithm";
+	w = 30;
+	printf("Testing on string: {%s}\n", s);
+	res = test_split(s, w);
+	print_strings((const char **) res);
+	free_strings(res);
+
+	s = "string for testing the string splitting algorithm";
+	w = 10;
+	printf("Testing on string: {%s}\n", s);
+	res = test_split(s, w);
+	print_strings((const char **) res);
+	free_strings(res);
+
+	s = "string for testing the string splitting algorithm";
+	w = 5;
+	printf("Testing on string: {%s}\n", s);
+	res = test_split(s, w);
+	print_strings((const char **) res);
+	free_strings(res);
+
+	s = "pneumoultramicroscopicossilicovulcanoconiose";
+	w = 5;
+	printf("Testing on string: {%s}\n", s);
+	res = test_split(s, w);
+	print_strings((const char **) res);
+	free_strings(res);
+
+	s = "";
+	w = 5;
+	printf("Testing on string: {%s}\n", s);
+	res = test_split(s, w);
+	print_strings((const char **) res);
+	free_strings(res);
+
+	s = "a   b   c   d   e   f  g";
+	w = 5;
+	printf("Testing on string: {%s}\n", s);
+	res = test_split(s, w);
+	print_strings((const char **) res);
+	free_strings(res);
+}
+
 int main(int argc, char *argv[]){
 	test1();
+	test2();
 
 	return 0;
 }

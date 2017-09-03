@@ -16,6 +16,8 @@ void elfChoiceDialog_setChoiceZero(ElfChoiceDialog *elf, const char *text);
 
 void elfChoiceDialog_setWidth(ElfChoiceDialog *elf, int width);
 
+const char *elfChoiceDialog_getInterface(ElfChoiceDialog *elf);
+
 void elfChoiceDialog_printInternal(const ElfChoiceDialog *elf);
 
 // TODO: Remove this
@@ -32,9 +34,9 @@ char **test_split(const char *string, int width);
 	The interface should look like this:
 
             .------------------------------------------------------.
-            |               Header                                 |
+            |                       Header                         |
             |------------------------------------------------------|
-            |             Text:                                    |
+            |           Text                                       |
             |                                                      |
             |           [1] -                                      |
             |           [2] -                                      |
@@ -92,6 +94,15 @@ void elfChoiceDialog_setWidth(ElfChoiceDialog *elf, int width);
 	Sets the width of the ChoiceDialog.
 	The width is the number of characters between the Dialog's side frames, as illustrated
 	  on the top of this documentation.
+	Must be a number higher than 9. 8 letters are reserved for writing the choices, and 1 letter is
+	  reserved for the leading whitespace before writing the choice itself.
+
+const char *elfChoiceDialog_getInterface(ElfChoiceDialog *elf);
+	Returns a string that represents the whole Dialog text.
+	Printing the returned string to the terminal should present the dialog to the user.
+	The dialog ends with a newline character.
+	The dialog is re-built only when needed, which is when the dialog is invallidated by a change made
+	  by any (most of them) function call.
 */
 
 #endif

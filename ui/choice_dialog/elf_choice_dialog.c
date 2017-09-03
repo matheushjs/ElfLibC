@@ -168,8 +168,8 @@ void elfChoiceDialog_setChoiceZero(ElfChoiceDialog *elf, const char *text){
 
 // Documented in header file.
 void elfChoiceDialog_setWidth(ElfChoiceDialog *elf, int width){
-	if(width <= 0)
-		ELF_DIE("Invallid choice number.");
+	if(width <= 9)
+		ELF_DIE("Invallid width. Must higher than 9.");
 	elf->width = width;
 	elf->isValid = false;
 }
@@ -218,7 +218,7 @@ bool token_empty(TokenInfo *tok){
 }
 
 static
-char **fit_string_to_width(const char *string, int width){
+char **fit_string_to_width(const char *string, int width, int *size_out){
 	// Must return a NULL-terminated array of strings, each containing
 	//   a fragment of 'string' that doesn't exceed length 'width'.
 	
@@ -305,17 +305,109 @@ char **fit_string_to_width(const char *string, int width){
 	lines = realloc(lines, sizeof(char *) * (lineCount + 1));
 	lines[lineCount] = NULL;
 
+	if(size_out)
+		*size_out = lineCount;
+
 	elfStringBuf_destroy(&line);
 	return lines;
 }
 
 // TODO: Remove this
 char **test_split(const char *string, int width){
-	return fit_string_to_width(string, width);
+	return fit_string_to_width(string, width, NULL);
+}
+
+// Frees a NULL-terminated array of strings
+static
+void free_strings(char **strings){
+	int i;
+	for(i = 0; strings[i] != NULL; i++)
+		free(strings[i]);
+	free(strings);
 }
 
 const
 char *elfChoiceDialog_getInterface(ElfChoiceDialog *elf){
+	// Structure that holds an array of strings, which consist of lines that should be
+	//   placed vertically.
+	typedef struct _VerticalText {
+		char **lines;
+		int nLines;
+	} VerticalText;
+
+	VerticalText header;
+	VerticalText text;
+	VerticalText *choices;
+	VerticalText choiceZero;
+	int i, n;
+	
+	// Split header, text and choiceZero
+	header.lines     = fit_string_to_width(elf->header,     elf->width, &header.nLines);
+	text.lines       = fit_string_to_width(elf->text,       elf->width, &text.nLines);
+	choiceZero.lines = fit_string_to_width(elf->choiceZero, elf->width, &choiceZero.nLines);
+	
+	// Split all the choices
+	choices = malloc(sizeof(VerticalText) * elf->choiceCount);
+	int choiceWidth = elf->width - 8;
+	for(i = 0, n = elf->choiceCount; i < n; i++){
+		choices[i].lines = fit_string_to_width(elf->choices[i], choiceWidth, &choices[i].nLines);
+	}
+
+	// Calculate canvas height
+	int canvasHeight = 1 + header.nLines + 1 + text.nLines + 1;
+	for(i = 0, n = elf->choiceCount; i < n; i++)
+		canvasHeight += choices[i].nLines;
+	canvasHeight += 1 + choiceZero.nLines + 1;
+
+	// Calculate canvas width
+	int canvasWidth;
+	canvasWidth = elf->spacing + 1 + elf->sidePadding + elf->width + elf->sidePadding + 1;
+	
+	// Create canvas
+	ElfCanvas *canvas = elfCanvas_new(canvasWidth, canvasHeight);
+
+	// Draw top and bottom frames
+	elfCanvas_fillRow_span(canvas, elf->spacing, canvasWidth-1, 0, "-");
+	elfCanvas_fillRow_span(canvas, elf->spacing, canvasWidth-1, canvasHeight-1, "-");
+
+	// Draw frame below header
+	int headerFrameHeight = 1 + header.nLines + 1 - 1; // -1 cuz of 0-indexing
+	elfCanvas_fillRow_span(canvas, elf->spacing, canvasWidth-1, headerFrameHeight, "-");
+
+	// Draw frame above choiceZero
+	int choiceZeroFrameHeight = headerFrameHeight;
+	choiceZeroFrameHeight += text.nLines + 1;
+	for(i = 0, n = elf->choiceCount; i < n; i++)
+		choiceZeroFrameHeight += choices[i].nLines;
+	choiceZeroFrameHeight += 1; // Doesn't need -1 because headerFrameHeight already consider it.
+	elfCanvas_fillRow_span(canvas, elf->spacing, canvasWidth-1, choiceZeroFrameHeight, "-");
+
+	// Draw left and right frames
+	elfCanvas_fillCol_span(canvas, 0, canvasHeight-1, elf->spacing, "|");
+	elfCanvas_fillCol_span(canvas, 0, canvasHeight-1, canvasWidth-1, "|");
+
+	// Draw edge points
+	elfCanvas_drawChar(canvas, elf->spacing , 0, ".");
+	elfCanvas_drawChar(canvas, canvasWidth-1, 0, ".");
+	
+	elfCanvas_drawChar(canvas, elf->spacing , canvasHeight-1, "'");
+	elfCanvas_drawChar(canvas, canvasWidth-1, canvasHeight-1, "'");
+
+
+	// TODO: Remove
+	elfCanvas_print(canvas);
+
+
+	elfCanvas_destroy(&canvas);
+	
+	// Free all splitted lines
+	free_strings(header.lines);
+	free_strings(text.lines);
+	free_strings(choiceZero.lines);
+	for(i = 0, n = elf->choiceCount; i < n; i++)
+		free_strings(choices[i].lines);
+	free(choices);
+
 	return NULL;
 }
 

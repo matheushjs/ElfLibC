@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include <elf_string_buf.h>
 #include <elf_utf_buf.h>
 #include <elf_encodings.h>
 
@@ -162,3 +163,22 @@ void elfCanvas_fillCol(ElfCanvas *elf, int w, const char *c){
 	elfCanvas_fillCol_span(elf, 0, elf->h-1, w, c);
 }
 
+// Documented in header file.
+char *elfCanvas_buildString(ElfCanvas *elf){
+	ElfStringBuf *buf;
+	int i, n;
+
+	buf = elfStringBuf_new();
+
+	// Append each line in the canvas to the string buffer, delimited by newlines
+	for(i = 0, n = elf->h; i < n; i++){
+		const char *toAppend = elfUtfBuf_getString(elf->canvas[i]);
+		elfStringBuf_appendString(buf, toAppend);
+		elfStringBuf_appendChar(buf, '\n');
+	}
+
+	char *retval = elfStringBuf_makeString(buf, NULL);
+	elfStringBuf_destroy(&buf);
+	
+	return retval;
+}

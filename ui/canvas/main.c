@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <elf_canvas.h>
 
 void test1(){
@@ -21,11 +22,30 @@ void test1(){
 	elfCanvas_fillCol(elf, 9, "é");
 
 	elfCanvas_fprint(elf, stdout);
+
+	char *string = elfCanvas_buildString(elf);
+	printf("=======\n%s=======\n", string);
+	free(string);
+
+	elfCanvas_destroy(&elf);
+}
+
+void test2(){
+	ElfCanvas *elf;
+
+	elf = elfCanvas_new(1, 1);
+	
+	char *string;
+	string = elfCanvas_buildString(elf);
+
+	printf("{%s}\n", string);
+	free(string);
+
 	elfCanvas_destroy(&elf);
 }
 
 int main(int argc, char *argv[]){
 	test1();
-	
+	test2();
 	return 0;
 }

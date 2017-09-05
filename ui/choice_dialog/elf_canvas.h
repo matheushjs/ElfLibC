@@ -24,6 +24,8 @@ void elfCanvas_fillRow(ElfCanvas *elf, int h, const char *c);
 void elfCanvas_fillCol_span(ElfCanvas *elf, int h1, int h2, int w, const char *c);
 void elfCanvas_fillCol(ElfCanvas *elf, int w, const char *c);
 
+char *elfCanvas_buildString(ElfCanvas *elf);
+
 /* DOCUMENTATION
 
 typedef ElfCanvas;
@@ -76,6 +78,9 @@ void elfCanvas_fillCol_span(ElfCanvas *elf, int h1, int h2, int w, const char *c
 
 void elfCanvas_fillCol(ElfCanvas *elf, int w, const char *c);
 	Fills the whole column 'w' with UTF character 'c'.
+
+char *elfCanvas_buildString(ElfCanvas *elf);
+	Returns the canvas as a string. Rows of the canvas are separated by newline characters.
 */
 
 #endif

@@ -123,8 +123,9 @@ void test2(){
 }
 
 void test3(){
+	const char *str;
 	ElfChoiceDialog *elf = elfChoiceDialog_new();
-	
+
 	printf("\n\n===== Canvas Building =====\n");
 
 	elfChoiceDialog_setHeader(elf, "Hello World!");
@@ -133,7 +134,11 @@ void test3(){
 	elfChoiceDialog_addChoice(elf, "Choice Number 2");
 	elfChoiceDialog_setChoiceZero(elf, "Choice Zero!!");
 
-	elfChoiceDialog_getInterface(elf);
+	str = elfChoiceDialog_getInterface(elf);
+	printf("%p\n%s\n", str, str);
+
+	str = elfChoiceDialog_getInterface(elf);
+	printf("%p\n%s\n", str, str);
 
 	elfChoiceDialog_destroy(&elf);
 }

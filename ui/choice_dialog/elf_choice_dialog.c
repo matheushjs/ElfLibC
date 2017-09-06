@@ -342,6 +342,9 @@ void free_strings(char **strings){
 
 const
 char *elfChoiceDialog_getInterface(ElfChoiceDialog *elf){
+	if(elf->isValid)
+		return (const char *) elf->interface;
+
 	// Structure that holds an array of strings, which consist of lines that should be
 	//   placed vertically.
 	typedef struct _VerticalText {
@@ -406,14 +409,13 @@ char *elfChoiceDialog_getInterface(ElfChoiceDialog *elf){
 	elfCanvas_drawChar(canvas, elf->spacing , canvasHeight-1, "'");
 	elfCanvas_drawChar(canvas, canvasWidth-1, canvasHeight-1, "'");
 
-
-	// TODO: Remove
-	elfCanvas_print(canvas);
-
-	// TODO: String returned must end with a newline
-	// TODO: String must be stored within the ElfChoiceDialog structure
-
+	char *retval = (char *) elfCanvas_buildString(canvas);
 	elfCanvas_destroy(&canvas);
+
+	if(elf->interface)
+		free(elf->interface);
+	elf->interface = retval;
+	elf->isValid = true;
 	
 	// Free all splitted lines
 	free_strings(header.lines);
@@ -423,7 +425,7 @@ char *elfChoiceDialog_getInterface(ElfChoiceDialog *elf){
 		free_strings(choices[i].lines);
 	free(choices);
 
-	return NULL;
+	return (const char *) elf->interface;
 }
 
 void elfChoiceDialog_fprint(ElfChoiceDialog *elf, FILE *fp){

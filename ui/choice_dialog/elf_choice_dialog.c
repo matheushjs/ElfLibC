@@ -342,6 +342,36 @@ void free_strings(char **strings){
 	free(strings);
 }
 
+
+/* TODO: Implement this
+ *
+ * Some clarifications on building the dialog
+ * The dialog will be built using 4 ElfCanvas: Header, TextBox, MiddleBox and ZeroBox
+ *
+ * The header will be built as something like this:
+ * 
+     |                                                      |
+     |                       Header                         |
+     |                                                      |
+ *
+ * The TextBox:
+ *
+     |           Text                                       |
+ *
+ * The MiddleBox:
+ *
+     |           [1] -                                      |
+     |           [2] -                                      |
+     |           [3] -                                      |
+     |           [4] -                                      |
+ *
+ * The ZeroBox:
+ *
+     |           [0] - Exit                                 |
+ *
+ * And then each canvas will be glued one to the other, delimiting them with frames
+ */
+
 const
 char *elfChoiceDialog_getInterface(ElfChoiceDialog *elf){
 	if(elf->isValid)
@@ -362,8 +392,8 @@ char *elfChoiceDialog_getInterface(ElfChoiceDialog *elf){
 	
 	// Split header, text and choiceZero
 	header.lines     = fit_string_to_width(elf->header,     elf->width, &header.nLines);
-	text.lines       = fit_string_to_width(elf->text,       elf->width, &text.nLines);
-	choiceZero.lines = fit_string_to_width(elf->choiceZero, elf->width, &choiceZero.nLines);
+	text.lines       = fit_string_to_width(elf->text,       elf->width - 8, &text.nLines);
+	choiceZero.lines = fit_string_to_width(elf->choiceZero, elf->width - 8, &choiceZero.nLines);
 	
 	// Split all the choices
 	choices = malloc(sizeof(VerticalText) * elf->choiceCount);

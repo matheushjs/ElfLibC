@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <elf_string.h>
 #include <elf_choice_dialog.h>
 
 // Prints a NULL_terminated array of strings
@@ -143,10 +144,43 @@ void test3(){
 	elfChoiceDialog_destroy(&elf);
 }
 
+void addStuff(ElfChoiceDialog *elf){
+	elfChoiceDialog_setHeader(elf, "This is my dialog's cute big header that I want properly split in multiple lines");
+	elfChoiceDialog_setText(elf, "This is my dialog's cute big text that I also want properly split in multiple lines");
+	elfChoiceDialog_setChoiceZero(elf, "This is my dialog's cute choice zero, which, duh, I also want it properly split in multiple lines");
+
+	int i;
+	for(i = 0; i < 10; i++){
+		char *str = elfString_format("This is my dialog's %d-th choice, which is big because I want to check if it is properly split in multiple lines", i+1);
+		elfChoiceDialog_addChoice(elf, str);
+		free(str);
+	}
+}
+
+void test4(){
+	ElfChoiceDialog *elf = elfChoiceDialog_new();
+
+	addStuff(elf);
+
+	printf("%s\n", elfChoiceDialog_getInterface(elf));
+	
+	elfChoiceDialog_setWidth(elf, 20);
+	printf("%s\n", elfChoiceDialog_getInterface(elf));
+
+	elfChoiceDialog_setWidth(elf, 30);
+	printf("%s\n", elfChoiceDialog_getInterface(elf));
+
+	elfChoiceDialog_setWidth(elf, 100);
+	printf("%s\n", elfChoiceDialog_getInterface(elf));
+
+	elfChoiceDialog_destroy(&elf);
+}
+
 int main(int argc, char *argv[]){
 	test1();
 	test2();
 	test3();
+	test4();
 
 	return 0;
 }

@@ -186,6 +186,8 @@ void elfChoiceDialog_setWidth(ElfChoiceDialog *elf, int width){
 
 /*
  * TODO
+ * 
+ * TODO: Separate Header, choiceZero and middleBoard in 3 different canvas
  */
 
 // Structure for handling an array of strings, where each string is a single token (a word).
@@ -356,7 +358,7 @@ char *elfChoiceDialog_getInterface(ElfChoiceDialog *elf){
 	VerticalText text;
 	VerticalText *choices;
 	VerticalText choiceZero;
-	int i, n;
+	int i, j, n;
 	
 	// Split header, text and choiceZero
 	header.lines     = fit_string_to_width(elf->header,     elf->width, &header.nLines);
@@ -408,6 +410,55 @@ char *elfChoiceDialog_getInterface(ElfChoiceDialog *elf){
 	elfCanvas_drawChar(canvas, canvasWidth-1, 0, ".");
 	elfCanvas_drawChar(canvas, elf->spacing , canvasHeight-1, "'");
 	elfCanvas_drawChar(canvas, canvasWidth-1, canvasHeight-1, "'");
+
+	// Draw header text
+	int h0 = 1; //first row to write
+	int w0 = elf->spacing + 1 + elf->sidePadding;
+	for(i = 0; i < header.nLines; i++){
+		elfCanvas_drawText(canvas, w0, h0 + i, header.lines[i]);
+	}
+	
+	// Draw secondary text
+	h0 = 1 + header.nLines + 1; //first row to write
+	w0 = w0; // Keep old value
+	for(i = 0; i < text.nLines; i++){
+		elfCanvas_drawText(canvas, w0, h0 + i, text.lines[i]);
+	}
+
+	// Draw options
+	h0 = 1 + header.nLines + 1 + text.nLines + 1;
+	w0 = w0; // Keep old value
+	int w1 = w0 + 8; // Width for each option's text
+	int nDigits = 1; // keep track of number of digits
+	for(i = 0; i < elf->choiceCount; i++){
+		// For each choice
+
+		// Increment digit count if needed
+		if( (i+1)%10 == 0 ) nDigits++;
+
+		// Make choice number string
+		char choiceStr[10];
+		sprintf(choiceStr, "[%d] - ", i+1);
+
+		// Write choice number string
+		elfCanvas_drawText(canvas, w0 + 3 - nDigits, h0, choiceStr);
+
+		// Write choice lines
+		for(j = 0; j < choices[i].nLines; j++){
+			elfCanvas_drawText(canvas, w1, h0 + j, choices[i].lines[j]);
+		}
+
+		// Increment height
+		h0 += choices[i].nLines;
+	}
+
+	// Draw choice zero
+	h0 += 1; // Keep old value and jump the frame
+	w0 = w0; // keep old
+	w1 = w1; // keep old
+	elfCanvas_drawText(canvas, w0, h0, "  [0] - ");
+	for(i = 0; i < choiceZero.nLines; i++)
+		elfCanvas_drawText(canvas, w1, h0 + i, choiceZero.lines[i]);
 
 	char *retval = (char *) elfCanvas_buildString(canvas);
 	elfCanvas_destroy(&canvas);

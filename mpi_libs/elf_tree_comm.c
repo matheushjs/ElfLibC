@@ -30,7 +30,7 @@ void ElfTreeComm_scatter(void *buf, int sendCount, MPI_Datatype type, MPI_Comm c
 			if(farDest > commSize) farDest = commSize;
 
 			int dataCount = (farDest - dest) * sendCount;
-			MPI_Send(buf + control * sendCount * typeSize, dataCount, type, dest, 0, comm);
+			MPI_Send( ((char*) buf) + control * sendCount * typeSize, dataCount, type, dest, 0, comm);
 		} else {
 			// Receive
 			int src = myRank - control;
@@ -72,7 +72,7 @@ void ElfTreeComm_gather(void *buf, int sendCount, MPI_Datatype type, MPI_Comm co
 			if(farDest > commSize) farDest = commSize;
 
 			int dataCount = (farDest - src) * sendCount;
-			MPI_Recv(buf + control * sendCount * typeSize, dataCount, type, src, 0, comm, MPI_STATUS_IGNORE);
+			MPI_Recv( ((char*) buf) + control * sendCount * typeSize, dataCount, type, src, 0, comm, MPI_STATUS_IGNORE);
 		} else {
 			// Send
 			int dest = myRank - control;

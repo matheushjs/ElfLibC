@@ -5,7 +5,7 @@ cfiles="$(find -name "*.c" -type f) $(find -name "*.h" -type f)"
 echo "/*" > LICENSE.new
 while IFS='' read -r line || [[ -n "$line" ]]; do
     echo " * $line"
-done < LICENSE >> LICENSE.new
+done < LICENSE.txt >> LICENSE.new
 echo " */" >> LICENSE.new
 
 # Add to files
@@ -22,7 +22,7 @@ makefiles="$(find -name "Makefile" -type f)";
 rm LICENSE.new
 while IFS='' read -r line || [[ -n "$line" ]]; do
     echo "# $line"
-done < LICENSE >> LICENSE.new
+done < LICENSE.txt >> LICENSE.new
 
 for i in $makefiles; do
 	cat LICENSE.new $i > $i.new;
